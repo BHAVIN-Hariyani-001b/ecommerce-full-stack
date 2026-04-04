@@ -1,11 +1,18 @@
-// import { Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Header from "../components/layout/Header";
+import Fotter from "../components/layout/Footer";
+import ProductImage from "../components/product/HeroBanner";
+
 const Home = () => {
   return (
     <div>
-        <Navbar />
+      <Header />
+      <main>
+        {/* <ProductImage /> */}
+        
+      </main>
+      <Fotter />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
