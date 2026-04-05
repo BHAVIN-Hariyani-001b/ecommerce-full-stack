@@ -3,5 +3,6 @@
 
 .scrollbar-none{
     scrollbar-width: none;
+    scroll-behavior: smooth;
 }
 
