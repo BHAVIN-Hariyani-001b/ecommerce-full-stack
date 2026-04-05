@@ -6,9 +6,15 @@ import ElectronicsCard from "../cards/ElectronicsCard";
 import BeautyCard from "../cards/BeautyCard";
 import MobileCard from "../cards/MobileCard";
 import HomeCard from "../cards/HomeCard";
+// import { useSelector, useDispatch } from "react-redux";
+// import { setCategory } from "../../features/category/categotySlice";
 
 const Navbar = () => {
   // this is get data from in db use of api
+
+  // const active = useSelector((state) => state.active);
+  // const dispatch = useDispatch();
+
   const category = [
     { id: 1, name: "All" },
     { id: 2, name: "FashionCard" },
@@ -29,15 +35,25 @@ const Navbar = () => {
     HomeCard: <HomeCard />,
   };
 
+  const handleCategory = () => {
+    // dispatch(setCategory(category.name));
+  };
+
   return (
-    <div className="py-5 bg-blue-50">
+    <div className="py-2 flex justify-center items-center">
       <PageWapper>
-        <div className="flex justify-center items-center space-x-10">
-          {category.map((category) => (
-            <button key={category.id} className="cursor-pointer">
-              {category.name}
-            </button>
-          ))}
+        <div className="w-screen">
+          <div className="flex gap-4 overflow-auto scrollbar-none">
+            {category.map((category) => (
+              <button
+                key={category.id}
+                onClick={handleCategory}
+                className="cursor-pointer bg-blue-700 text-white px-4 py-2 rounded-4xl"
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
         </div>
       </PageWapper>
     </div>

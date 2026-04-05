@@ -8,7 +8,6 @@ const Home = () => {
       <Header />
       <main>
         {/* <ProductImage /> */}
-        
       </main>
       <Fotter />
     </div>
