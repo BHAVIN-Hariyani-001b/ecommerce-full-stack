@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
-
-.scrollbar-none{
+.scrollbar-none {
     scrollbar-width: none;
     scroll-behavior: smooth;
 }
-
