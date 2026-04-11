@@ -1,22 +1,27 @@
 from flask import Flask
-from app.routes.auth_routes import auth_dp
-from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from app.routes.auth_routes import auth_dp
+from app.routes.product_routes import product_bp
+from flask_cors import CORS
+# from app import config
+from app.db import db
 import os
 
 load_dotenv()
 
-db = SQLAlchemy()
-
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     # configure the database URI
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATA_URL", None)
+
+    # app.config.from_object(config)
+    app.secret_key = os.getenv("SECRET_KEY")
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATA_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.secret_key = os.getenv("SECRET_KEY", None)
 
     # register blueprints
-    app.register_blueprint(auth_dp)
+    app.register_blueprint(auth_dp,url_prefix='/api')
+    app.register_blueprint(product_bp,url_prefix='/api')
     # initialize the database
     db.init_app(app)
 
