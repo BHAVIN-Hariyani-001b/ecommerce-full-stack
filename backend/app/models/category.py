@@ -1,5 +1,6 @@
 from app.db import db
 
+
 class Category(db.Model):
     __tablename__ = 'category' 
     id = db.Column(db.Integer,primary_key=True)

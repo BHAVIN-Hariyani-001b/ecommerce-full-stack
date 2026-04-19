@@ -1,4 +1,4 @@
-from flask import Blueprint,jsonify,request
+from flask import Blueprint,jsonify,request,Response
 from app.models.product import Product
 from app.models.category import Category
 from app.db import db
@@ -7,7 +7,8 @@ from sqlalchemy import select
 product_bp = Blueprint('product',__name__)
 
 @product_bp.route("/product/<int:id>",methods=["GET"])
-def get_product(id):
+def get_product(id : int) -> Response:
+    """get id of the product and return product detail's base on id"""
     try:
         product = db.session.get(Product,id)
         if not product:
@@ -22,10 +23,11 @@ def get_product(id):
 
 @product_bp.route("/product",methods=["GET"])
 def get_products():
+    """get category in perameter in url OR not get perameter and defualt all Product. return all product base on category"""
     try:
         category = request.args.get('category')
         print(category)
-        if category and category != "All":
+        if category:
             products = Product.query.filter(
                 Product.category.has(name=category)
             ).all()
@@ -40,7 +42,8 @@ def get_products():
         }),500
 
 @product_bp.route("/product/category",methods=["GET"])
-def get_category():
+def get_category() -> Response:
+    """unique category return"""
     try:
         result = db.session.execute(select(Category))
         # result = Product.query.all()
@@ -58,3 +61,4 @@ def get_category():
             "message" : "An error occurred while fetching the category",
             "error" : str(e)
         }),500
+

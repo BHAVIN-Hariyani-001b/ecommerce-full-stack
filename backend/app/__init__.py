@@ -3,8 +3,11 @@ from dotenv import load_dotenv
 from app.routes.auth_routes import auth_dp
 from app.routes.product_routes import product_bp
 from flask_cors import CORS
-# from app import config
 from app.db import db
+from app.models.productImage import ProductImage
+from app.models.category import Category
+from app.models.product import Product
+
 import os
 
 load_dotenv()

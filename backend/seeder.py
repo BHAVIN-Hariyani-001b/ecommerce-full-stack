@@ -1,6 +1,9 @@
 from app import create_app
 from app.models.product import Product
 from app.models.category import Category
+from app.models.productImage import ProductImage
+from app.models.users import User
+
 from app.db import db
 from dotenv import load_dotenv
 
@@ -27,40 +30,137 @@ with app.app_context():
     db.session.commit()  # 👈 Commit first to generate IDs
 
     # 👇 Step 2: Use category_id (not category string)
-    products = [
-        # Fashion
-        Product(name="T-Shirt",  price=499,   discount=20, category_id=categories["Fashion"].id),
-        Product(name="Jeans",    price=1299,  discount=15, category_id=categories["Fashion"].id),
-        Product(name="Sneakers", price=2499,  discount=25, category_id=categories["Fashion"].id),
+    products_data = [
+        {
+            "product": Product(
+                name="T-Shirt",
+                price=499,
+                discount=20,
+                category_id=categories["Fashion"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/tshirt1.jpg", is_primary=True, order=1),
+                ProductImage(image_url="https://example.com/tshirt2.jpg", is_primary=False, order=2),
+                ProductImage(image_url="https://example.com/tshirt3.jpg", is_primary=False, order=3),
+            ]
+        },
+        {
+            "product": Product(
+                name="Jeans",
+                price=1299,
+                discount=15,
+                category_id=categories["Fashion"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/jeans1.jpg", is_primary=True, order=1),
+                ProductImage(image_url="https://example.com/jeans2.jpg", is_primary=False, order=2),
+            ]
+        },
+        {
+            "product": Product(
+                name="Sneakers",
+                price=2499,
+                discount=25,
+                category_id=categories["Fashion"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/shoes1.jpg", is_primary=True, order=1),
+                ProductImage(image_url="https://example.com/shoes2.jpg", is_primary=False, order=2),
+            ]
+        },
 
         # Mobile
-        Product(name="iPhone 15",           price=79999, discount=5,  category_id=categories["Mobile"].id),
-        Product(name="Samsung Galaxy S23",  price=69999, discount=10, category_id=categories["Mobile"].id),
-        Product(name="OnePlus 11",          price=56999, discount=8,  category_id=categories["Mobile"].id),
+        {
+            "product": Product(
+                name="iPhone 15",
+                price=79999,
+                discount=5,
+                category_id=categories["Mobile"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/iphone1.jpg", is_primary=True, order=1),
+                ProductImage(image_url="https://example.com/iphone2.jpg", is_primary=False, order=2),
+                ProductImage(image_url="https://example.com/iphone3.jpg", is_primary=False, order=3),
+            ]
+        },
+        {
+            "product": Product(
+                name="Samsung Galaxy S23",
+                price=69999,
+                discount=10,
+                category_id=categories["Mobile"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/samsung1.jpg", is_primary=True, order=1),
+                ProductImage(image_url="https://example.com/samsung2.jpg", is_primary=False, order=2),
+            ]
+        },
 
         # Beauty
-        Product(name="Lipstick",  price=299, discount=10, category_id=categories["Beauty"].id),
-        Product(name="Face Wash", price=199, discount=5,  category_id=categories["Beauty"].id),
-        Product(name="Perfume",   price=999, discount=20, category_id=categories["Beauty"].id),
+        {
+            "product": Product(
+                name="Lipstick",
+                price=299,
+                discount=10,
+                category_id=categories["Beauty"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/lipstick1.jpg", is_primary=True, order=1),
+            ]
+        },
 
         # Electronics
-        Product(name="Samsung TV",          price=45000, discount=15, category_id=categories["Electronics"].id),
-        Product(name="Bluetooth Speaker",   price=1999,  discount=30, category_id=categories["Electronics"].id),
-        Product(name="Laptop",              price=65000, discount=12, category_id=categories["Electronics"].id),
+        {
+            "product": Product(
+                name="Samsung TV",
+                price=45000,
+                discount=15,
+                category_id=categories["Electronics"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/tv1.jpg", is_primary=True, order=1),
+                ProductImage(image_url="https://example.com/tv2.jpg", is_primary=False, order=2),
+            ]
+        },
 
         # Home
-        Product(name="Sofa",         price=25000, discount=18, category_id=categories["Home"].id),
-        Product(name="Dining Table", price=15000, discount=10, category_id=categories["Home"].id),
-        Product(name="Bed Sheet",    price=1200,  discount=5,  category_id=categories["Home"].id),
+        {
+            "product": Product(
+                name="Sofa",
+                price=25000,
+                discount=18,
+                category_id=categories["Home"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/sofa1.jpg", is_primary=True, order=1),
+            ]
+        },
 
         # Food
-        Product(name="Pizza",  price=349, discount=0,  category_id=categories["Food"].id),
-        Product(name="Burger", price=199, discount=5,  category_id=categories["Food"].id),
-        Product(name="Pasta",  price=299, discount=10, category_id=categories["Food"].id),
+        {
+            "product": Product(
+                name="Pizza",
+                price=349,
+                discount=0,
+                category_id=categories["Food"].id
+            ),
+            "images": [
+                ProductImage(image_url="https://example.com/pizza1.jpg", is_primary=True, order=1),
+            ]
+        },
     ]
 
-    db.session.add_all(products)
+    for item in products_data:
+        product = item["product"]
+
+        # attach images
+        for img in item["images"]:
+            product.images.append(img)
+
+        db.session.add(product)
+
     db.session.commit()
 
+    print("Products + Images inserted ✅")
     print(f"✅ {len(categories)} categories inserted!")
-    print(f"✅ {len(products)} products inserted!")
+    print(f"✅ {len(products_data)} products inserted!")
