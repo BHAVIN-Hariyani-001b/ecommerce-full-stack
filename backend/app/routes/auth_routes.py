@@ -42,6 +42,9 @@ def register():
 
     if missing:
         return jsonify({"error":f"Missing fields: {', '.join(missing)}"}),400
+
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({"error" : "Email already exists"}),409
     
     try:
         user = User(username=data['username'],email=data['email'],phone=data.get('phone'))
