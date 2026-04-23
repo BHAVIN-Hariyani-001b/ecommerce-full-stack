@@ -1,12 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCategory } from "../../middleware/productCategory";
-
-export const fetchCategories = createAsyncThunk(
-  "category/fetchCategories",
-  async () => {
-    return await getCategory();
-  }
-);
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchCategories } from "./categoryThunk";
 
 const initialState = {
   active: "All",
@@ -27,7 +20,6 @@ const categorySlice = createSlice({
     builder
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
@@ -35,7 +27,8 @@ const categorySlice = createSlice({
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        console.log(action.payload);
+        // state.error = action.payload;
       });
   },
 });

@@ -1,13 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
 import App from "./App.jsx";
 import Home from "./pages/Home";
-import { store } from "./app/store.js";
 import { Provider } from "react-redux";
-
+import SearchProduct from "./pages/SearchProduct.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./app/store.js";
 
+import "./index.css";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <Home />,
       },
+      {
+        path: "/search",
+        element: <SearchProduct />,
+      }
     ],
   },
 ]);
@@ -24,9 +29,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router}>
-        <App />
-      </RouterProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <RouterProvider router={router} />
+      </PersistGate>
     </Provider>
   </StrictMode>,
 );

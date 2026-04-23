@@ -1,0 +1,50 @@
+import { useEffect } from "react";
+import { RxCross2 } from "react-icons/rx";
+
+const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) => {
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") onClose?.();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] px-4"
+      onMouseDown={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title || "Modal"}
+    >
+      <div
+        className={[
+          "relative w-full",
+          widthClassName,
+          "rounded-2xl bg-white shadow-xl border border-gray-200",
+        ].join(" ")}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-semibold text-[#2b2f3a]">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
+            aria-label="Close"
+          >
+            <RxCross2 className="text-xl text-[#586274]" />
+          </button>
+        </div>
+
+        <div className="px-6 py-5">{children}</div>
+      </div>
+    </div>
+  );
+};
+
+export default Modal;
