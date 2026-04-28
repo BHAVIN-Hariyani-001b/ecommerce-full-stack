@@ -2,11 +2,13 @@ from flask import Blueprint,jsonify,request
 from app.models.users import User 
 from app.db import db
 from sqlalchemy.exc import IntegrityError
+from app.util.token import generate_token
+from app.util.auth_middleware import login_required
 
 auth_dp = Blueprint('auth',__name__)
 
 # login route
-@auth_dp.route("/login",methods=["POST"])
+@auth_dp.route("/auth/login",methods=["POST"])
 def login():
     data = request.get_json()
 
@@ -26,14 +28,16 @@ def login():
     
     if not user.check_password(data['password']):
         return jsonify({"error" : "Invalid password"}), 401
+    
+    token = generate_token(user.id,user.role.value)
 
     return jsonify({
         "message" : "Login successful",
-        "user" : user.to_dict()
+        "token" : token
     }),200
 
 # register route
-@auth_dp.route("/register",methods=["POST"])
+@auth_dp.route("/auth/register",methods=["POST"])
 def register():
     data =  request.get_json()
     print(data)
@@ -51,11 +55,12 @@ def register():
         user.set_password(data["password"])
         db.session.add(user)
         db.session.commit()
-        print(User.query.all())
+
+        token = generate_token(user.id,user.role.value)
 
         return jsonify({
-            "message": "User registered successfully",
-            "user": user.to_dict()
+            "message": "Registered successfully",
+            "token": token
         }), 201
 
     except ValueError as e:
@@ -65,3 +70,15 @@ def register():
     except IntegrityError:
         db.session.rollback()
         return jsonify({"error": "Email already exists"}), 409
+    
+@auth_dp.route("/auth/profile",methods=["GET"])
+@login_required
+def get_user():
+    user = User.query.get(request.user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    return jsonify({
+        "user": user.to_dict()
+    }), 200
