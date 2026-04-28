@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, registerApi } from "../../middleware/authApi";
+import { loginApi, registerApi, getProfileApi } from "../../middleware/authApi";
 
 const getErrorMessage = (error) => {
   const data = error?.response?.data;
@@ -14,7 +14,7 @@ const getErrorMessage = (error) => {
 };
 
 export const loginUser = createAsyncThunk(
-  "auth/login",
+  "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const data = await loginApi({ email, password });
@@ -26,7 +26,7 @@ export const loginUser = createAsyncThunk(
 );
 
 export const registerUser = createAsyncThunk(
-  "auth/register",
+  "auth/registerUser",
   async ({ username, email, password }, { rejectWithValue }) => {
     try {
       const data = await registerApi({ username, email, password });
@@ -36,4 +36,18 @@ export const registerUser = createAsyncThunk(
     }
   },
 );
+
+export const getUserProfile = createAsyncThunk(
+  "auth/getUserProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await getProfileApi();
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+
 

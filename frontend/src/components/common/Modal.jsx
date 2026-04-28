@@ -1,15 +1,27 @@
 import { useEffect } from "react";
 import { RxCross2 } from "react-icons/rx";
+import { useDispatch } from "react-redux";
+import { clearAuthError } from "../../features/auth/authSlice";
 
 const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) => {
+
+  const dispatch = useDispatch();
+  
+  const handleErrorMessage = () => {
+    dispatch(clearAuthError());
+  };
+
   useEffect(() => {
     if (!open) return;
+
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose?.();
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
+
 
   if (!open) return null;
 
@@ -17,6 +29,7 @@ const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) 
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px] px-4"
       onMouseDown={onClose}
+      onClick={handleErrorMessage}
       role="dialog"
       aria-modal="true"
       aria-label={title || "Modal"}
@@ -34,7 +47,7 @@ const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) 
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
+            className="cursor-pointer p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
             aria-label="Close"
           >
             <RxCross2 className="text-xl text-[#586274]" />

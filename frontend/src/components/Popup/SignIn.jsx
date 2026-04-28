@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { loginUser } from "../../features/auth/authThunk";
-import { clearAuthError } from "../../features/auth/authSlice";
 
-const SignIn = ({ open, onClose, onSwitchToSignUp }) => {
+const SignIn = ({ open, onClose, onSwitchToSignUp,handleErrorMessage }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
@@ -41,7 +40,7 @@ const SignIn = ({ open, onClose, onSwitchToSignUp }) => {
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="you@example.com"
-            onFocus={() => dispatch(clearAuthError())}
+            onFocus={handleErrorMessage}
           />
         </div>
 
@@ -57,14 +56,14 @@ const SignIn = ({ open, onClose, onSwitchToSignUp }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="••••••••"
-            onFocus={() => dispatch(clearAuthError())}
+            onFocus={handleErrorMessage}
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-[#8685ef] text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity"
+          className="w-full rounded-xl cursor-pointer bg-[#8685ef] text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity"
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
@@ -74,7 +73,7 @@ const SignIn = ({ open, onClose, onSwitchToSignUp }) => {
           <button
             type="button"
             onClick={onSwitchToSignUp}
-            className="text-[#454d5c] font-semibold hover:underline"
+            className="text-[#454d5c] cursor-pointer font-semibold hover:underline"
           >
             Sign up
           </button>

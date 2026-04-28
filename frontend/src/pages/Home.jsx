@@ -3,6 +3,7 @@ import Fotter from "../components/layout/Footer";
 import { useSelector } from "react-redux";
 import All from "../components/cards/All";
 import ProductSection from "../components/cards/ProductSection";
+// import useAuth from "../hook/useAuth";
 // import { useEffect } from "react";
 
 const Home = () => {
