@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { loginUser } from "../../features/auth/authThunk";
+import Passwordshow from "../common/Passwordshow";
 
-const SignIn = ({ open, onClose, onSwitchToSignUp,handleErrorMessage }) => {
+const SignIn = ({ open, onClose, onSwitchToSignUp, handleErrorMessage }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
 
@@ -50,7 +52,7 @@ const SignIn = ({ open, onClose, onSwitchToSignUp,handleErrorMessage }) => {
           </label>
           <input
             id="signin-password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -58,6 +60,10 @@ const SignIn = ({ open, onClose, onSwitchToSignUp,handleErrorMessage }) => {
             placeholder="••••••••"
             onFocus={handleErrorMessage}
           />
+        </div>
+
+        <div>
+          <Passwordshow showPassword={showPassword} setShowPassword={setShowPassword} />
         </div>
 
         <button

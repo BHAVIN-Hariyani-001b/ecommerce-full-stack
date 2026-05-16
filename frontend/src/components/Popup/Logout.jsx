@@ -6,8 +6,8 @@ import { FaRegCircleUser } from "react-icons/fa6";
 
 function Logout() {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-  const displayName = user?.username || user?.name || user?.email || "Profile";
+  const user  = useSelector((state) => state.auth.user);
+  const displayName = user?.username || "Profile";
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
@@ -30,6 +30,7 @@ function Logout() {
         title="Account"
       >
         <div className="flex flex-col gap-4">
+          
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#8685ef]/15 flex items-center justify-center">
               <FaRegCircleUser className="text-[#8685ef] text-xl" />

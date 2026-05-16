@@ -2,14 +2,16 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { registerUser } from "../../features/auth/authThunk";
+import Passwordshow from "../common/Passwordshow";
 
 const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
   const { loading, error } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,7 +82,7 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
           </label>
           <input
             id="signup-password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -96,7 +98,7 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
           </label>
           <input
             id="signup-confirm"
-            type="password"
+            type={showPassword ? "text" : "password"}
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -112,6 +114,10 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
           {passwordMismatch && (
             <p className="text-xs text-red-500">Passwords do not match.</p>
           )}
+        </div>
+
+        <div>
+          <Passwordshow showPassword={showPassword} setShowPassword={setShowPassword} />
         </div>
 
         <button

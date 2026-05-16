@@ -4,8 +4,8 @@ import { loginUser, registerUser, getUserProfile } from "./authThunk";
 const initialState = {
   isLoading: false,
   error: null,
-  data: null, // raw API response
   user: null,
+  userRole : "user",
   token: null,
   isLoggedIn: false,
 };
@@ -24,8 +24,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isLoading = false;
       state.error = null;
-      state.data = null;
       state.user = null;
+      state.userRole = "user";
       state.token = null;
       state.isLoggedIn = false;
     },
@@ -68,12 +68,14 @@ const authSlice = createSlice({
         state.error = null; 
       })
       .addCase(getUserProfile.fulfilled, (state, action) => {
-        state.user = action.payload || state.user;
-        state.isLoggedIn = false;
-        state.data = action.payload;
+        state.isLoading = false;
         state.user = pickUser(action.payload) || state.user;
+        state.userRole = state.user?.role || "user";
+        state.isLoggedIn = true;
       })
-      .addCase(getUserProfile.rejected, (state) => {
+      .addCase(getUserProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || "Failed to fetch profile";
         state.token = null; // invalidate token on profile fetch failure
         state.isLoggedIn = false;
       })

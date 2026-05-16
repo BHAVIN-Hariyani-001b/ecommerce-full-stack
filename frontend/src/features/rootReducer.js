@@ -15,7 +15,7 @@ const persistConfigCategory = {
 const persistConfigAuth = {
   key: "auth",
   storage,
-  whitelist: ["token", "user", "isLoggedIn"],
+  whitelist: ["token", "user", "isLoggedIn","userRole"],
 };
 
 const rootReducer = combineReducers({

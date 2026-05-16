@@ -10,7 +10,8 @@ const useAuth = () => {
       if (token && !user) {
         try {
             const response = await dispatch(getUserProfile()).unwrap();
-            console.log(response);
+            // console.log(response);
+            return response?.data;
         } catch (error) {
           console.log(error);
         }

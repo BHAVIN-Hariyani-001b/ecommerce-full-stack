@@ -3,16 +3,18 @@ import Fotter from "../components/layout/Footer";
 import { useSelector } from "react-redux";
 import All from "../components/cards/All";
 import ProductSection from "../components/cards/ProductSection";
-// import useAuth from "../hook/useAuth";
-// import { useEffect } from "react";
+import useAuth from "../hook/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const active = useSelector((state) => state.category.active);
-  // console.log(active)
+  const userRoll = useSelector((state) => state.auth?.userRole);
+  useAuth(); // Automatically fetch user profile if token exists
+  const navigate = useNavigate();
 
-  // useEffect(()=>{
-  //   console.log("Hello")
-  // },[])
+  if (userRoll === "admin") {
+    navigate("/admin");
+  }
 
   return (
     <div>
