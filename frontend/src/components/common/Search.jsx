@@ -24,7 +24,6 @@ const Search = () => {
   return (
     <>
       <label
-        htmlFor=""
         className="border border-gray-300 flex items-center justify-center bg-white text-[#454d5c] rounded-xl w-full h-12 py-2 px-4 gap-1"
       >
         <MdOutlineSearch className="text-2xl text-[#454d5c]" />

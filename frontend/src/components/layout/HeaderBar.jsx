@@ -6,7 +6,6 @@ import { FaLocationDot } from "react-icons/fa6";
 import { NavLink, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Search from "../common/Search";
-import Modal from "../common/Modal";
 import Logout from "../Popup/Logout";
 
 const HeaderBar = ({ onLoginClick }) => {

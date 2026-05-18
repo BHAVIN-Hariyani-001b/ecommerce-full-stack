@@ -5,10 +5,13 @@ import SignIn from "../Popup/SignIn";
 import SignUp from "../Popup/SignUp";
 import { useDispatch } from "react-redux";
 import { clearAuthError } from "../../features/auth/authSlice";
+import { useLocation } from "react-router-dom";
 
 const Header = () => {
   const [authView, setAuthView] = useState("signin");
   const [authOpen, setAuthOpen] = useState(false);
+
+  const location = useLocation();
 
   const dispatch = useDispatch();
 
@@ -24,10 +27,11 @@ const Header = () => {
     dispatch(clearAuthError());
   };
 
+
   return (
     <>
       <HeaderBar onLoginClick={openSignIn} />
-      <Navbar />
+      { location.pathname !== "/search" && <Navbar /> }
       <SignIn
         open={authOpen && authView === "signin"}
         onClose={() => setAuthOpen(false)}
