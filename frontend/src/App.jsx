@@ -1,12 +1,12 @@
+import { memo } from "react";
 import { Outlet } from "react-router-dom";
-function App() {
+
+const App = memo(function App() {
   return (
-    <>
-      <div>
-        <Outlet />
-      </div>
-    </>
+    <div>
+      <Outlet />
+    </div>
   );
-}
+});
 
 export default App;

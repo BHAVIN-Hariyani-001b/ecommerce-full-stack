@@ -1,11 +1,17 @@
+import { memo, useCallback, useMemo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 import { MdOutlineMail, MdOutlinePhone } from "react-icons/md";
 import PageWapper from "./PageWapper";
 
-const Footer = () => {
+const Footer = memo(function Footer() {
   const { pathname } = useLocation();
-  const isCompact = pathname === "/search";
+  const isCompact = useMemo(() => pathname === "/search", [pathname]);
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
+
+  const handleNewsletterSubmit = useCallback((e) => {
+    e.preventDefault();
+  }, []);
 
   return (
     <footer className="mt-10 border-t border-gray-200 bg-white">
@@ -93,10 +99,7 @@ const Footer = () => {
               <p className="mt-3 text-sm text-[#586274]">
                 New products and offers in your inbox.
               </p>
-              <form
-                className="mt-4 flex gap-2"
-                onSubmit={(e) => e.preventDefault()}
-              >
+              <form className="mt-4 flex gap-2" onSubmit={handleNewsletterSubmit}>
                 <input
                   type="email"
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
@@ -114,7 +117,7 @@ const Footer = () => {
         )}
 
         <div className="py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-[#586274]">
-          <p>© {new Date().getFullYear()} Ecommerce. All rights reserved.</p>
+          <p>© {currentYear} Ecommerce. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-[#2b2f3a]">
               Privacy Policy
@@ -127,6 +130,6 @@ const Footer = () => {
       </PageWapper>
     </footer>
   );
-};
+});
 
 export default Footer;

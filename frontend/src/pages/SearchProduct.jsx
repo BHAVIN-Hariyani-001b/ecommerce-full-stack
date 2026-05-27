@@ -1,10 +1,11 @@
+import { memo } from "react";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 
-const SearchProduct = () => {
+const SearchProduct = memo(function SearchProduct() {
   return (
     <div>
-      <Header/>
+      <Header />
       <main>
         <div className="flex w-full max-w-6xl justify-center px-4 py-6">
           <h1>Search Product</h1>
@@ -12,7 +13,7 @@ const SearchProduct = () => {
       </main>
       <Footer />
     </div>
-  )
-}
+  );
+});
 
 export default SearchProduct;

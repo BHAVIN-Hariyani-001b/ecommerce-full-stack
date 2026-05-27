@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { registerUser } from "../../features/auth/authThunk";
 import Passwordshow from "../common/Passwordshow";
 
-const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
+const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,23 +13,40 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
   const { loading, error } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) return;
-    try {
-      await dispatch(registerUser({ username, email, password })).unwrap();
-      setPassword("");
-      setConfirmPassword("");
-      onClose?.();
-    } catch {
-      // handled in slice
-    }
-  };
+  const passwordMismatch = useMemo(
+    () =>
+      password.length > 0 &&
+      confirmPassword.length > 0 &&
+      password !== confirmPassword,
+    [password, confirmPassword],
+  );
 
-  const passwordMismatch =
-    password.length > 0 &&
-    confirmPassword.length > 0 &&
-    password !== confirmPassword;
+  const confirmInputClassName = useMemo(
+    () =>
+      [
+        "border rounded-xl px-3 py-2 outline-none focus:ring-2",
+        passwordMismatch
+          ? "border-red-300 focus:ring-red-200"
+          : "border-gray-200 focus:ring-[#8685ef]/30",
+      ].join(" "),
+    [passwordMismatch],
+  );
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (password !== confirmPassword) return;
+      try {
+        await dispatch(registerUser({ username, email, password })).unwrap();
+        setPassword("");
+        setConfirmPassword("");
+        onClose?.();
+      } catch {
+        // handled in slice
+      }
+    },
+    [dispatch, username, email, password, confirmPassword, onClose],
+  );
 
   return (
     <Modal
@@ -39,11 +56,11 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
       widthClassName="max-w-sm"
     >
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        {error && (
+        {error ? (
           <div className="border border-red-200 bg-red-50 text-red-700 rounded-xl px-3 py-2 text-sm">
             {error}
           </div>
-        )}
+        ) : null}
         <div className="flex flex-col gap-1">
           <label htmlFor="signup-name" className="text-sm text-[#586274]">
             Username
@@ -56,7 +73,6 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
             onChange={(e) => setUsername(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="xyz"
-            onFocus={handleErrorMessage}
           />
         </div>
 
@@ -72,7 +88,6 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="you@example.com"
-            onFocus={handleErrorMessage}
           />
         </div>
 
@@ -88,7 +103,6 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="Create a password"
-            onFocus={handleErrorMessage}
           />
         </div>
 
@@ -102,22 +116,19 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className={[
-              "border rounded-xl px-3 py-2 outline-none focus:ring-2",
-              passwordMismatch
-                ? "border-red-300 focus:ring-red-200"
-                : "border-gray-200 focus:ring-[#8685ef]/30",
-            ].join(" ")}
+            className={confirmInputClassName}
             placeholder="Repeat password"
-            onFocus={handleErrorMessage}
           />
-          {passwordMismatch && (
+          {passwordMismatch ? (
             <p className="text-xs text-red-500">Passwords do not match.</p>
-          )}
+          ) : null}
         </div>
 
         <div>
-          <Passwordshow showPassword={showPassword} setShowPassword={setShowPassword} />
+          <Passwordshow
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+          />
         </div>
 
         <button
@@ -141,6 +152,6 @@ const SignUp = ({ open, onClose, onSwitchToSignIn, handleErrorMessage }) => {
       </form>
     </Modal>
   );
-};
+});
 
 export default SignUp;

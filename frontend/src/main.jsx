@@ -1,15 +1,18 @@
-import { StrictMode } from "react";
+import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
-import Home from "./pages/Home";
+
 import { Provider } from "react-redux";
-import SearchProduct from "./pages/SearchProduct.jsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./app/store.js";
 import { setupInterceptors } from "./middleware/index.js";
-import Dashboard from "./admin/pages/Dashboard/Dashboard.jsx";
 import "./index.css";
+import Loding from "./components/common/Loding.jsx";
+
+const Home = lazy(() => import("./pages/Home"));
+const SearchProduct = lazy(() => import("./pages/SearchProduct"));
+const Dashboard = lazy(() => import("./admin/pages/Dashboard/Dashboard"));
 
 // Setup axios interceptors after store is created
 setupInterceptors(store);
@@ -28,9 +31,9 @@ const router = createBrowserRouter([
         element: <SearchProduct />,
       },
       {
-        path : "/admin",
-        element : <Dashboard />
-      }
+        path: "/admin",
+        element: <Dashboard />,
+      },
     ],
   },
 ]);
@@ -39,7 +42,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <RouterProvider router={router} />
+        <Suspense fallback={<Loding />}>
+          <RouterProvider router={router} />
+        </Suspense>
       </PersistGate>
     </Provider>
   </StrictMode>,

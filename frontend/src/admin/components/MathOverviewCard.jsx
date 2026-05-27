@@ -1,4 +1,10 @@
-const MathOverviewCard = ({ title, description, icon }) => {
+import { memo } from "react";
+
+const MathOverviewCard = memo(function MathOverviewCard({
+  title,
+  description,
+  icon,
+}) {
   return (
     <div className="bg-white p-4 w-50 cursor-pointer h-25 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 ease-in-out delay-100">
       <div className="flex items-center justify-between">
@@ -12,6 +18,6 @@ const MathOverviewCard = ({ title, description, icon }) => {
       </div>
     </div>
   );
-};
+});
 
 export default MathOverviewCard;

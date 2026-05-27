@@ -1,15 +1,20 @@
-import { useEffect } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch } from "react-redux";
 import { clearAuthError } from "../../features/auth/authSlice";
 
-const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) => {
-
+const Modal = memo(function Modal({
+  open,
+  title,
+  onClose,
+  children,
+  widthClassName = "max-w-md",
+}) {
   const dispatch = useDispatch();
-  
-  const handleErrorMessage = () => {
+
+  const handleErrorMessage = useCallback(() => {
     dispatch(clearAuthError());
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (!open) return;
@@ -22,6 +27,15 @@ const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) 
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
 
+  const panelClassName = useMemo(
+    () =>
+      [
+        "relative w-full",
+        widthClassName,
+        "rounded-2xl bg-white shadow-xl border border-gray-200",
+      ].join(" "),
+    [widthClassName],
+  );
 
   if (!open) return null;
 
@@ -34,14 +48,7 @@ const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) 
       aria-modal="true"
       aria-label={title || "Modal"}
     >
-      <div
-        className={[
-          "relative w-full",
-          widthClassName,
-          "rounded-2xl bg-white shadow-xl border border-gray-200",
-        ].join(" ")}
-        onMouseDown={(e) => e.stopPropagation()}
-      >
+      <div className={panelClassName} onMouseDown={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-[#2b2f3a]">{title}</h2>
           <button
@@ -58,6 +65,6 @@ const Modal = ({ open, title, onClose, children, widthClassName = "max-w-md" }) 
       </div>
     </div>
   );
-};
+});
 
 export default Modal;

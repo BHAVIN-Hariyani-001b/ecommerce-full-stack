@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { GrCart } from "react-icons/gr";
 import { MdOutlineSearch } from "react-icons/md";
@@ -8,9 +9,10 @@ import { useSelector } from "react-redux";
 import Search from "../common/Search";
 import Logout from "../Popup/Logout";
 
-const HeaderBar = ({ onLoginClick }) => {
+const HeaderBar = memo(function HeaderBar({ onLoginClick }) {
   const location = useLocation();
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isSearchPage = location.pathname === "/search";
 
   return (
     <div className="border-b border-gray-200 sticky top-0 bg-white z-10">
@@ -33,7 +35,7 @@ const HeaderBar = ({ onLoginClick }) => {
             </p>
           </div>
           <div className="w-full max-w-svw flex items-center justify-center cursor-pointer pr-4 max-[600px]:absolute max-[600px]:left-0 max-[600px]:right-0 max-[600px]:mx-auto max-[600px]:top-21 max-[600px]:px-4">
-            {location.pathname === "/search" ? (
+            {isSearchPage ? (
               <Search />
             ) : (
               <NavLink
@@ -70,6 +72,6 @@ const HeaderBar = ({ onLoginClick }) => {
       </header>
     </div>
   );
-};
+});
 
 export default HeaderBar;

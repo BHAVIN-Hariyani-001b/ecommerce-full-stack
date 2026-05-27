@@ -1,12 +1,11 @@
-// import { useSelector } from "react-redux";
+import { memo } from "react";
 
-const productSection = ({ category }) => {
-  // const activeProduct = useSelector((state) => state.category.active);
+const ProductSection = memo(function ProductSection({ category }) {
   return (
     <div>
       <h1>{category}</h1>
     </div>
   );
-};
+});
 
-export default productSection;
+export default ProductSection;

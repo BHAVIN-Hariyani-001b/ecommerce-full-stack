@@ -1,35 +1,38 @@
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { loginUser } from "../../features/auth/authThunk";
 import Passwordshow from "../common/Passwordshow";
 
-const SignIn = ({ open, onClose, onSwitchToSignUp, handleErrorMessage }) => {
+const SignIn = memo(function SignIn({ open, onClose, onSwitchToSignUp }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await dispatch(loginUser({ email, password })).unwrap();
-      setPassword("");
-      onClose?.();
-    } catch {
-      // handled in slice
-    }
-  };
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      try {
+        await dispatch(loginUser({ email, password })).unwrap();
+        setPassword("");
+        onClose?.();
+      } catch {
+        // handled in slice
+      }
+    },
+    [dispatch, email, password, onClose],
+  );
 
   return (
     <Modal open={open} onClose={onClose} title="Sign In" widthClassName="max-w-sm">
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        {error && (
+        {error ? (
           <div className="border border-red-200 bg-red-50 text-red-700 rounded-xl px-3 py-2 text-sm">
             {error}
           </div>
-        )}
+        ) : null}
         <div className="flex flex-col gap-1">
           <label htmlFor="signin-email" className="text-sm text-[#586274]">
             Email
@@ -42,7 +45,6 @@ const SignIn = ({ open, onClose, onSwitchToSignUp, handleErrorMessage }) => {
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="you@example.com"
-            onFocus={handleErrorMessage}
           />
         </div>
 
@@ -58,12 +60,14 @@ const SignIn = ({ open, onClose, onSwitchToSignUp, handleErrorMessage }) => {
             onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-[#8685ef]/30"
             placeholder="••••••••"
-            onFocus={handleErrorMessage}
           />
         </div>
 
         <div>
-          <Passwordshow showPassword={showPassword} setShowPassword={setShowPassword} />
+          <Passwordshow
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+          />
         </div>
 
         <button
@@ -87,6 +91,6 @@ const SignIn = ({ open, onClose, onSwitchToSignUp, handleErrorMessage }) => {
       </form>
     </Modal>
   );
-};
+});
 
 export default SignIn;

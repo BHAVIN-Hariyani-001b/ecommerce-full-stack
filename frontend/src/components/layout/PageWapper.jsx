@@ -1,9 +1,7 @@
-const PageWapper = ({children,className}) => {
-  return (
-    <div className={`max-w-310  ${className}`}>
-        {children}
-    </div>
-  )
-}
+import { memo } from "react";
 
-export default PageWapper
+const PageWapper = memo(function PageWapper({ children, className }) {
+  return <div className={`max-w-310  ${className}`}>{children}</div>;
+});
+
+export default PageWapper;

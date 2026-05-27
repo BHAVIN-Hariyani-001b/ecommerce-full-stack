@@ -1,10 +1,15 @@
-const All = () => {
+import { lazy, memo, Suspense } from "react";
+
+const HeroBanner = lazy(() => import("../product/HeroBanner"));
+
+const All = memo(function All() {
   return (
     <div>
-      <h1>All</h1>
-      <p>how are you</p>
+      <Suspense fallback={<div>loding...</div>}>
+        <HeroBanner />
+      </Suspense>
     </div>
   );
-};
+});
 
 export default All;

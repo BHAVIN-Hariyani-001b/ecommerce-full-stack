@@ -1,4 +1,9 @@
-const Passwordshow = ({ showPassword, setShowPassword }) => {
+import { memo } from "react";
+
+const Passwordshow = memo(function Passwordshow({
+  showPassword,
+  setShowPassword,
+}) {
   return (
     <div className="ml-1">
       <div className="flex items-center gap-1">
@@ -15,6 +20,6 @@ const Passwordshow = ({ showPassword, setShowPassword }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Passwordshow;

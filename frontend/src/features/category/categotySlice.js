@@ -25,10 +25,8 @@ const categorySlice = createSlice({
         state.loading = false;
         state.category = action.payload;
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
+      .addCase(fetchCategories.rejected, (state) => {
         state.loading = false;
-        console.log(action.payload);
-        // state.error = action.payload;
       });
   },
 });
