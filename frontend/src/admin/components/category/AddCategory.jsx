@@ -1,11 +1,11 @@
 import { useCallback, useRef, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
+import { ToastContainer, toast } from "react-toastify";
 
 const AddCategory = () => {
   const catImageRef = useRef(null);
 
-  const [formError, setFormError] = useState("");
   const [categoryData, setCategoryData] = useState({
     name: "",
     description: "",
@@ -21,11 +21,9 @@ const AddCategory = () => {
 
   const handleSubmit = useCallback(async () => {
     if (!isCheckData(categoryData)) {
-      setFormError("Please fill all required fields");
+      toast.error("Please fill all required fields")
       return;
     }
-
-    setFormError("");
 
     try {
       const formData = new FormData();
@@ -33,6 +31,7 @@ const AddCategory = () => {
       formData.append("description", categoryData.description);
       formData.append("status", categoryData.status);
       formData.append("catImage", catImageRef.current);
+      toast.success("Category created successfully!");
     } catch (error) {
       console.log(error);
     }
@@ -51,7 +50,6 @@ const AddCategory = () => {
 
   const handleOnChange = useCallback(
     (e) => {
-      setFormError("");
       const { name, value } = e.target;
       setCategoryData((prev) => ({
         ...prev,
@@ -87,7 +85,7 @@ const AddCategory = () => {
   return (
     <>
       <form className="flex flex-col gap-3" autoComplete="off">
-        {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
+        <ToastContainer position="top-right" autoClose={1000} />
         <div className="flex flex-col gap-2">
           <label htmlFor="catName" className="font-semibold">
             Category Name

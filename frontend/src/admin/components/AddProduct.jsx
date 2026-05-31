@@ -1,17 +1,11 @@
-import {
-  lazy,
-  memo,
-  Suspense,
-  useCallback,
-  useState,
-  useRef,
-} from "react";
+import { lazy, memo, Suspense, useCallback, useState, useRef } from "react";
 import { FiSave } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { addProduct } from "../features/productAdd/productAddThunk";
 import SkeletonAddProduct from "./common/SkeletonAddProduct";
 import CircularProgress from "@mui/material/CircularProgress";
 import AddAtribute from "./product_add/AddAtribute";
+import { ToastContainer, toast } from "react-toastify";
 
 const ProductInfo = lazy(() => import("./product_add/ProductInfo"));
 const AddImage = lazy(() => import("./product_add/AddImage"));
@@ -57,19 +51,13 @@ const AddProduct = memo(function AddProduct() {
   const addImageRef = useRef(null);
   const atributeRef = useRef(null);
   const [productData, setProductData] = useState(INITIAL_PRODUCT_DATA);
-  const [formError, setFormError] = useState("");
-
 
   const handleSubmit = useCallback(
     async (status) => {
       if (!isProductFormValid(productData)) {
-        setFormError(
-          "Please fill all required fields (including category, gender, and primary image) before saving.",
-        );
+        toast.error("Please fill all required fields correctly.");
         return;
       }
-
-      setFormError("");
 
       try {
         // Build FormData for submission
@@ -104,10 +92,10 @@ const AddProduct = memo(function AddProduct() {
         }
 
         await dispatch(addProduct(formData)).unwrap();
-
         setProductData(INITIAL_PRODUCT_DATA);
+        toast.success("Product saved successfully!");
       } catch (err) {
-        setFormError(typeof err === "string" ? err : "Failed to save product.");
+        toast.error(typeof err === "string" ? err : "Failed to save product.");
       }
     },
 
@@ -130,9 +118,7 @@ const AddProduct = memo(function AddProduct() {
 
   return (
     <div className="px-4 py-3">
-      {formError ? (
-        <p className="text-sm text-red-600 px-2 mb-2">{formError}</p>
-      ) : null}
+      <ToastContainer position="top-right" autoClose={1000} />
 
       <div className="flex justify-between max-[600px]:flex-col">
         <h1 className="text-lg p-2 font-medium">Add Product</h1>
@@ -166,7 +152,6 @@ const AddProduct = memo(function AddProduct() {
           <ProductInfo
             productData={productData}
             setProductData={setProductData}
-            setFormError={setFormError}
           />
         </Suspense>
 
@@ -176,7 +161,6 @@ const AddProduct = memo(function AddProduct() {
             atributeRef={atributeRef}
             productData={productData}
             setProductData={setProductData}
-            setFormError={setFormError}
           />
         </Suspense>
       </form>
