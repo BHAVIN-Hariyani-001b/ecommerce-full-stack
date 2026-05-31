@@ -1,8 +1,17 @@
-import { lazy, memo, Suspense, useCallback, useState, useRef } from "react";
+import {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useState,
+  useRef,
+} from "react";
 import { FiSave } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { addProduct } from "../features/productAdd/productAddThunk";
 import SkeletonAddProduct from "./common/SkeletonAddProduct";
+import CircularProgress from "@mui/material/CircularProgress";
+import AddAtribute from "./product_add/AddAtribute";
 
 const ProductInfo = lazy(() => import("./product_add/ProductInfo"));
 const AddImage = lazy(() => import("./product_add/AddImage"));
@@ -43,11 +52,13 @@ const isProductFormValid = (data) =>
     data.image?.image_name,
   );
 
-const AddProduct = memo(function AddProduct({ onBack }) {
+const AddProduct = memo(function AddProduct() {
   const dispatch = useDispatch();
   const addImageRef = useRef(null);
+  const atributeRef = useRef(null);
   const [productData, setProductData] = useState(INITIAL_PRODUCT_DATA);
   const [formError, setFormError] = useState("");
+
 
   const handleSubmit = useCallback(
     async (status) => {
@@ -103,28 +114,22 @@ const AddProduct = memo(function AddProduct({ onBack }) {
     [dispatch, productData],
   );
 
-  const handlePublish = useCallback(
-    () => handleSubmit("public"),
-    [handleSubmit],
-  );
+  const handlePublish = useCallback(() => {
+    handleSubmit("public");
+    addImageRef.current.reset();
+    atributeRef.current.reset();
+  }, [handleSubmit]);
 
-  const handleSaveDraft = useCallback(
-    () => handleSubmit("private"),
-    [handleSubmit],
-  );
+  const handleSaveDraft = useCallback(() => {
+    handleSubmit("private");
+    addImageRef.current.reset();
+    atributeRef.current.reset();
+  }, [handleSubmit]);
 
   const handlePreventDefault = useCallback((e) => e.preventDefault(), []);
 
   return (
     <div className="px-4 py-3">
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-4 text-sm text-blue-700 hover:underline cursor-pointer"
-      >
-        ← Back to dashboard
-      </button>
-
       {formError ? (
         <p className="text-sm text-red-600 px-2 mb-2">{formError}</p>
       ) : null}
@@ -135,22 +140,19 @@ const AddProduct = memo(function AddProduct({ onBack }) {
         <div className="space-x-2 flex p-2 max-[600px]:justify-between">
           <button
             type="button"
-            className="bg-green-700 hover:scale-101 cursor-pointer text-white font-semibold px-4 py-4 rounded-lg"
+            className="bg-green-700 hover:scale-101 w-40 h-15 cursor-pointer text-white font-semibold px-4 py-4 rounded-lg"
             onClick={handlePublish}
           >
-            Publish Product
+            Public Product
           </button>
 
           <button
             type="button"
-            className="border border-gray-200 hover:scale-101 cursor-pointer text-black font-semibold px-4 py-4 rounded-lg flex justify-center items-center gap-2"
+            className="border border-gray-200  w-40 h-15 hover:scale-101 cursor-pointer text-black font-semibold px-4 py-4 rounded-lg flex justify-center items-center gap-2"
             onClick={handleSaveDraft}
           >
-            <div>
-              <FiSave />
-            </div>
-
-            <div>Save to draft</div>
+            <FiSave />
+            <span>Save to draft</span>
           </button>
         </div>
       </div>
@@ -164,14 +166,17 @@ const AddProduct = memo(function AddProduct({ onBack }) {
           <ProductInfo
             productData={productData}
             setProductData={setProductData}
+            setFormError={setFormError}
           />
         </Suspense>
 
         <Suspense fallback={<SkeletonAddProduct />}>
           <AddImage
             ref={addImageRef}
+            atributeRef={atributeRef}
             productData={productData}
             setProductData={setProductData}
+            setFormError={setFormError}
           />
         </Suspense>
       </form>

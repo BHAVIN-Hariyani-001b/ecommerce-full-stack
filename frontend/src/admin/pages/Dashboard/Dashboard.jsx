@@ -1,19 +1,23 @@
-import { lazy, memo, Suspense, useCallback, useState } from "react";
+import { lazy, memo, Suspense, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import DashHeader from "../../components/DashHeader";
 import BottomMenu from "../../components/BottomMenu";
-import AddProduct from "../../components/AddProduct";
 import SkeletonDash from "../../components/common/SkeletonDash";
+import SideBar from "../../components/Sidebar/SideBar";
+import AddProduct from "../../components/AddProduct";
+import Category from "../../components/category/Category";
+import Container from "../../components/common/Container";
 
 const DashMain = lazy(() => import("../../components/DashMain"));
+// const AddProduct = lazy(() => import("../../components/AddProduct"));
 
 const Dashboard = memo(function Dashboard() {
   const userRoll = useSelector((state) => state.auth?.userRole);
-  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [activePage, setActivePage] = useState("dashboard");
+  // console.log(activePage);
 
-  const handleBack = useCallback(() => setShowAddProduct(false), []);
-  const handleAddProduct = useCallback(() => setShowAddProduct(true), []);
+  const [sideBar, setSideBar] = useState(false);
 
   if (userRoll === "user") {
     return <Navigate to="/" />;
@@ -22,19 +26,29 @@ const Dashboard = memo(function Dashboard() {
   return (
     <div className="h-screen flex flex-col">
       <header className="h-fit shadow-lg shadow-black-1px border border-gray-200">
-        <DashHeader />
+        <DashHeader setSideBar={setSideBar} sideBar={sideBar} />
       </header>
-      <main className="flex-8 overflow-auto">
-        {showAddProduct ? (
-          <AddProduct onBack={handleBack} />
-        ) : (
+      <main
+        className={`flex-8 overflow-auto relative h-full w-full scrollbar-none ${sideBar && "overflow-hidden"}`}
+      >
+        {activePage === "dashboard" ? (
           <Suspense fallback={<SkeletonDash />}>
-            <DashMain onAddProduct={handleAddProduct} />
+            <DashMain setActivePage={setActivePage} />
           </Suspense>
+        ) : (
+          <Container setActivePage={setActivePage}>
+            {activePage === "Add Product" && <AddProduct />}
+            {activePage === "Category" && <Category />}
+          </Container>
         )}
+        <SideBar
+          setSideBar={setSideBar}
+          sideBarOpen={sideBar}
+          setActivePage={setActivePage}
+        />
       </main>
       <footer className="flex-1 shadow-[0_-8px_16px_rgba(0,0,0,0.15)] border-t border-[#c3bfd5] p-1">
-        <BottomMenu />
+        <BottomMenu setActivePage={setActivePage} />
       </footer>
     </div>
   );

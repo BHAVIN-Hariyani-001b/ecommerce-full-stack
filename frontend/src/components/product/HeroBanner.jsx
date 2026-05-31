@@ -16,7 +16,6 @@ const HeroBanner = memo(function HeroBanner() {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef(null);
 
-
   const startAutoPlay = () => {
     intervalRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
@@ -31,7 +30,7 @@ const HeroBanner = memo(function HeroBanner() {
     stopAutoPlay();
     setCurrent((n + images.length) % images.length);
     startAutoPlay();
-  }
+  };
 
   useEffect(() => {
     if (images.length === 0) return;
@@ -44,7 +43,7 @@ const HeroBanner = memo(function HeroBanner() {
     <div className="max-[600px]:hidden">
       <PageWapper>
         <div className="flex flex-col justify-center items-center rounded-md my-5  relative border border-gray-200">
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center transition-all">
             <img
               src={images[current]}
               loading="lazy"
@@ -60,19 +59,19 @@ const HeroBanner = memo(function HeroBanner() {
               </button>
               <button
                 className="cursor-pointer hover:scale-104"
-                onClick={()=> handelSlide(current + 1)}
+                onClick={() => handelSlide(current + 1)}
               >
                 <IoIosArrowDroprightCircle />
               </button>
             </div>
           </div>
-          <div className="w-full h-10 flex gap-7 justify-center items-center">
+          <div className="w-full h-10 flex gap-3 justify-center items-center">
             {images.map((item, index) => (
               <button
                 tabIndex={index}
-                onClick={()=>handelSlide(index)}
+                onClick={() => handelSlide(index)}
                 type="button"
-                className={`p-1 rounded-full ease-linear cursor-pointer transition-all delay-150 ${index === current ? 'bg-blue-700 p-2' : 'bg-blue-500'}`}
+                className={`p-1 rounded-full cursor-pointer transition-all ease-in-out 0.1  s delay-200 ${index === current ? "bg-blue-700 w-5 h-2.5" : "bg-blue-300 w-2.5 h-2.5 hover:bg-blue-400"}`}
                 key={index}
               ></button>
             ))}

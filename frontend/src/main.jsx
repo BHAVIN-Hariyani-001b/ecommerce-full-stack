@@ -1,16 +1,16 @@
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
-
+import Home from "./pages/Home"
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./app/store.js";
 import { setupInterceptors } from "./middleware/index.js";
-import "./index.css";
 import Loding from "./components/common/Loding.jsx";
+import "./index.css";
 
-const Home = lazy(() => import("./pages/Home"));
+// const Home = lazy(() => import("./pages/Home"));
 const SearchProduct = lazy(() => import("./pages/SearchProduct"));
 const Dashboard = lazy(() => import("./admin/pages/Dashboard/Dashboard"));
 

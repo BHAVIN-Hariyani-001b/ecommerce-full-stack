@@ -8,12 +8,12 @@ const QuickActionsBtn = memo(function QuickActionsBtn({
   icon,
   title,
   className,
-  onClick,
+  setActivePage,
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={()=>setActivePage(title)}
       className="border focus:bg-blue-700 first:bg-blue-700 first:hover:text-black first:focus:hover:text-white first:text-white focus:text-white focus:hover:scale-98 transition-all delay-75 border-gray-300 cursor-pointer rounded-lg w-full h-25 flex flex-col justify-center items-center gap-3 hover:bg-blue-100"
     >
       <div className={`${className} font-semibold`}>{icon}</div>
@@ -22,13 +22,12 @@ const QuickActionsBtn = memo(function QuickActionsBtn({
   );
 });
 
-const QuickActions = memo(function QuickActions({ onAddProduct }) {
+const QuickActions = memo(function QuickActions({ setActivePage }) {
   const quickActions = useMemo(
     () => [
       {
         icon: <IoMdAddCircleOutline />,
         title: "Add Product",
-        onClick: onAddProduct,
       },
       {
         icon: <MdListAlt />,
@@ -43,7 +42,7 @@ const QuickActions = memo(function QuickActions({ onAddProduct }) {
         title: "Sales Report",
       },
     ],
-    [onAddProduct],
+    [],
   );
 
   return (
@@ -56,7 +55,7 @@ const QuickActions = memo(function QuickActions({ onAddProduct }) {
             icon={item.icon}
             className="text-2xl"
             title={item.title}
-            onClick={item.onClick}
+            setActivePage={setActivePage}
           />
         ))}
       </div>

@@ -64,9 +64,7 @@ const GalleryImage = memo(function GalleryImage({ img, onRemove }) {
   );
 });
 
-const AddImage = memo(function AddImage(
-  { productData, setProductData, ref },
-) {
+const AddImage = memo(function AddImage({ productData, setProductData, ref, atributeRef }) {
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState([]);
   const [primPreview, setPrimPreview] = useState(null);
@@ -79,17 +77,19 @@ const AddImage = memo(function AddImage(
       getFormData: () => {
         const formData = new FormData();
 
-        // ✅ Flask reads: request.files['image']
         if (fileStorageRef.current.primary) {
           formData.append("image", fileStorageRef.current.primary);
         }
 
-        // ✅ Flask reads: request.files.getlist('images')
         fileStorageRef.current.gallery.forEach((file) => {
           formData.append("images", file); // same key repeated = list in Flask
         });
 
         return formData;
+      },
+      reset: () => {
+        setPreview([]);
+        setPrimPreview(null);
       },
     }),
     [],
@@ -242,7 +242,7 @@ const AddImage = memo(function AddImage(
         </div>
       </div>
       <div>
-        <AddAtribute setProductData={setProductData} />
+        <AddAtribute setProductData={setProductData} ref={atributeRef} />
       </div>
     </div>
   );
