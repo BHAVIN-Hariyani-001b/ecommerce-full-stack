@@ -4,6 +4,7 @@ from sqlalchemy import Enum as saEnum
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import validates
 import re
+import uuid
 
 class userRole(pyEnum):
     ADMIN = "admin"
@@ -12,7 +13,7 @@ class userRole(pyEnum):
 
 class User(db.Model):
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20), unique=True,nullable=True)
@@ -88,6 +89,14 @@ class User(db.Model):
             "username": self.username,
             "email": self.email,
             "phone": self.phone,
+            "role": self.role.value,
+            "created_at": self.timestamp.isoformat(),
+        }
+    
+    def to_dict_(self):
+        return {
+            "username": self.username,
+            "email": self.email,
             "role": self.role.value,
             "created_at": self.timestamp.isoformat(),
         }

@@ -1,12 +1,10 @@
 from flask import Flask
 from dotenv import load_dotenv
-from app.routes.auth_routes import auth_dp
-from app.routes.product_routes import product_bp
 from flask_cors import CORS
 from app.db import db
 from app.models.productImage import ProductImage
 from app.models.category import Category
-from app.models.product import Product
+from app.models.product import Products
 
 import os
 
@@ -21,10 +19,21 @@ def create_app():
     app.secret_key = os.getenv("SECRET_KEY")
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATA_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Configure file upload settings
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max file size
+    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), '../../frontend/public/image')
+
+    # import blueprints
+    from app.routes.auth_routes import auth_dp
+    from app.routes.product_routes import product_bp
+    from app.routes.category_routes import category_bp
 
     # register blueprints
     app.register_blueprint(auth_dp,url_prefix='/api')
     app.register_blueprint(product_bp,url_prefix='/api')
+    app.register_blueprint(category_bp,url_prefix='/api')
+
     # initialize the database
     db.init_app(app)
 
