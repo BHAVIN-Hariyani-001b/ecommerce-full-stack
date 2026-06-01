@@ -1,15 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchCategories } from "./categoryThunk";
+import { fetchCategories } from "../../../features/category/categoryThunk";
+import { NewaddCategory } from "./categoryThunk";
 
 const initialState = {
   active: "All",
   category: [],
   loading: false,
   error: null,
+  successMessage: null,
 };
 
 const categorySlice = createSlice({
-  name: "userCategory",
+  name: "adminCategory",
   initialState: initialState,
   reducers: {
     setCategory: (state, action) => {
@@ -18,6 +20,7 @@ const categorySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // fetch categories
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
       })
@@ -28,7 +31,23 @@ const categorySlice = createSlice({
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // add category
+      .addCase(NewaddCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(NewaddCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.category.push(action.payload);
+        state.successMessage = "Category added successfully";
+      })
+      .addCase(NewaddCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
+
+      // update category
   },
 });
 

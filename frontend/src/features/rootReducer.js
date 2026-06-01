@@ -1,9 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import categoryReducer from "../features/category/categotySlice";
+import userCategoryReducer from "../features/category/categotySlice";
 import authReducer from "../features/auth/authSlice";
 import productAddReducer from "../admin/features/productAdd/productAddSlice";
 import storageDefault from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
+import adminCategoryReducer from "../admin/features/category/categorySlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -20,9 +21,10 @@ const persistConfigAuth = {
 };
 
 const rootReducer = combineReducers({
-  category: persistReducer(persistConfigCategory, categoryReducer),
+  userCategory: persistReducer(persistConfigCategory, userCategoryReducer),
   auth: persistReducer(persistConfigAuth, authReducer),
   productAdd: productAddReducer,
+  adminCategory: persistReducer(persistConfigCategory, adminCategoryReducer),
 });
 
 export default rootReducer;

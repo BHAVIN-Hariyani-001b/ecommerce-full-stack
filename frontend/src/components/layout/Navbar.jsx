@@ -32,8 +32,8 @@ const CategoryButton = memo(function CategoryButton({
 });
 
 const Navbar = memo(function Navbar() {
-  const active = useSelector((state) => state.category.active);
-  const category = useSelector((state) => state.category.category);
+  const active = useSelector((state) => state.userCategory.active);
+  const category = useSelector((state) => state.userCategory.category);
   const dispatch = useDispatch();
 
   useEffect(() => {

@@ -1,16 +1,13 @@
 import { memo, useEffect } from "react";
-
 import { IoIosArrowDown } from "react-icons/io";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { fetchCategories } from "../../../features/category/categoryThunk";
 
 const BasicInfo = memo(function BasicInfo({
   productData,
   handleOnChange,
 }) {
-  const category = useSelector((state) => state.category.category);
+  const category = useSelector((state) => state.userCategory.category);
 
   const dispatch = useDispatch();
 

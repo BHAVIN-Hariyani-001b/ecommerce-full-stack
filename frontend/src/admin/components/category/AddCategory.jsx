@@ -1,14 +1,17 @@
 import { useCallback, useRef, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
+import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
+import { NewaddCategory } from "../../features/category/categoryThunk";
 
 const AddCategory = () => {
   const catImageRef = useRef(null);
-
+  const dispatch = useDispatch();
   const [categoryData, setCategoryData] = useState({
     name: "",
     description: "",
+    catImageUrl: "",
     catImage: "",
     status: false,
   });
@@ -21,7 +24,7 @@ const AddCategory = () => {
 
   const handleSubmit = useCallback(async () => {
     if (!isCheckData(categoryData)) {
-      toast.error("Please fill all required fields")
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -29,8 +32,19 @@ const AddCategory = () => {
       const formData = new FormData();
       formData.append("name", categoryData.name);
       formData.append("description", categoryData.description);
-      formData.append("status", categoryData.status);
-      formData.append("catImage", catImageRef.current);
+      formData.append(
+        "status",
+        categoryData.status === true ? "ACTIVE" : "INACTIVE",
+      );
+      formData.append("catImage", categoryData.catImage);
+      formData.append("catImageUrl", catImageRef.current);
+
+      const result = await dispatch(NewaddCategory(formData)).unwrap();
+      if (!result) {
+        toast.error("Failed to add category");
+        return;
+      }
+
       toast.success("Category created successfully!");
     } catch (error) {
       console.log(error);
@@ -39,10 +53,11 @@ const AddCategory = () => {
     setCategoryData({
       name: "",
       description: "",
+      catImageUrl: "",
       catImage: "",
       status: false,
     });
-  }, [categoryData]);
+  }, [categoryData, dispatch]);
 
   const handleCatImageOpen = useCallback(() => {
     catImageRef.current?.click();
@@ -65,7 +80,11 @@ const AddCategory = () => {
       if (!file) return;
 
       const imageUrl = URL.createObjectURL(file);
-      setCategoryData((prev) => ({ ...prev, catImage: imageUrl }));
+      setCategoryData((prev) => ({
+        ...prev,
+        catImage: file,
+        catImageUrl: imageUrl,
+      }));
     },
     [setCategoryData],
   );
@@ -75,7 +94,7 @@ const AddCategory = () => {
       if (prev) {
         URL.revokeObjectURL(prev.catImage);
       }
-      return { ...prev, catImage: "" };
+      return { ...prev, catImage: "", catImageUrl: "" };
     });
     if (catImageRef.current) catImageRef.current.value = "";
   }, []);
@@ -159,7 +178,7 @@ const AddCategory = () => {
             ) : (
               <div className="border rounded-2xl border-gray-200 h-full flex items-center justify-center p-2 relative">
                 <img
-                  src={categoryData.catImage}
+                  src={categoryData.catImageUrl}
                   alt={categoryData.name}
                   className="h-full object-contain border border-gray-300 rounded-2xl border-dotted"
                 />

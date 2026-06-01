@@ -25,7 +25,7 @@ const RenderMain = memo(function RenderMain({ active }) {
 
 const Home = memo(function Home() {
   useAuth();
-  const active = useSelector((state) => state.category.active);
+  const active = useSelector((state) => state.userCategory.active);
   const userRoll = useSelector((state) => state.auth?.userRole);
 
   const mainContent = useMemo(
