@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://127.0.0.1:5000/api/",
-  timeout: 5000,
+  withCredentials : true,
 });
 
 // Function to set up interceptor after store is created
@@ -21,6 +21,6 @@ export const setupInterceptors = (store) => {
       return Promise.reject(error);
     }
   );
-};
+};  
 
 export default api;

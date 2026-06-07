@@ -4,7 +4,7 @@ import { memo, useCallback, useState } from "react";
 
 const Search = memo(function Search() {
   const [searchActive, setSearchActive] = useState(false);
-  const [searchValue, setSearchValue] = useState("Search...");
+  const [searchValue, setSearchValue] = useState("");
 
   const handleSearch = useCallback((e) => {
     const value = e.target.value;
@@ -25,6 +25,7 @@ const Search = memo(function Search() {
         className="w-full h-10 px-2 pb-0.5 outline-none text-[#454d5c]"
         autoComplete="off"
         name="search"
+        placeholder="Search..."
         value={searchValue}
         onChange={handleSearch}
       />

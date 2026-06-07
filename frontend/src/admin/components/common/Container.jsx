@@ -11,10 +11,10 @@ const Container = ({ children, setActivePage }) => {
           className="text-lg cursor-pointer flex items-center group justify-center gap-1 hover:bg-gray-100 transition-all ease-in-out delay-100 p-2 rounded-lg"
         >
           <IoIosArrowBack className="group-hover:-translate-x-1 transition-all delay-75 ease-in-out" />
-           <div>Back</div>
+          <div>Back</div>
         </button>
       </div>
-      {children}
+      <div>{children}</div>
     </div>
   );
 };

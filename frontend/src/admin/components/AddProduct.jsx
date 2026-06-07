@@ -51,6 +51,7 @@ const AddProduct = memo(function AddProduct() {
   const addImageRef = useRef(null);
   const atributeRef = useRef(null);
   const [productData, setProductData] = useState(INITIAL_PRODUCT_DATA);
+  // console.log(productData)
 
   const handleSubmit = useCallback(
     async (status) => {
@@ -65,7 +66,7 @@ const AddProduct = memo(function AddProduct() {
 
         // Add product fields individually to FormData
         formData.append("name", productData.name || "");
-        formData.append("Category", productData.Category || "");
+        formData.append("category", productData.Category || "");
         formData.append("Base_price", String(productData.Base_price || ""));
         formData.append(
           "Product_price",
@@ -79,8 +80,10 @@ const AddProduct = memo(function AddProduct() {
         formData.append("status", status);
 
         // Add attributes if any
-        if (productData.attributes && productData.attributes.length > 0) {
-          formData.append("attributes", JSON.stringify(productData.attributes));
+        if (productData.attributes?.length > 0) {
+          productData.attributes.forEach((attr, idx) => {
+            formData.append(`attributes[${idx}]`, JSON.stringify(attr));
+          });
         }
 
         // Get and add images from AddImage component
@@ -88,8 +91,11 @@ const AddProduct = memo(function AddProduct() {
           const imageFormData = addImageRef.current.getFormData();
           for (const [key, value] of imageFormData.entries()) {
             formData.append(key, value);
+            console.log(key,value)
           }
         }
+
+        // console.log(Object.fromEntries(formData));
 
         await dispatch(addProduct(formData)).unwrap();
         setProductData(INITIAL_PRODUCT_DATA);
@@ -102,14 +108,15 @@ const AddProduct = memo(function AddProduct() {
     [dispatch, productData],
   );
 
-  const handlePublish = useCallback(() => {
-    handleSubmit("public");
+  const handlePublish = useCallback(async () => {
+    await handleSubmit("public");
+    console.log("addImageRef.current:", addImageRef.current);
     addImageRef.current.reset();
     atributeRef.current.reset();
   }, [handleSubmit]);
 
-  const handleSaveDraft = useCallback(() => {
-    handleSubmit("private");
+  const handleSaveDraft = useCallback(async () => {
+    await handleSubmit("private");
     addImageRef.current.reset();
     atributeRef.current.reset();
   }, [handleSubmit]);
@@ -157,7 +164,7 @@ const AddProduct = memo(function AddProduct() {
 
         <Suspense fallback={<SkeletonAddProduct />}>
           <AddImage
-            ref={addImageRef}
+            imageRef={addImageRef}
             atributeRef={atributeRef}
             productData={productData}
             setProductData={setProductData}

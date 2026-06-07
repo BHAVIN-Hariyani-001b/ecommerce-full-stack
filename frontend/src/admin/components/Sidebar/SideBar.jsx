@@ -5,7 +5,6 @@ import { IoClose } from "react-icons/io5";
 
 const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
   const SideBarMenuItem = [
-    "Add Product",
     "Inventory",
     "Sales Report",
     "View Orders",

@@ -64,7 +64,7 @@ const GalleryImage = memo(function GalleryImage({ img, onRemove }) {
   );
 });
 
-const AddImage = memo(function AddImage({ productData, setProductData, ref, atributeRef }) {
+const AddImage = memo(function AddImage({ productData, setProductData, imageRef, atributeRef }) {
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState([]);
   const [primPreview, setPrimPreview] = useState(null);
@@ -72,7 +72,7 @@ const AddImage = memo(function AddImage({ productData, setProductData, ref, atri
 
   // In AddImage.jsx — fix getFormData to use keys Flask expects
   useImperativeHandle(
-    ref,
+    imageRef  ,
     () => ({
       getFormData: () => {
         const formData = new FormData();
@@ -90,6 +90,7 @@ const AddImage = memo(function AddImage({ productData, setProductData, ref, atri
       reset: () => {
         setPreview([]);
         setPrimPreview(null);
+        fileStorageRef.current = { primary: null, gallery: [] };
       },
     }),
     [],

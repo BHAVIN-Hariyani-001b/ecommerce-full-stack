@@ -1,5 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginApi, registerApi, getProfileApi } from "../../middleware/authApi";
+import {
+  loginApi,
+  registerApi,
+  getProfileApi,
+  checkAdmin,
+} from "../../middleware/authApi";
 
 const getErrorMessage = (error) => {
   const data = error?.response?.data;
@@ -49,5 +54,14 @@ export const getUserProfile = createAsyncThunk(
   },
 );
 
-
-
+export const fetchAdminStatus = createAsyncThunk(
+  "auth/isAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await checkAdmin();
+      return data;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);

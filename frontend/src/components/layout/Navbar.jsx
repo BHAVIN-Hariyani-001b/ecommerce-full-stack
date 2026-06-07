@@ -22,10 +22,10 @@ const CategoryButton = memo(function CategoryButton({
       ].join(" ")}
     >
       <img
-        src={`../../../public/image/${image}`}
+        src={`../../../public/image/category_img/${image}`}
         alt=""
         className="w-7"
-      />
+      /> 
       <span>{name}</span>
     </button>
   );
@@ -52,7 +52,7 @@ const Navbar = memo(function Navbar() {
       <PageWapper className={"overflow-x-auto scrollbar-none rounded"}>
         <div className="flex items-center gap-10 max-[1000px]:gap-5">
           {category?.map((item) =>
-            // item?.id !== 1 ? (
+            item?.status === "active" ? (
               <CategoryButton
                 key={item?.id}
                 name={item?.name}
@@ -60,7 +60,7 @@ const Navbar = memo(function Navbar() {
                 isActive={item?.name === active}
                 onSelect={handleCategory}
               />
-            // ) : null,
+            ) : null,
           )}
         </div>
       </PageWapper>

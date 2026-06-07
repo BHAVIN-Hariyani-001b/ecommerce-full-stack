@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchCategories } from "../../../features/category/categoryThunk";
-import { NewaddCategory } from "./categoryThunk";
+import {
+  NewaddCategory,
+  updateCategory,
+  deleteCategory,
+} from "./categoryThunk";
 
 const initialState = {
   active: "All",
@@ -8,6 +12,7 @@ const initialState = {
   loading: false,
   error: null,
   successMessage: null,
+  isUpdated: false,
 };
 
 const categorySlice = createSlice({
@@ -16,6 +21,10 @@ const categorySlice = createSlice({
   reducers: {
     setCategory: (state, action) => {
       state.active = action.payload;
+    },
+
+    setIsUpdated: (state, action) => {
+      state.isUpdated = action.payload ?? true;
     },
   },
   extraReducers: (builder) => {
@@ -39,17 +48,52 @@ const categorySlice = createSlice({
       })
       .addCase(NewaddCategory.fulfilled, (state, action) => {
         state.loading = false;
-        state.category.push(action.payload);
-        state.successMessage = "Category added successfully";
+        state.category.push(action.payload.category);
+        state.isUpdated = true;
       })
       .addCase(NewaddCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
-
+      })
       // update category
+      .addCase(updateCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedCategory = action.payload.category;
+
+        const index = state.category.findIndex(
+          (cat) => cat.id === updatedCategory.id,
+        );
+
+        if (index !== -1) {
+          state.category[index] = updatedCategory;
+        }
+
+        state.isUpdated = true;
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // delete category
+      .addCase(deleteCategory.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.category = state.category.filter(
+          (cat) => cat.id !== action.payload,
+        );
+        state.isUpdated = true;
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export default categorySlice.reducer;
-export const { setCategory } = categorySlice.actions;
+export const { setCategory, setIsUpdated } = categorySlice.actions;

@@ -15,10 +15,11 @@ export const registerApi = async ({ username, email, password }) => {
 };
 
 export const getProfileApi = async () => {
-  const response = await api.get("/auth/profile",{
-    headers: {
-      "Authorization" : `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+  const response = await api.get("/auth/profile");
+  return response?.data;
+};
+
+export const checkAdmin = async () => {
+  const response = await api.get("/auth/verify");
   return response?.data;
 };

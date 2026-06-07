@@ -8,18 +8,19 @@ import SideBar from "../../components/Sidebar/SideBar";
 import AddProduct from "../../components/AddProduct";
 import Category from "../../components/category/Category";
 import Container from "../../components/common/Container";
+import Product from "../../components/product_show/Product";
 
 const DashMain = lazy(() => import("../../components/DashMain"));
 // const AddProduct = lazy(() => import("../../components/AddProduct"));
 
 const Dashboard = memo(function Dashboard() {
-  const userRoll = useSelector((state) => state.auth?.userRole);
+  const isAdmin = useSelector((state) => state.auth?.isAdmin);
   const [activePage, setActivePage] = useState("dashboard");
   // console.log(activePage);
 
   const [sideBar, setSideBar] = useState(false);
 
-  if (userRoll === "user") {
+  if (!isAdmin) {
     return <Navigate to="/" />;
   }
 
@@ -37,8 +38,9 @@ const Dashboard = memo(function Dashboard() {
           </Suspense>
         ) : (
           <Container setActivePage={setActivePage}>
-            {activePage === "Add Product" && <AddProduct />}
             {activePage === "Category" && <Category />}
+            {activePage == "Products" && <Product setActivePage={setActivePage} />}
+            {activePage == "Add Product" && <AddProduct />}
           </Container>
         )}
         <SideBar

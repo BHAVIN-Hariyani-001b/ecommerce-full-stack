@@ -1,11 +1,19 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
 import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-import { NewaddCategory } from "../../features/category/categoryThunk";
+import { fetchCategories } from "../../../features/category/categoryThunk";
+import {
+  NewaddCategory,
+  updateCategory,
+} from "../../features/category/categoryThunk";
+import {
+  setCategory,
+  setIsUpdated,
+} from "../../features/category/categorySlice";
 
-const AddCategory = () => {
+const AddCategory = ({ data }) => {
   const catImageRef = useRef(null);
   const dispatch = useDispatch();
   const [categoryData, setCategoryData] = useState({
@@ -16,11 +24,39 @@ const AddCategory = () => {
     status: false,
   });
 
+
+  useEffect(() => {
+    if (data?.id) {
+      setCategoryData({
+        name: data.name ?? "",
+        description: data.description ?? "",
+        catImageUrl: data.image
+          ? `../../../../public/image/category_img/${data.image}`
+          : "",
+        catImage: data.image ?? "",
+        status: data.status === "ACTIVE" ? true : false,
+      });
+    } else if (data === false) {
+      setCategoryData({
+        name: "",
+        description: "",
+        catImageUrl: "",
+        catImage: "",
+        status: false,
+      });
+    }
+  }, [data]);
+
   const handleToggle = useCallback(() => {
     setCategoryData((prev) => ({ ...prev, status: !prev.status }));
   }, []);
 
-  const isCheckData = (data) => Boolean(data.name.trim() && data.catImage);
+  const isCheckData = (data) =>
+    Boolean(
+      data.name.trim() &&
+      (data.catImage instanceof File ||
+        (typeof data.catImage === "string" && data.catImage.trim())),
+    );
 
   const handleSubmit = useCallback(async () => {
     if (!isCheckData(categoryData)) {
@@ -36,20 +72,37 @@ const AddCategory = () => {
         "status",
         categoryData.status === true ? "ACTIVE" : "INACTIVE",
       );
-      formData.append("catImage", categoryData.catImage);
-      formData.append("catImageUrl", catImageRef.current);
 
-      const result = await dispatch(NewaddCategory(formData)).unwrap();
-      if (!result) {
-        toast.error("Failed to add category");
-        return;
+      // Only append file if it's a File object (new upload)
+      if (categoryData.catImage instanceof File) {
+        formData.append("catImage", categoryData.catImage);
+      } else if (data?.id && categoryData.catImage) {
+        formData.append("existingImage", categoryData.catImage);
       }
 
-      toast.success("Category created successfully!");
+      let result;
+      if (data?.id) {
+        // Update existing category
+        result = await dispatch(
+          updateCategory({ id: data.id, formData }),
+        ).unwrap();
+        toast.success("Category updated successfully!");
+      } else {
+        // Add new category
+        result = await dispatch(NewaddCategory(formData)).unwrap();
+        toast.success("Category created successfully!");
+      }
+
+      if (!result) {
+        toast.error("Failed to process category");
+        return;
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error:", error);
+      toast.error(error || "Failed to process category");
     }
 
+    // Reset form
     setCategoryData({
       name: "",
       description: "",
@@ -57,7 +110,8 @@ const AddCategory = () => {
       catImage: "",
       status: false,
     });
-  }, [categoryData, dispatch]);
+    dispatch(setCategory(null));
+  }, [categoryData, dispatch, data]);
 
   const handleCatImageOpen = useCallback(() => {
     catImageRef.current?.click();
@@ -99,12 +153,14 @@ const AddCategory = () => {
     if (catImageRef.current) catImageRef.current.value = "";
   }, []);
 
-  console.log(categoryData);
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [handleSubmit, dispatch]);
 
   return (
     <>
       <form className="flex flex-col gap-3" autoComplete="off">
-        <ToastContainer position="top-right" autoClose={1000} />
+        <ToastContainer position="top-right" className="z-50" autoClose={1000} />
         <div className="flex flex-col gap-2">
           <label htmlFor="catName" className="font-semibold">
             Category Name
@@ -171,7 +227,7 @@ const AddCategory = () => {
             <span className="font-semibold">Click to Upload</span>
           </button>
           <div className="flex items-center p-4 justify-center border border-gray-300 rounded-lg h-50 object-contain max-[600px]:max-h-40">
-            {!categoryData.catImage ? (
+            {!categoryData.catImage && !categoryData.catImageUrl ? (
               <span className="bg-gray-300 px-2 py-1 rounded-3xl text-[12px]">
                 image preview
               </span>
@@ -202,15 +258,41 @@ const AddCategory = () => {
             onChange={handleOnChangeImage}
           />
         </div>
-        <div className="text-center w-full h-14 text-white font-semibold cursor-pointer bg-blue-500 rounded-xl flex items-center justify-center hover:bg-blue-400 focus:scale-99">
-          <button
-            type="button"
-            className="w-full h-full"
-            onClick={handleSubmit}
-          >
-            Create Category
-          </button>
-        </div>
+        {!data?.id ? (
+          <div className="text-center w-full h-14 text-white font-semibold bg-blue-500 rounded-xl flex items-center justify-center hover:bg-blue-400 focus:scale-99">
+            <button
+              type="button"
+              className="w-full h-full cursor-pointer"
+              onClick={handleSubmit}
+            >
+              Create Category
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-4">
+            <div className="text-center w-full h-14 text-white font-semibold bg-blue-500 rounded-xl flex items-center justify-center hover:bg-blue-400 focus:scale-99">
+              <button
+                type="button"
+                className="w-full h-full cursor-pointer"
+                onClick={()=>{
+                  handleSubmit();
+                  dispatch(setIsUpdated(false));
+                }}
+              >
+                Update Category
+              </button>
+            </div>
+            <div className="text-center w-full h-14 border border-gray-200 font-semibold rounded-xl flex items-center justify-center hover:text-white hover:bg-blue-400 focus:scale-99">
+              <button
+                type="button"
+                className="w-full h-full cursor-pointer"
+                onClick={() => {dispatch(setIsUpdated(false))}}
+              >
+                Cancel Category
+              </button>
+            </div>
+          </div>
+        )}
       </form>
     </>
   );

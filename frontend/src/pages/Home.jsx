@@ -4,8 +4,8 @@ import Fotter from "../components/layout/Footer";
 import { useSelector } from "react-redux";
 import All from "../components/cards/All";
 import ProductSection from "../components/cards/ProductSection";
-import useAuth from "../hook/useAuth";
 import { Navigate } from "react-router-dom";
+import useAdminVerify from "../hook/useAdminVerify";
 
 const RenderMain = memo(function RenderMain({ active }) {
   if (active === "All") {
@@ -20,22 +20,17 @@ const RenderMain = memo(function RenderMain({ active }) {
     <div className="flex w-full max-w-6xl justify-center px-4 py-6">
       <ProductSection category={active} />
     </div>
-  );  
+  );
 });
 
 const Home = memo(function Home() {
-  useAuth();
   const active = useSelector((state) => state.userCategory.active);
-  const userRoll = useSelector((state) => state.auth?.userRole);
+  const { isAdmin, isLoading, token } = useAdminVerify();
 
-  const mainContent = useMemo(
-    () => <RenderMain active={active} />,
-    [active],
-  );
+  const mainContent = useMemo(() => <RenderMain active={active} />, [active]);
 
-  if (userRoll === "admin") {
-    return <Navigate to="/admin" />;
-  }
+  if (token && isLoading) return null;
+  if (isAdmin) return <Navigate to="/admin" />;
 
   return (
     <div>
