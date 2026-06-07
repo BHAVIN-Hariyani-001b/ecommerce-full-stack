@@ -1,59 +1,21 @@
-from flask import Blueprint,jsonify,request,Response,current_app
+from flask import Blueprint,jsonify,request,Response
 from app.models.product import Products, Gender, Status
 from app.models.category import Category
 from app.models.productImage import ProductImage
 from app.models.productAttribute import ProductAttribute
 from app.db import db
-from werkzeug.utils import secure_filename
-import os
+from app.util.imageUpload import save_image as save_uploaded_file
 import json
-from datetime import datetime
+from app.util.admin import admin_required
+from sqlalchemy import update,delete,select
 
 product_bp = Blueprint('product',__name__)
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def save_uploaded_file(file, product_id=None):
-    """Save uploaded file to img folder and return filename"""
-    if not file or file.filename == '':
-        return None
-    
-    if not allowed_file(file.filename):
-        return None
-    
-    # Create img folder if it doesn't exist - use absolute path
-    img_folder = os.path.join(os.path.dirname(__file__), '../../../frontend/public/image/product_img')
-    img_folder = os.path.abspath(img_folder)
-    
-    try:
-        os.makedirs(img_folder, exist_ok=True)
-    except Exception as e:
-        print(f"Error creating folder {img_folder}: {e}")
-        return None
-    
-    # Generate unique filename
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
-    filename = secure_filename(f"{timestamp}{file.filename}")
-    
-    # Save file
-    filepath = os.path.join(img_folder, filename)
-    try:
-        file.save(filepath)
-        print(f"File saved successfully to: {filepath}")
-        return filename
-    except Exception as e:
-        print(f"Error saving file to {filepath}: {e}")
-        return None
-
 @product_bp.route("/product/<uuid:id>",methods=["GET"])
-def get_product(id : int) -> Response:
+def get_product(id) -> Response:
     """get id of the product and return product detail's base on id"""
     try:
-        product = db.session.get(Products,id)
+        product = db.session.get(Products,(id))
         if not product:
             return jsonify({'message': 'Product not found'}), 404
         
@@ -69,6 +31,7 @@ def get_product(id : int) -> Response:
         }),500  
     
 @product_bp.route("/product/add",methods=["POST"])
+@admin_required
 def create_product():
     """create product with all details, handle file uploads, and return created product details"""
     try:
@@ -153,7 +116,7 @@ def create_product():
             primary_image_file = request.files['image']
             
         if primary_image_file:
-            filename = save_uploaded_file(primary_image_file)
+            filename = save_uploaded_file(primary_image_file, UPLOAD_FOLDER='../../../frontend/public/image/product_img')
             if filename:
                 product.images.append(
                     ProductImage(
@@ -186,7 +149,7 @@ def create_product():
             gallery_files = request.files.getlist('images')
         
         for idx, file in enumerate(gallery_files, start=2):
-            filename = save_uploaded_file(file)
+            filename = save_uploaded_file(file, UPLOAD_FOLDER='../../../frontend/public/image/product_img')
             if filename:
                 product.images.append(ProductImage(
                     image_name=filename,
@@ -212,7 +175,7 @@ def create_product():
                 is_primary=img.get('is_primary', False),
                 sort_order=img.get('sort_order', idx),
             ))
-
+    
         # Handle attributes from FormData or JSON
         attributes_data = []
         
@@ -262,6 +225,114 @@ def create_product():
         db.session.rollback()
         return jsonify({
             "message" : "An error occurred while creating the product",
+            "error" : str(e)
+        }),500
+
+
+@product_bp.route("/product/update/<uuid:id>",methods=["PUT"])
+def update_product(id) -> Response:
+    """update product with all details, handle file uploads, and return updated product details"""
+    try:  
+        data = request.form.to_dict()
+        # data = request.get_json()
+        print(data)
+        print(request.files)
+
+        existing = db.session.get(Products,str(id))
+        if not existing:
+            return jsonify({"error" : "Product not found"})
+        
+        print(existing)
+
+        try:
+            base_price = float(data.get('BPrice'))
+            product_price = float(data.get('PPrice'))
+            qty = int(data.get('qty', 0))
+            discount = float(data.get('discount', 0))
+        except (ValueError, TypeError):
+            return jsonify({
+                "message": "Invalid numeric values for Base_price, Product_price, qty, or discount"
+            }), 400
+        
+        category_name = data.get("category")
+        if category_name:
+            category = Category.query.filter_by(name=category_name).first()
+        else:
+            category = Category.query.first()
+
+        if not category:
+            return jsonify({
+                "message" : "Category not found"
+            }),404
+        
+        gender = data.get("gender","").lower()
+    
+        try:
+            gender = Gender(gender) if gender else None
+        except ValueError:
+            gender = None
+
+        status = data.get('status',"").lower()
+        if isinstance(status,str):
+            status = status.lower()
+        try:
+            status = Status(status) if status else Status.PUBLIC
+        except ValueError:
+            status = Status.PUBLIC
+
+        existing.name = data.get('name',existing.name).strip()
+        existing.Base_price = base_price
+        existing.Product_price = product_price
+        existing.sku = data.get('sku',existing.sku).strip()
+        existing.qty = qty
+        existing.discount = discount
+        existing.category_id = category.id
+        existing.description = data.get('description',existing.description) or None
+        existing.gender = gender
+        existing.status = status
+
+        primary_image_file = None
+        if 'image' in request.files:
+            primary_image_file = request.files.get('image')
+
+        if primary_image_file:
+            filename = save_uploaded_file(primary_image_file,UPLOAD_FOLDER="../../../frontend/public/image/product_img")
+            if filename:
+                result = (
+                    update(ProductImage)
+                    .where(
+                        ProductImage.product_id == str(id),
+                        ProductImage.is_primary == True
+                    )
+                    .values(image_name=filename)
+                )
+
+        
+
+
+        # gallery_files = request.files.getlist('images')
+        # print(gallery_files)
+        # for idx, file in enumerate(gallery_files, start=2):
+        #     filename = save_uploaded_file(
+        #         file,
+        #         UPLOAD_FOLDER="../../../frontend/public/image/product_img"
+        #     )
+        #     if filename:
+        #         existing.images.append(
+        #              ProductImage(image_name=filename, is_primary=False, sort_order=idx)
+        #         )
+
+        db.session.execute(result)
+        db.session.commit()
+
+        return jsonify({
+            "message" : "Product update succssfully" 
+        }), 200 
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "message" : "An error occurred while updateing product",
             "error" : str(e)
         }),500
 

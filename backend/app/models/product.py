@@ -23,7 +23,7 @@ class Products(db.Model):
     Base_price = db.Column(Numeric(10, 2),nullable=False)
     Product_price = db.Column(Numeric(10, 2),nullable=False)
 
-    sku = db.Column(db.String)
+    sku = db.Column(db.String(36), unique=True, nullable=False)
     qty = db.Column(db.Integer,default=0)
     discount = db.Column(db.Integer,default=0)
 
@@ -65,8 +65,8 @@ class Products(db.Model):
             'category' : str(self.category.name) if self.category else None,
             'attributes' : [attr.to_dict() for attr in self.attributes],
             'image' : next(
-                (img.image_url for img in self.images if img.is_primary),
+                (img.to_dict() for img in self.images if img.is_primary),
                 None
             ),
-            'images' : [img.to_dict() for img in self.images],            
+            'images' : [img.to_dict() for img in self.images if not img.is_primary],            
         }

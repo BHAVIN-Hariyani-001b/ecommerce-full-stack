@@ -17,17 +17,17 @@ with app.app_context():
     db.create_all()
 
     # 👇 Step 1: Create all categories
-    categories = {
-        "All"         : Category(name="All",image="all.png"),
-        "Fashion"     : Category(name="Fashion",image="feshion.png"),
-        "Mobile"      : Category(name="Mobile",image="mobile.png"),
-        "Beauty"      : Category(name="Beauty",image="beauty.png"),
-        "Electronics" : Category(name="Electronics",image="electronics.png"),
-        "Home"        : Category(name="Home",image="home.png"),
-        "Food"        : Category(name="Food",image="food.png"),
-    }
+    # categories = {
+    #     "All"         : Category(name="All",image="all.png"),
+    #     "Fashion"     : Category(name="Fashion",image="feshion.png"),
+    #     "Mobile"      : Category(name="Mobile",image="mobile.png"),
+    #     "Beauty"      : Category(name="Beauty",image="beauty.png"),
+    #     "Electronics" : Category(name="Electronics",image="electronics.png"),
+    #     "Home"        : Category(name="Home",image="home.png"),
+    #     "Food"        : Category(name="Food",image="food.png"),
+    # }
 
-    db.session.add_all(categories.values())
+    # db.session.add_all(categories.values())
     # db.session.commit()  # 👈 Commit first to generate IDs
 
     # 👇 Step 2: Use category_id (not category string)

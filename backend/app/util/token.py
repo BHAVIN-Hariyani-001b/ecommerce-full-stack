@@ -1,28 +1,21 @@
-import jwt
-import os
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
-load_dotenv() 
+from flask_jwt_extended import create_access_token, decode_token
+from flask_jwt_extended.exceptions import JWTDecodeError
+from jwt.exceptions import ExpiredSignatureError
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+def generate_token(user_id: str, role: str) -> str:
+    return create_access_token(
+        identity=str(user_id),
+        additional_claims={"role": role}
+    )
 
-def generate_token(user_id : int, role :str) -> str:
-    payload = {
-        "user_id": user_id,
-        "role" : role,
-        "exp" : datetime.utcnow() + timedelta(hours=1)
-    }
-    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-    return token
-
-def verify_token(token : str) -> dict:
+def verify_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return payload
-    except jwt.ExpiredSignatureError:
+        decoded = decode_token(token)
+        return {
+            "user_id": decoded.get("sub"),   # flask-jwt stores identity in "sub"
+            "role":    decoded.get("role")
+        }
+    except ExpiredSignatureError:
         raise ValueError("Token has expired")
-    except jwt.InvalidTokenError:
+    except JWTDecodeError:
         raise ValueError("Invalid token")
-
-# print(generate_token(1,"admin"))
-# print(verify_token(generate_token(1,"admin")))

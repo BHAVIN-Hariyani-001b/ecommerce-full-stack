@@ -1,40 +1,75 @@
-from flask import Flask
-from dotenv import load_dotenv
+from flask import Flask, jsonify
 from flask_cors import CORS
+import jwt
 from app.db import db
 from app.models.productImage import ProductImage
 from app.models.category import Category
 from app.models.product import Products
-
+from app.config import Config
+from flask_jwt_extended import JWTManager
 import os
 
-load_dotenv()
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
     # configure the database URI
 
-    # app.config.from_object(config)
-    app.secret_key = os.getenv("SECRET_KEY")
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATA_URL')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.from_object(Config)
+    # app.secret_key = os.getenv("SECRET_KEY")
+    # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATA_URL')
+    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    CORS(app
+        , resources={r"/api/*": {"origins": app.config['FRONTEND_URL']}}
+        , supports_credentials=True
+        ,  allow_headers=["Content-Type", "Authorization"]
+        )
+    
+    # Initialize JWT Manager
+    # works with flask_jwt_extended 
+    # and identifies the user and role from the token and provide access to protected routes
+    jwt_manager = JWTManager(app)
+
+    # @jwt_manager.unauthorized_loader
+    # def unauthorized_response(callback):
+    #     return jsonify({
+    #         "success": False,
+    #         "message": "Missing or invalid token"
+    #     }), 401
+    
+    # @jwt_manager.expired_token_loader
+    # def expired_token_response(jwt_header, jwt_payload):
+    #     return jsonify({
+    #         "success": False,
+    #         "message": "Token has expired"
+    #     }), 401
+    
+    # @jwt_manager.invalid_token_loader
+    # def invalid_token_response(error):
+    #     return jsonify({
+    #         "success": False,
+    #         "message": "Invalid token"
+    #     }), 401
     
     # Configure file upload settings
-    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max file size
-    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), '../../frontend/public/image')
+    # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max file size
+    # app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), '../../frontend/public/image')
 
     # import blueprints
-    from app.routes.auth_routes import auth_dp
+    from app.routes.auth_routes import auth_bp
     from app.routes.product_routes import product_bp
     from app.routes.category_routes import category_bp
 
     # register blueprints
-    app.register_blueprint(auth_dp,url_prefix='/api')
+    app.register_blueprint(auth_bp,url_prefix='/api')
     app.register_blueprint(product_bp,url_prefix='/api')
     app.register_blueprint(category_bp,url_prefix='/api')
 
     # initialize the database
     db.init_app(app)
+
+    # Auto-create tables if not exists
+    # with app.app_context():
+        # db.create_all()
 
     return app

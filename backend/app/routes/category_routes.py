@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from app.models.category import Category
 from app.db import db
 from sqlalchemy import select,update,delete
+from app.util.imageUpload import save_image
+from app.util.admin import admin_required
 
 category_bp = Blueprint('category_bp', __name__)
 
@@ -15,7 +17,7 @@ def get_category():
         if not category:
             return jsonify({"message" : "Category not found"}), 404
         
-        data = [c.to_dict() for c in category if c.status.value == "active"]
+        data = [c.to_dict() for c in category]
         return jsonify({"category": data}),200
     
     except Exception as e:
@@ -24,26 +26,38 @@ def get_category():
             "error" : str(e)
         }),500
 
-@category_bp.route('/categories', methods=['POST'])
+@category_bp.route('/product/category/add', methods=['POST'])
 def create_category():
     """add new category"""
     try:
-        data =  request.get_json()
+        print(request.headers)
+        print(request.form)
 
-        if not data.get('name'):
-            return jsonify({"error": "Name is required"}), 400
+        name = request.form.get('name')
+        description = request.form.get('description')
+        status = request.form.get('status')
+
+        image_file = request.files.get('catImage')
+
+        image = None
+        if image_file:
+            filename = save_image(image_file, UPLOAD_FOLDER = '../../../frontend/public/image/category_img')
+            if filename:
+                image = filename
+
+        if not name and image:
+            return jsonify({"message": "Name and Image are required fields"}), 400
         
         result = Category(
-            name=data.get('name'),
-            slug=data.get('slug'),
-            description=data.get('description'),
-            image=data.get('catImage'),
-            status=data.get('status', 'active')
+            name=name,
+            description=description,
+            image=image,
+            status=status,
         )
 
         db.session.add(result)
         db.session.commit()
-        return jsonify({"message": "Category created successfully"}), 201
+        return jsonify({"message": "Category created successfully", "category": result.to_dict()}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({
@@ -51,35 +65,43 @@ def create_category():
             "error" : str(e)
         }),500
     
-@category_bp.route('/categories/<int:id>', methods=['PUT'])
+@category_bp.route('/product/category/update/<int:id>', methods=['PUT'])
 def update_category(id):
     """update new category"""
     try:
-        data =  request.get_json()
-
         existing = db.session.get(Category,id)
         if not existing:
             return jsonify({"error": "Category not found"}), 404
         
+        image_file = request.files.get('catImage')
+
+        image = None
+        if request.form.get('existingImage'):
+            image = request.form.get('existingImage')
+        else:
+            if image_file:
+                filename = save_image(image_file, UPLOAD_FOLDER = '../../../frontend/public/image/category_img')
+                if filename:
+                    image = filename
+        
         result = update(Category).where(Category.id == id).values(
-            name=data.get('name'),
-            slug=data.get('slug'),
-            description=data.get('description'),
-            image=data.get('catImage'),
-            status=data.get('status')
+            name=request.form.get('name'),
+            description=request.form.get('description'),
+            image=image,
+            status=request.form.get('status')
         )
 
         db.session.execute(result)
         db.session.commit()
-        return jsonify({"message": "Category updated successfully"}), 200
+        return jsonify({"message": "Category updated successfully","category": existing.to_dict()}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({
-            "message" : "An error occurred while creating the category",
+            "message" : "An error occurred while updating the category",
             "error" : str(e)
         }),500
     
-@category_bp.route('/categories/<int:id>', methods=['DELETE'])
+@category_bp.route('/product/category/delete/<int:id>', methods=['DELETE'])
 def delete_category(id):
     """Delete new category"""
     try:
@@ -90,7 +112,7 @@ def delete_category(id):
         result = delete(Category).where(Category.id == id)
         db.session.execute(result)
         db.session.commit()
-        return jsonify({"message": "Category deleted successfully"}), 200
+        return jsonify({"message": "Category deleted successfully","category": existing.to_dict()}), 200
     
     except Exception as e:
         db.session.rollback()

@@ -7,6 +7,7 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         try:
             auth_header = request.headers.get('Authorization')  
+            print(auth_header)
             if not auth_header:
                 return jsonify({
                     'success': False,

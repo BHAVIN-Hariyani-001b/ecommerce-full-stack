@@ -1,14 +1,14 @@
 from flask import Blueprint,jsonify,request
+from flask_jwt_extended import create_access_token , verify_jwt_in_request, get_jwt_identity, jwt_required,get_jwt
 from app.models.users import User 
 from app.db import db
 from sqlalchemy.exc import IntegrityError
-from app.util.token import generate_token
 from app.util.auth_middleware import login_required
 
-auth_dp = Blueprint('auth',__name__)
+auth_bp = Blueprint('auth',__name__)
 
 # login route
-@auth_dp.route("/auth/login",methods=["POST"])
+@auth_bp.route("/auth/login",methods=["POST"])
 def login():
     data = request.get_json()
 
@@ -29,15 +29,24 @@ def login():
     if not user.check_password(data['password']):
         return jsonify({"error" : "Invalid password"}), 401
     
-    token = generate_token(user.id,user.role.value)
+    token = create_access_token(
+        identity=str(user.id),
+        additional_claims={"role": user.role.value}
+    )
 
     return jsonify({
         "message" : "Login successful",
-        "token" : token
+        "token" : token,
+        "user": {
+            "id":       str(user.id),
+            "username": user.username,
+            "email":    user.email,
+            "role":     user.role.value
+        }
     }),200
 
 # register route
-@auth_dp.route("/auth/register",methods=["POST"])
+@auth_bp.route("/auth/register",methods=["POST"])
 def register():
     data =  request.get_json()
     print(data)
@@ -56,11 +65,20 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        token = generate_token(user.id,user.role.value)
+        token = create_access_token(
+            identity=str(user.id),
+            additional_claims={"role": user.role.value}
+        )
 
         return jsonify({
             "message": "Registered successfully",
-            "token": token
+            "token": token,
+            "user": {
+                "id":       str(user.id),
+                "username": user.username,
+                "email":    user.email,
+                "role":     user.role.value
+            }
         }), 201
 
     except ValueError as e:
@@ -71,14 +89,32 @@ def register():
         db.session.rollback()
         return jsonify({"error": "Email already exists"}), 409
     
-@auth_dp.route("/auth/profile",methods=["GET"])
-@login_required
+@auth_bp.route("/auth/profile",methods=["GET"])
+@jwt_required()
 def get_user():
-    user = User.query.get(request.user_id)
+    user_id = get_jwt_identity()
+    user = db.session.get(User,user_id)
 
     if not user:
         return jsonify({"error": "User not found"}), 404
     
     return jsonify({
         "user": user.to_dict()
+    }), 200
+
+@auth_bp.route('/auth/verify', methods=['GET'])
+@jwt_required()
+def verify():
+    claims = get_jwt()
+    user_id =  get_jwt_identity()
+
+    user = db.session.get(User,user_id)
+
+    if not user:
+        return jsonify({"error" : "User Not Found"}),404
+
+    return jsonify({
+        "valid":True,
+        "role": claims.get("role"),
+        "id": user_id
     }), 200
