@@ -1,13 +1,14 @@
-import { memo, useCallback, useImperativeHandle, useState } from "react";
-
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { IoIosArrowDown } from "react-icons/io";
-
 import { RxCrossCircled } from "react-icons/rx";
-
 const ATTRIBUTE_TYPES = ["Text", "Color", "Size", "Number"];
-
 const DEFAULT_COLOR = "#fff";
-
 const PLACEHOLDERS = {
   Text: "e.g. Cotton",
   Size: "e.g. XL",
@@ -43,7 +44,11 @@ const AttributeChip = memo(function AttributeChip({ item, onRemove }) {
   );
 });
 
-const AddAtribute = memo(function AddAtribute({ setProductData, ref }) {
+const AddAtribute = memo(function AddAtribute({
+  productData,
+  setProductData,
+  ref,
+}) {
   const [attributes, setAttributes] = useState([]);
   const [attributeType, setAttributeType] = useState("Text");
   const [attributeValue, setAttributeValue] = useState("");
@@ -52,35 +57,47 @@ const AddAtribute = memo(function AddAtribute({ setProductData, ref }) {
     ref,
     () => ({
       reset: () => {
-       setAttributes([])
+        setAttributes([]);
+        setProductData((prev) => ({ ...prev, attributes: [] }));
       },
     }),
-    [],
+    [setProductData],
   );
 
   const addAttribute = useCallback(() => {
     const value = attributeValue.trim();
-
     if (!value) return;
 
     setAttributes((prev) => [
       ...prev,
-
       { id: crypto.randomUUID(), type: attributeType, value },
     ]);
-
     setProductData((prev) => ({
       ...prev,
-
       attributes: [...prev.attributes, { type: attributeType, value }],
     }));
 
     setAttributeValue(attributeType === "Color" ? DEFAULT_COLOR : "");
   }, [attributeType, attributeValue, setProductData]);
 
-  const removeAttribute = useCallback((id) => {
-    setAttributes((prev) => prev.filter((item) => item.id !== id));
-  }, []);
+  const removeAttribute = useCallback(
+    (id) => {
+      setAttributes((prev) => {
+        const target = prev.find((item) => item.id === id);
+        if (!target) return prev;
+
+        setProductData((pd) => ({
+          ...pd,
+          attributes: pd.attributes.filter(
+            (a) => !(a.type === target.type && a.value === target.value),
+          ),
+        }));
+
+        return prev.filter((item) => item.id !== id);
+      });
+    },
+    [setProductData],
+  );
 
   const handleTypeChange = useCallback((e) => {
     const nextType = e.target.value;
@@ -94,15 +111,23 @@ const AddAtribute = memo(function AddAtribute({ setProductData, ref }) {
     (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
-
         addAttribute();
       }
     },
-
     [addAttribute],
   );
 
   const inputType = attributeType === "Number" ? "number" : "text";
+
+  useEffect(() => {
+    setAttributes(
+      productData?.attributes?.map((attr) => ({
+        id: crypto.randomUUID(),
+        type: attr?.type,
+        value: attr?.value,
+      })) ?? [],
+    );
+  }, [productData?.id]);
 
   return (
     <div>
@@ -122,8 +147,8 @@ const AddAtribute = memo(function AddAtribute({ setProductData, ref }) {
             required={true}
             className="outline-none w-full bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
           >
-            {ATTRIBUTE_TYPES.map((type) => (
-              <option key={type} value={type}>
+            {ATTRIBUTE_TYPES.map((type, index) => (
+              <option key={index} value={type}>
                 {type}
               </option>
             ))}

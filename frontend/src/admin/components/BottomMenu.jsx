@@ -29,7 +29,7 @@ const BottomMenuItem = memo(function BottomMenuItem({
   setActivePage,
 }) {
   return (
-    <button onClick={()=>setActivePage(itemName)} className="hover:bg-[#dae2fd] transition-all duration-300 hover:text-gray-500 cursor-pointer ease-in-out delay-75 h-15 w-25 rounded-4xl flex flex-col justify-center items-center">
+    <button onClick={()=>setActivePage(itemName.toLowerCase())} className="hover:bg-[#dae2fd] transition-all duration-300 hover:text-gray-500 cursor-pointer ease-in-out delay-75 h-15 w-25 rounded-4xl flex flex-col justify-center items-center">
       {icon}
       <p className="text-[13px] font-medium text-[#5c647a]">{itemName}</p>
     </button>

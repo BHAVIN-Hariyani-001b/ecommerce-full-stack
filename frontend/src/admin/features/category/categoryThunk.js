@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../../middleware";  
 import { addCategoryAPI, deleteCategoryAPI, updateCategoryAPI } from "../../middleware/category";
 
 export const NewaddCategory = createAsyncThunk(

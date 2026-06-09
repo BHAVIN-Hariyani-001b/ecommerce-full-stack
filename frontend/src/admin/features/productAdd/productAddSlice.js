@@ -6,6 +6,7 @@ const initialState = {
   error: null,
   success: false,
   products: [],
+  isUpdateProduct: false,
 };
 
 const productAddSlice = createSlice({
@@ -16,11 +17,15 @@ const productAddSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.success = false;
+      state.isUpdateProduct = false;
+    },
+    setIsUpdatedProduct: (state, action) => {
+      state.isUpdateProduct = action.payload ?? false;
     },
   },
   extraReducers: (builder) => {
     builder
-      // get product 
+      // get product
       .addCase(ProductGet.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -52,5 +57,5 @@ const productAddSlice = createSlice({
   },
 });
 
-export const { resetProductAdd } = productAddSlice.actions;
+export const { resetProductAdd, setIsUpdatedProduct } = productAddSlice.actions;
 export default productAddSlice.reducer;

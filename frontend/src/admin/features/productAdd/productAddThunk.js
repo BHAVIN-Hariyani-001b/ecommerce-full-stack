@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { productAdd } from "../../middleware/productApi";
+import { productAdd, updateProduct } from "../../middleware/productApi";
 import { getProduct } from "../../middleware/productApi";
 
 export const addProduct = createAsyncThunk(
@@ -26,6 +26,18 @@ export const ProductGet = createAsyncThunk(
       return res;
     } catch {
       return rejectWithValue("product not get, somthing went wrong");
+    }
+  },
+);
+
+export const UpdateProductAPI = createAsyncThunk(
+  "productAdd/UpdateProduct",
+  async ({ id, formData }, { rejectWithValue }) => {
+    try {
+      const response = await updateProduct(id,formData);
+      return response;
+    } catch {
+      rejectWithValue("Failed to update Product")
     }
   },
 );

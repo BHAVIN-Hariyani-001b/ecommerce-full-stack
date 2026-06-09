@@ -39,8 +39,12 @@ const Dashboard = memo(function Dashboard() {
         ) : (
           <Container setActivePage={setActivePage}>
             {activePage === "Category" && <Category />}
-            {activePage == "Products" && <Product setActivePage={setActivePage} />}
-            {activePage == "Add Product" && <AddProduct />}
+            {activePage == "products" && (
+              <Product setActivePage={setActivePage} />
+            )}
+            {activePage == "Add Product" && (
+              <AddProduct setActivePage={setActivePage} />
+            )}
           </Container>
         )}
         <SideBar

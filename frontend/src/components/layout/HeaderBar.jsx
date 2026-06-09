@@ -16,6 +16,7 @@ const HeaderBar = memo(function HeaderBar({ onLoginClick }) {
 
   return (
     <div className="border-b border-gray-200 sticky top-0 bg-white z-10">
+
       <header>
         <div className="flex items-center justify-between py-1 px-30  text-[#586274] gap-3 max-[1000px]:px-10 max-[600px]:px-6 max-[600px]:pb-16 max-[600px]:gap-2 max-[600px]:relative">
           <div>

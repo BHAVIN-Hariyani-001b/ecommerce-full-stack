@@ -24,7 +24,6 @@ const AddCategory = ({ data }) => {
     status: false,
   });
 
-
   useEffect(() => {
     if (data?.id) {
       setCategoryData({
@@ -86,17 +85,16 @@ const AddCategory = ({ data }) => {
         result = await dispatch(
           updateCategory({ id: data.id, formData }),
         ).unwrap();
-        toast.success("Category updated successfully!");
       } else {
         // Add new category
         result = await dispatch(NewaddCategory(formData)).unwrap();
-        toast.success("Category created successfully!");
       }
 
       if (!result) {
         toast.error("Failed to process category");
         return;
       }
+      toast.success("Category created successfully!");
     } catch (error) {
       console.error("Error:", error);
       toast.error(error || "Failed to process category");
@@ -160,7 +158,11 @@ const AddCategory = ({ data }) => {
   return (
     <>
       <form className="flex flex-col gap-3" autoComplete="off">
-        <ToastContainer position="top-right" className="z-50" autoClose={1000} />
+        <ToastContainer
+          position="top-right"
+          className="z-50"
+          autoClose={1000}
+        />
         <div className="flex flex-col gap-2">
           <label htmlFor="catName" className="font-semibold">
             Category Name
@@ -274,7 +276,7 @@ const AddCategory = ({ data }) => {
               <button
                 type="button"
                 className="w-full h-full cursor-pointer"
-                onClick={()=>{
+                onClick={() => {
                   handleSubmit();
                   dispatch(setIsUpdated(false));
                 }}
@@ -286,7 +288,9 @@ const AddCategory = ({ data }) => {
               <button
                 type="button"
                 className="w-full h-full cursor-pointer"
-                onClick={() => {dispatch(setIsUpdated(false))}}
+                onClick={() => {
+                  dispatch(setIsUpdated(false));
+                }}
               >
                 Cancel Category
               </button>

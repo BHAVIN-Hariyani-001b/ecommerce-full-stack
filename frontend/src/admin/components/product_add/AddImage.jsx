@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   useImperativeHandle,
+  useEffect,
 } from "react";
 
 const PRIMARY_IMAGE_NAME = "img1";
@@ -48,8 +49,8 @@ const GalleryImage = memo(function GalleryImage({ img, onRemove }) {
   return (
     <div className="border border-dashed border-gray-200 w-30 rounded-xl relative">
       <img
-        src={img.url}
-        alt={img.name}
+        src={img?.url ?? img?.image_url}
+        alt={img?.name}
         className="w-30 h-30 object-contain rounded-lg"
       />
       <button
@@ -64,7 +65,12 @@ const GalleryImage = memo(function GalleryImage({ img, onRemove }) {
   );
 });
 
-const AddImage = memo(function AddImage({ productData, setProductData, imageRef, atributeRef }) {
+const AddImage = memo(function AddImage({
+  productData,
+  setProductData,
+  imageRef,
+  atributeRef,
+}) {
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState([]);
   const [primPreview, setPrimPreview] = useState(null);
@@ -72,7 +78,7 @@ const AddImage = memo(function AddImage({ productData, setProductData, imageRef,
 
   // In AddImage.jsx — fix getFormData to use keys Flask expects
   useImperativeHandle(
-    imageRef  ,
+    imageRef,
     () => ({
       getFormData: () => {
         const formData = new FormData();
@@ -135,7 +141,7 @@ const AddImage = memo(function AddImage({ productData, setProductData, imageRef,
 
       setPreview((prev) => [
         ...prev,
-        { name: galleryImageName(prev.length), url: imageURL },
+        { name: galleryImageName(prev.length), url: imageURL, imageId: null },
       ]);
 
       fileStorageRef.current.gallery.push(file);
@@ -153,32 +159,64 @@ const AddImage = memo(function AddImage({ productData, setProductData, imageRef,
     [setProductData],
   );
 
-  const removeImage = useCallback((name) => {
-    if (name === PRIMARY_IMAGE_NAME) {
-      fileStorageRef.current.primary = null;
-      setPrimPreview((prev) => {
-        if (prev) URL.revokeObjectURL(prev.url);
-        return null;
-      });
-      return;
-    }
-
-    setPreview((prev) => {
-      const target = prev.find((item) => item.name === name);
-      if (target) URL.revokeObjectURL(target.url);
-      const filtered = prev.filter((item) => item.name !== name);
-      const galleryIndex = prev.findIndex((item) => item.name === name);
-      if (galleryIndex !== -1) {
-        fileStorageRef.current.gallery.splice(galleryIndex, 1);
+  const removeImage = useCallback(
+    (name) => {
+      if (name === PRIMARY_IMAGE_NAME) {
+        fileStorageRef.current.primary = null;
+        setPrimPreview((prev) => {
+          if (prev?.url) URL.revokeObjectURL(prev.url);
+          return null;
+        });
+        setProductData((prev) => ({ ...prev, image: null }));
+        return;
       }
-      return renumberGallery(filtered);
-    });
-  }, []);
+
+      setPreview((prev) => {
+        const target = prev.find((item) => item.name === name);
+        if (!target) return prev;
+
+        if (target.imageId) {
+          if (target.imageId) {
+            setProductData((pd) => ({
+              ...pd,
+              removeImg: [
+                ...new Set([...(pd.removeImg ?? []), target.imageId]),
+              ],
+            }));
+          }
+        } else {
+          const galleryIndex = prev.findIndex((item) => item.name === name);
+          if (galleryIndex !== -1) {
+            fileStorageRef.current.gallery.splice(galleryIndex, 1);
+          }
+        }
+
+        // revoke blob URL only for new uploads
+        if (target.url) URL.revokeObjectURL(target.url);
+
+        const filtered = prev.filter((item) => item.name !== name);
+        return renumberGallery(filtered);
+      });
+    },
+    [setProductData],
+  );
 
   const handleRemovePrimary = useCallback(
     () => removeImage(PRIMARY_IMAGE_NAME),
     [removeImage],
   );
+
+  useEffect(() => {
+    setPreview(
+      productData?.images?.map((img, i) => ({
+        name: galleryImageName(i),
+        image_url: img.image_url,
+        imageId: img.id ?? null,
+      })) ?? [],
+    );
+    setPrimPreview(null); // let productData.image.image_url take over
+    fileStorageRef.current = { primary: null, gallery: [] };
+  }, [productData?.id]);
 
   return (
     <div className="border border-gray-200 p-3 rounded-xl">
@@ -196,18 +234,18 @@ const AddImage = memo(function AddImage({ productData, setProductData, imageRef,
             required={true}
             onChange={handleFileChange}
           />
-          {primPreview ? (
+          {(primPreview ?? productData?.image?.image_url) ? (
             <div className="w-full p-2 relative">
               <img
-                src={primPreview.url || productData?.image?.image_url}
-                alt={primPreview.name}
+                src={primPreview?.url ?? productData?.image?.image_url}
+                alt={primPreview?.name ?? productData?.image?.image_name}
                 className="w-full h-50 object-contain rounded-lg"
               />
               <button
                 type="button"
                 onClick={handleRemovePrimary}
                 className="absolute top-3 right-3 cursor-pointer"
-                aria-label={`Remove ${primPreview.name}`}
+                aria-label={`Remove ${primPreview?.name || "primary image"}`}
               >
                 <RxCrossCircled className="text-2xl text-black" />
               </button>
@@ -243,7 +281,11 @@ const AddImage = memo(function AddImage({ productData, setProductData, imageRef,
         </div>
       </div>
       <div>
-        <AddAtribute setProductData={setProductData} ref={atributeRef} />
+        <AddAtribute
+          setProductData={setProductData}
+          productData={productData}
+          ref={atributeRef}
+        />
       </div>
     </div>
   );

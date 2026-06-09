@@ -71,7 +71,7 @@ const HeroBanner = memo(function HeroBanner() {
                 tabIndex={index}
                 onClick={() => handelSlide(index)}
                 type="button"
-                className={`p-1 rounded-full cursor-pointer transition-all ease-in-out 0.1  s delay-200 ${index === current ? "bg-blue-700 w-5 h-2.5" : "bg-blue-300 w-2.5 h-2.5 hover:bg-blue-400"}`}
+                className={`p-1 rounded-full cursor-pointer transition-all ease-in-out delay-200 ${index === current ? "bg-blue-700 w-5 h-2.5" : "bg-blue-300 w-2.5 h-2.5 hover:bg-blue-400"}`}
                 key={index}
               ></button>
             ))}

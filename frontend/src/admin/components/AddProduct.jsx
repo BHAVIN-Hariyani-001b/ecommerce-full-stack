@@ -1,11 +1,22 @@
-import { lazy, memo, Suspense, useCallback, useState, useRef } from "react";
+import {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
 import { FiSave } from "react-icons/fi";
-import { useDispatch } from "react-redux";
-import { addProduct } from "../features/productAdd/productAddThunk";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addProduct,
+  UpdateProductAPI,
+} from "../features/productAdd/productAddThunk";
 import SkeletonAddProduct from "./common/SkeletonAddProduct";
-import CircularProgress from "@mui/material/CircularProgress";
 import AddAtribute from "./product_add/AddAtribute";
 import { ToastContainer, toast } from "react-toastify";
+import { setIsUpdatedProduct } from "../features/productAdd/productAddSlice";
 
 const ProductInfo = lazy(() => import("./product_add/ProductInfo"));
 const AddImage = lazy(() => import("./product_add/AddImage"));
@@ -21,14 +32,10 @@ const INITIAL_PRODUCT_DATA = {
   description: "",
   gender: "",
   status: "public",
-  image: {
-    image_url: "",
-    image_name: "",
-    is_primary: true,
-    sort_order: 1,
-  },
+  image: { image_url: "", image_name: "", is_primary: true, sort_order: 1 },
   images: [],
   attributes: [],
+  removeImg: [],
 };
 
 const isProductFormValid = (data) =>
@@ -46,25 +53,68 @@ const isProductFormValid = (data) =>
     data.image?.image_name,
   );
 
-const AddProduct = memo(function AddProduct() {
+const AddProduct = memo(function AddProduct({ setActivePage }) {
   const dispatch = useDispatch();
   const addImageRef = useRef(null);
   const atributeRef = useRef(null);
   const [productData, setProductData] = useState(INITIAL_PRODUCT_DATA);
-  // console.log(productData)
+
+  const isUpdateProduct = useSelector(
+    (state) => state.productAdd.isUpdateProduct,
+  );
+
+  useEffect(() => {
+    if (isUpdateProduct?.id) {
+      setProductData({
+        id: isUpdateProduct?.id,
+        name: isUpdateProduct?.name ?? "",
+        Category: isUpdateProduct?.category ?? "",
+        Base_price: isUpdateProduct?.BPrice ?? "",
+        Product_price: isUpdateProduct?.PPrice ?? "",
+        sku: isUpdateProduct?.sku ?? "",
+        qty: isUpdateProduct?.qty ?? "",
+        discount: isUpdateProduct?.discount ?? "",
+        description: isUpdateProduct?.description ?? "",
+        gender: isUpdateProduct?.gender ?? "",
+        status: isUpdateProduct?.status ?? "public",
+        image: {
+          image_url: `../../../public/image/product_img/${isUpdateProduct?.image?.image_name}`,
+          image_name: isUpdateProduct?.image?.image_name,
+        },
+        images: (isUpdateProduct?.images ?? []).map((img) => ({
+          id: img?.id,
+          image_name: img.image_name,
+          image_url: `../../../public/image/product_img/${img.image_name}`,
+        })),
+        attributes: (isUpdateProduct?.attributes ?? []).map((attr) => ({
+          id: crypto.randomUUID(),
+          type: attr.type,
+          value: attr.value,
+        })),
+        removeImg: [],
+      });
+    } else {
+      setProductData(INITIAL_PRODUCT_DATA);
+      addImageRef.current?.reset();
+      atributeRef.current?.reset();
+    }
+  }, [isUpdateProduct?.id]);
+
+  const resetForm = useCallback(() => {
+    setProductData(INITIAL_PRODUCT_DATA);
+    addImageRef.current?.reset();
+    atributeRef.current?.reset();
+  }, []);
 
   const handleSubmit = useCallback(
     async (status) => {
       if (!isProductFormValid(productData)) {
         toast.error("Please fill all required fields correctly.");
-        return;
+        return false; // ✅ return false so caller knows it failed
       }
 
       try {
-        // Build FormData for submission
         const formData = new FormData();
-
-        // Add product fields individually to FormData
         formData.append("name", productData.name || "");
         formData.append("category", productData.Category || "");
         formData.append("Base_price", String(productData.Base_price || ""));
@@ -79,74 +129,132 @@ const AddProduct = memo(function AddProduct() {
         formData.append("gender", productData.gender || "");
         formData.append("status", status);
 
-        // Add attributes if any
+        if (productData.removeImg?.length > 0) {
+          productData.removeImg.forEach((id) => {
+            formData.append("removeImg[]", id);
+          });
+        }
+
         if (productData.attributes?.length > 0) {
           productData.attributes.forEach((attr, idx) => {
             formData.append(`attributes[${idx}]`, JSON.stringify(attr));
           });
         }
 
-        // Get and add images from AddImage component
         if (addImageRef.current?.getFormData) {
           const imageFormData = addImageRef.current.getFormData();
           for (const [key, value] of imageFormData.entries()) {
             formData.append(key, value);
-            console.log(key,value)
           }
         }
 
-        // console.log(Object.fromEntries(formData));
+        const isUpdating = Boolean(isUpdateProduct?.id);
 
-        await dispatch(addProduct(formData)).unwrap();
-        setProductData(INITIAL_PRODUCT_DATA);
-        toast.success("Product saved successfully!");
+        let result = null;
+        if (isUpdating) {
+          result = await dispatch(
+            UpdateProductAPI({ id: isUpdateProduct?.id, formData }),
+          ).unwrap();
+        } else {
+          result = await dispatch(addProduct(formData)).unwrap();
+        }
+
+        if (!result) {
+          toast.error(
+            isUpdating ? "Failed to update product." : "Failed to add product.",
+          );
+          return false;
+        }
+
+        toast.success(
+          isUpdating
+            ? "Product updated successfully!"
+            : "Product added successfully!",
+        );
+
+        if (isUpdating) {
+          await dispatch(setIsUpdatedProduct(false));
+        }
+
+        setTimeout(() => {
+          resetForm();
+          setActivePage(isUpdating ? "products" : "Add Product");
+        }, 1500);
+
+        return true;
       } catch (err) {
         toast.error(typeof err === "string" ? err : "Failed to save product.");
+        return false;
       }
     },
-
-    [dispatch, productData],
+    [dispatch, productData, isUpdateProduct, setActivePage, resetForm],
   );
 
   const handlePublish = useCallback(async () => {
-    await handleSubmit("public");
-    console.log("addImageRef.current:", addImageRef.current);
-    addImageRef.current.reset();
-    atributeRef.current.reset();
-  }, [handleSubmit]);
+    const success = await handleSubmit("public");
+    if (success) resetForm();
+  }, [handleSubmit, resetForm]);
 
   const handleSaveDraft = useCallback(async () => {
-    await handleSubmit("private");
-    addImageRef.current.reset();
-    atributeRef.current.reset();
-  }, [handleSubmit]);
+    const success = await handleSubmit("private");
+    if (success) resetForm();
+  }, [handleSubmit, resetForm]);
+
+  const handleCancel = useCallback(() => {
+    resetForm();
+    dispatch(setIsUpdatedProduct(false));
+    setActivePage("products");
+  }, [resetForm, dispatch, setActivePage]);
 
   const handlePreventDefault = useCallback((e) => e.preventDefault(), []);
 
   return (
     <div className="px-4 py-3">
-      <ToastContainer position="top-right" autoClose={1000} />
+      <ToastContainer position="top-right" autoClose={1500} />
 
       <div className="flex justify-between max-[600px]:flex-col">
-        <h1 className="text-lg p-2 font-medium">Add Product</h1>
+        <h1 className="text-lg p-2 font-medium">
+          {isUpdateProduct?.id ? "Edit Product" : "Add Product"}
+        </h1>
 
-        <div className="space-x-2 flex p-2 max-[600px]:justify-between">
-          <button
-            type="button"
-            className="bg-green-700 hover:scale-101 w-40 h-15 cursor-pointer text-white font-semibold px-4 py-4 rounded-lg"
-            onClick={handlePublish}
-          >
-            Public Product
-          </button>
-
-          <button
-            type="button"
-            className="border border-gray-200  w-40 h-15 hover:scale-101 cursor-pointer text-black font-semibold px-4 py-4 rounded-lg flex justify-center items-center gap-2"
-            onClick={handleSaveDraft}
-          >
-            <FiSave />
-            <span>Save to draft</span>
-          </button>
+        <div className="space-x-2 text-[14px] flex p-2 max-[600px]:justify-between">
+          {isUpdateProduct?.id ? (
+            <>
+              <button
+                type="button"
+                className="bg-green-700 hover:scale-101 w-40 h-15 cursor-pointer text-white font-semibold px-4 py-4 rounded-lg"
+                onClick={handlePublish}
+              >
+                Update Product
+              </button>
+              <button
+                type="button"
+                className="border border-gray-200 w-40 h-15 hover:scale-101 cursor-pointer text-black font-semibold px-4 py-4 rounded-lg flex justify-center items-center gap-2"
+                onClick={handleCancel}
+              >
+                <FiSave />
+                <span>Cancel Update</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="bg-green-700 hover:scale-101 w-40 h-15 cursor-pointer text-white font-semibold px-4 py-4 rounded-lg"
+                onClick={handlePublish}
+              >
+                Public Product
+              </button>
+              <button
+                type="button"
+                className="border border-gray-200 w-40 h-15 hover:scale-101 cursor-pointer text-black font-semibold px-4 py-4 rounded-lg flex justify-center items-center gap-2"
+                onClick={handleSaveDraft}
+              >
+                <FiSave />
+                <span>Save to draft</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -164,6 +272,7 @@ const AddProduct = memo(function AddProduct() {
 
         <Suspense fallback={<SkeletonAddProduct />}>
           <AddImage
+            key={isUpdateProduct?.id ?? "new"}
             imageRef={addImageRef}
             atributeRef={atributeRef}
             productData={productData}
