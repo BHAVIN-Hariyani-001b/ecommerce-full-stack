@@ -22,5 +22,5 @@ class Config:
     # FORONTEND URL for CORS
     FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
 
-    JWT_ACCESS_TOKEN_EXPIRES  = timedelta(hours=1)   # ✅ 1 hour
+    JWT_ACCESS_TOKEN_EXPIRES  = timedelta(hours=1)  
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)

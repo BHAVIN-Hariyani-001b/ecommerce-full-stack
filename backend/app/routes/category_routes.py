@@ -109,8 +109,7 @@ def delete_category(id):
         if not existing:
             return jsonify({"error": "Category not found"}), 404
 
-        result = delete(Category).where(Category.id == id)
-        db.session.execute(result)
+        db.session.delete(existing)
         db.session.commit()
         return jsonify({"message": "Category deleted successfully","category": existing.to_dict()}), 200
     

@@ -245,10 +245,10 @@ def update_product(id) -> Response:
         print(existing)
 
         try:
-            base_price = float(data.get('BPrice'))
-            product_price = float(data.get('PPrice'))
-            qty = int(data.get('qty', 0))
-            discount = float(data.get('discount', 0))
+            base_price = float(data.get('Base_price') or 0)
+            product_price = float(data.get('Product_price') or 0)
+            qty = int(data.get('qty', 0) or 0)   
+            discount = float(data.get('discount', 0) or 0)
         except (ValueError, TypeError):
             return jsonify({
                 "message": "Invalid numeric values for Base_price, Product_price, qty, or discount"
@@ -280,6 +280,8 @@ def update_product(id) -> Response:
         except ValueError:
             status = Status.PUBLIC
 
+
+        ## all valie are update depeands on user change 
         existing.name = data.get('name',existing.name).strip()
         existing.Base_price = base_price
         existing.Product_price = product_price
@@ -291,6 +293,8 @@ def update_product(id) -> Response:
         existing.gender = gender
         existing.status = status
 
+
+        # update primary image
         primary_image_file = None
         if 'image' in request.files:
             primary_image_file = request.files.get('image')
@@ -298,7 +302,7 @@ def update_product(id) -> Response:
         if primary_image_file:
             filename = save_uploaded_file(primary_image_file,UPLOAD_FOLDER="../../../frontend/public/image/product_img")
             if filename:
-                result = (
+                db.session.execute(
                     update(ProductImage)
                     .where(
                         ProductImage.product_id == str(id),
@@ -307,32 +311,73 @@ def update_product(id) -> Response:
                     .values(image_name=filename)
                 )
 
+        # remove gallry image for admin remove 
+        remove_img_ids = request.form.getlist("removeImg[]") 
+
+        if remove_img_ids:
+            for i in remove_img_ids:
+                db.session.execute(delete(ProductImage).where(ProductImage.id == i))
+
+
+        ## add gallery image
+        gallery_files = request.files.getlist('images')
+        for file in gallery_files:
+            filename = save_uploaded_file(
+                file,
+                UPLOAD_FOLDER="../../../frontend/public/image/product_img"
+            )
+            if filename:
+                existing.images.append(
+                     ProductImage(image_name=filename)
+                )
+
+        new_order = 2
+        for img in existing.images:
+            if img.is_primary:
+                img.sort_order = 1
+            else:
+                if (img.sort_order or 0) > 1: 
+                    img.sort_order = new_order
+                    new_order += 1
+
+        # remove deleted attributes
+        remove_attr_ids = request.form.getlist("removeAttributes[]")
+        for attr_id in remove_attr_ids:
+            db.session.execute(
+                delete(ProductAttribute).where(ProductAttribute.id == attr_id)
+            )
         
-
-
-        # gallery_files = request.files.getlist('images')
-        # print(gallery_files)
-        # for idx, file in enumerate(gallery_files, start=2):
-        #     filename = save_uploaded_file(
-        #         file,
-        #         UPLOAD_FOLDER="../../../frontend/public/image/product_img"
-        #     )
-        #     if filename:
-        #         existing.images.append(
-        #              ProductImage(image_name=filename, is_primary=False, sort_order=idx)
-        #         )
-
-        db.session.execute(result)
         db.session.commit()
 
         return jsonify({
-            "message" : "Product update succssfully" 
+            "message" : "Product update successfully" 
         }), 200 
     
     except Exception as e:
         db.session.rollback()
         return jsonify({
             "message" : "An error occurred while updateing product",
+            "error" : str(e)
+        }),500
+
+@product_bp.route("/product/delete/<uuid:id>",methods=["DELETE"])
+def delete_product(id):
+    """product delete with use of the product id"""
+    try:
+        print(id)
+        existing = db.session.get(Products,str(id))
+
+        if not existing:
+            return jsonify({"error": "Product not found"}), 404
+
+        db.session.delete(existing)
+        db.session.commit()
+
+        print(existing)
+        return jsonify({"message":"product delete successfully"})
+    except Exception as e:
+        return jsonify({
+            "message":"An error occurred while deleting the product",
             "error" : str(e)
         }),500
 

@@ -7,8 +7,8 @@ from app.models.category import Category
 from app.models.product import Products
 from app.config import Config
 from flask_jwt_extended import JWTManager
-import os
 
+BLOCKLIST = set()
 
 def create_app():
     app = Flask(__name__)
@@ -30,26 +30,25 @@ def create_app():
     # and identifies the user and role from the token and provide access to protected routes
     jwt_manager = JWTManager(app)
 
-    # @jwt_manager.unauthorized_loader
-    # def unauthorized_response(callback):
-    #     return jsonify({
-    #         "success": False,
-    #         "message": "Missing or invalid token"
-    #     }), 401
-    
-    # @jwt_manager.expired_token_loader
-    # def expired_token_response(jwt_header, jwt_payload):
-    #     return jsonify({
-    #         "success": False,
-    #         "message": "Token has expired"
-    #     }), 401
-    
-    # @jwt_manager.invalid_token_loader
-    # def invalid_token_response(error):
-    #     return jsonify({
-    #         "success": False,
-    #         "message": "Invalid token"
-    #     }), 401
+    @jwt_manager.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        return jwt_payload["jti"] in BLOCKLIST
+
+    @jwt_manager.expired_token_loader
+    def expired_token_response(jwt_header, jwt_payload):
+        return jsonify({"success": False, "message": "Token has expired"}), 401
+
+    @jwt_manager.invalid_token_loader
+    def invalid_token_response(error):
+        return jsonify({"success": False, "message": "Invalid token"}), 401
+
+    @jwt_manager.unauthorized_loader
+    def unauthorized_response(callback):
+        return jsonify({"success": False, "message": "Missing or invalid token"}), 401
+
+    @jwt_manager.revoked_token_loader
+    def revoked_token_response(jwt_header, jwt_payload):
+        return jsonify({"success": False, "message": "Token has been revoked"}), 401
     
     # Configure file upload settings
     # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max file size
