@@ -8,7 +8,7 @@ import { setIsUpdated } from "../../../admin/features/category/categorySlice";
 const CategoryList = ({ popup }) => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.adminCategory.category);
-
+  console.log(categories)
   return (
     <>
       {categories?.map((item, index) => (

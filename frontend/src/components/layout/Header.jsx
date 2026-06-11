@@ -1,10 +1,10 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import HeaderBar from "./HeaderBar";
 import Navbar from "./Navbar";
 import SignIn from "../Popup/SignIn";
 import SignUp from "../Popup/SignUp";
-import { useDispatch } from "react-redux";
-import { clearAuthError } from "../../features/auth/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { clearAuthError, clearSessionExpired } from "../../features/auth/authSlice";
 import { useLocation } from "react-router-dom";
 
 const Header = memo(function Header() {
@@ -12,6 +12,16 @@ const Header = memo(function Header() {
   const [authOpen, setAuthOpen] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const sessionExpired = useSelector((state) => state.auth.sessionExpired);
+
+  useEffect(() => {
+    if (sessionExpired) {
+      setAuthView("signin");
+      setAuthOpen(true);
+      dispatch(clearSessionExpired()); 
+    }
+  }, [sessionExpired, dispatch]);
 
   const openSignIn = useCallback(() => {
     setAuthView("signin");

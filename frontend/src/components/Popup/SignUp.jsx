@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { registerUser } from "../../features/auth/authThunk";
 import Passwordshow from "../common/Passwordshow";
+import { toast } from "react-toastify";
 
 const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const [username, setUsername] = useState("");
@@ -42,7 +43,7 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
         setConfirmPassword("");
         onClose?.();
       } catch {
-        // handled in slice
+        toast.error("please try again");
       }
     },
     [dispatch, username, email, password, confirmPassword, onClose],

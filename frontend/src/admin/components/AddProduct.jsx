@@ -15,7 +15,7 @@ import {
 } from "../features/productAdd/productAddThunk";
 import SkeletonAddProduct from "./common/SkeletonAddProduct";
 import AddAtribute from "./product_add/AddAtribute";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { setIsUpdatedProduct } from "../features/productAdd/productAddSlice";
 
 const ProductInfo = lazy(() => import("./product_add/ProductInfo"));
@@ -36,6 +36,7 @@ const INITIAL_PRODUCT_DATA = {
   images: [],
   attributes: [],
   removeImg: [],
+  removeAttributes: [],
 };
 
 const isProductFormValid = (data) =>
@@ -87,11 +88,12 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
           image_url: `../../../public/image/product_img/${img.image_name}`,
         })),
         attributes: (isUpdateProduct?.attributes ?? []).map((attr) => ({
-          id: crypto.randomUUID(),
+          id: attr.id,
           type: attr.type,
           value: attr.value,
         })),
         removeImg: [],
+        removeAttributes: [],
       });
     } else {
       setProductData(INITIAL_PRODUCT_DATA);
@@ -110,7 +112,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
     async (status) => {
       if (!isProductFormValid(productData)) {
         toast.error("Please fill all required fields correctly.");
-        return false; // ✅ return false so caller knows it failed
+        return false;
       }
 
       try {
@@ -148,6 +150,10 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
           }
         }
 
+        (productData.removeAttributes ?? []).forEach((id) => {
+          formData.append("removeAttributes[]", id);
+        });
+
         const isUpdating = Boolean(isUpdateProduct?.id);
 
         let result = null;
@@ -183,6 +189,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
 
         return true;
       } catch (err) {
+        console.error("Submit error:", err);
         toast.error(typeof err === "string" ? err : "Failed to save product.");
         return false;
       }
@@ -210,8 +217,6 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
 
   return (
     <div className="px-4 py-3">
-      <ToastContainer position="top-right" autoClose={1500} />
-
       <div className="flex justify-between max-[600px]:flex-col">
         <h1 className="text-lg p-2 font-medium">
           {isUpdateProduct?.id ? "Edit Product" : "Add Product"}

@@ -60,6 +60,7 @@ class Products(db.Model):
             'qty': self.qty,
             'description': self.description,
             'gender': self.gender.value,
+            'status': self.status.value,
             'category_id' : self.category_id,
             'discount': self.discount,
             'category' : str(self.category.name) if self.category else None,

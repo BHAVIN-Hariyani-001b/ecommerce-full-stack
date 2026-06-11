@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchCategories } from "../../../features/category/categoryThunk";
 import {
   NewaddCategory,
   updateCategory,
@@ -29,26 +28,13 @@ const categorySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetch categories
-      .addCase(fetchCategories.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchCategories.fulfilled, (state, action) => {
-        state.loading = false;
-        state.category = action.payload;
-      })
-      .addCase(fetchCategories.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
       // add category
       .addCase(NewaddCategory.pending, (state) => {
         state.loading = true;
       })
-      .addCase(NewaddCategory.fulfilled, (state, action) => {
+      .addCase(NewaddCategory.fulfilled, (state,action) => {
         state.loading = false;
-        state.category.push(action.payload.category);
+        state.category.push(action.payload.category)
         state.isUpdated = true;
       })
       .addCase(NewaddCategory.rejected, (state, action) => {

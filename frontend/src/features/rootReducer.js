@@ -1,6 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import userCategoryReducer from "../features/category/categotySlice";
-import authReducer from "../features/auth/authSlice";
+import authReducer from "../features/auth/authSlice.js";
 import productAddReducer from "../admin/features/productAdd/productAddSlice";
 import storageDefault from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";

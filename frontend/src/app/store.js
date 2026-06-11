@@ -11,6 +11,6 @@ export const store = configureStore({
     }),
 });
 
-setupInterceptors(store)
+setupInterceptors(store);
 
 export const persistor = persistStore(store);

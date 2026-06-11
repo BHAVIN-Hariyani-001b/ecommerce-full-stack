@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addProduct, ProductGet } from "./productAddThunk";
+import {
+  addProduct,
+  deleteProductAPI,
+  ProductGet,
+  UpdateProductAPI,
+} from "./productAddThunk";
 
 const initialState = {
   loading: false,
@@ -33,11 +38,11 @@ const productAddSlice = createSlice({
       .addCase(ProductGet.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.products = action.payload;
+        state.products = action.payload?.products ?? action.payload;
       })
       .addCase(ProductGet.rejected, (state, action) => {
         state.error = action.payload;
-        state.loading = true;
+        state.loading = false;
       })
 
       // add product
@@ -53,6 +58,41 @@ const productAddSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
+      })
+
+      // update product
+      .addCase(UpdateProductAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(UpdateProductAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        const index = state.products.findIndex(
+          (p) => p.id === action.payload.id,
+        );
+        if (index !== -1) state.products[index] = action.payload;
+      })
+      .addCase(UpdateProductAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // delete product
+      .addCase(deleteProductAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProductAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.products = state.products.filter(
+          (p) => p.id !== action.meta.arg, 
+        );
+      })
+      .addCase(deleteProductAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

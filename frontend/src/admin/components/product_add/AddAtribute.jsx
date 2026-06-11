@@ -86,12 +86,19 @@ const AddAtribute = memo(function AddAtribute({
         const target = prev.find((item) => item.id === id);
         if (!target) return prev;
 
-        setProductData((pd) => ({
-          ...pd,
-          attributes: pd.attributes.filter(
-            (a) => !(a.type === target.type && a.value === target.value),
-          ),
-        }));
+        setProductData((pd) => {
+          const isExisting = pd.attributes.some((a) => a.id === id);
+
+          return {
+            ...pd,
+            attributes: pd.attributes.filter(
+              (a) => !(a.type === target.type && a.value === target.value),
+            ),
+            removeAttributes: isExisting
+              ? [...new Set([...(pd.removeAttributes ?? []), id])]
+              : pd.removeAttributes,
+          };
+        });
 
         return prev.filter((item) => item.id !== id);
       });

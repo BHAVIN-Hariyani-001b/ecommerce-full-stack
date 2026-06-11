@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
 import { useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { fetchCategories } from "../../../features/category/categoryThunk";
 import {
   NewaddCategory,
@@ -90,6 +90,18 @@ const AddCategory = ({ data }) => {
         result = await dispatch(NewaddCategory(formData)).unwrap();
       }
 
+      await dispatch(fetchCategories());
+
+      // ✅ Reset form only after success
+      setCategoryData({
+        name: "",
+        description: "",
+        catImageUrl: "",
+        catImage: "",
+        status: false,
+      });
+      dispatch(setCategory(null));
+
       if (!result) {
         toast.error("Failed to process category");
         return;
@@ -153,16 +165,11 @@ const AddCategory = ({ data }) => {
 
   useEffect(() => {
     dispatch(fetchCategories());
-  }, [handleSubmit, dispatch]);
+  }, [dispatch]);
 
   return (
     <>
       <form className="flex flex-col gap-3" autoComplete="off">
-        <ToastContainer
-          position="top-right"
-          className="z-50"
-          autoClose={1000}
-        />
         <div className="flex flex-col gap-2">
           <label htmlFor="catName" className="font-semibold">
             Category Name

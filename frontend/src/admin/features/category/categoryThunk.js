@@ -6,7 +6,7 @@ export const NewaddCategory = createAsyncThunk(
   async (formData, { rejectWithValue }) => {
     try {
       const response = await addCategoryAPI(formData)
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Add Category Error:", error);
       return rejectWithValue(

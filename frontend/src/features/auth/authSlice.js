@@ -14,6 +14,7 @@ const initialState = {
   token: null,
   isLoggedIn: false,
   isAdmin: false,
+  sessionExpired: false,
 };
 
 const pickToken = (data) => data?.token;
@@ -27,6 +28,13 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.error = null;
     },
+    setSessionExpired: (state) => {
+      state.sessionExpired = true;
+    },
+    clearSessionExpired: (state) => {
+      state.sessionExpired = false;
+    },
+
     logout: (state) => {
       state.isLoading = false;
       state.error = null;
@@ -116,5 +124,11 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError, logout } = authSlice.actions;
 export default authSlice.reducer;
+
+export const {
+  clearAuthError,
+  logout,
+  setSessionExpired,
+  clearSessionExpired,
+} = authSlice.actions;

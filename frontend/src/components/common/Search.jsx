@@ -2,20 +2,22 @@ import { RxCross2 } from "react-icons/rx";
 import { MdOutlineSearch } from "react-icons/md";
 import { memo, useCallback, useState } from "react";
 
-const Search = memo(function Search() {
-  const [searchActive, setSearchActive] = useState(false);
+const Search = memo(function Search({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
 
-  const handleSearch = useCallback((e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    setSearchActive(value.length > 0);
-  }, []);
+  const handleSearch = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSearchValue(value);
+      onSearch?.(value);
+    },
+    [onSearch],
+  );
 
   const handleClear = useCallback(() => {
     setSearchValue("");
-    setSearchActive(false);
-  }, []);
+    onSearch?.("");
+  }, [onSearch]);
 
   return (
     <label className="border border-gray-300 flex items-center justify-center bg-white text-[#454d5c] rounded-xl w-full h-12 py-2 px-4 gap-1">
@@ -29,12 +31,12 @@ const Search = memo(function Search() {
         value={searchValue}
         onChange={handleSearch}
       />
-      {searchActive ? (
+      {searchValue.length > 0 && (
         <RxCross2
           className="text-2xl cursor-pointer rounded-full"
           onClick={handleClear}
         />
-      ) : null}
+      )}
     </label>
   );
 });

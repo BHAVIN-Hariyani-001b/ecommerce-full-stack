@@ -1,12 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { productAdd, updateProduct } from "../../middleware/productApi";
-import { getProduct } from "../../middleware/productApi";
+import {
+  addProductRequest,
+  deleteProductRequest,
+  getProductRequest,
+  updateProductRequest,
+} from "../../middleware/productApi";
 
 export const addProduct = createAsyncThunk(
   "productAdd/addProduct",
   async (formData, { rejectWithValue }) => {
     try {
-      const data = await productAdd(formData);
+      const data = await addProductRequest(formData);
       return data;
     } catch (error) {
       const message =
@@ -22,7 +26,7 @@ export const ProductGet = createAsyncThunk(
   "productAdd/getProduct",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await getProduct();
+      const res = await getProductRequest();
       return res;
     } catch {
       return rejectWithValue("product not get, somthing went wrong");
@@ -34,10 +38,22 @@ export const UpdateProductAPI = createAsyncThunk(
   "productAdd/UpdateProduct",
   async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const response = await updateProduct(id,formData);
+      const response = await updateProductRequest(id, formData);
       return response;
     } catch {
-      rejectWithValue("Failed to update Product")
+      return rejectWithValue("Failed to update Product");
+    }
+  },
+);
+
+export const deleteProductAPI = createAsyncThunk(
+  "productAdd/deleteProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await deleteProductRequest(id);
+      return response.data;
+    } catch {
+      return rejectWithValue("Failed to delete product");
     }
   },
 );
