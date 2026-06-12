@@ -9,6 +9,9 @@ import json
 from app.util.admin import admin_required
 from sqlalchemy import update,delete,select
 
+from sqlalchemy import func
+from collections import defaultdict
+
 product_bp = Blueprint('product',__name__)
 
 @product_bp.route("/product/<uuid:id>",methods=["GET"])
@@ -401,6 +404,49 @@ def get_products():
             "error" : str(e)
         }),500
 
+@product_bp.route("/products/homepage/product-summary")
+def get_products_page():
+
+    try:
+        limit = int(request.args.get('limit',10))
+        rn = func.row_number().over(
+            partition_by=Products.category_id,
+            order_by=Products.id
+        ).label("rn")
+
+        subquery = db.session.query(
+            Category.id.label("category_id"),
+            Category.name.label("category_name"),
+            Products.id.label("product_id"),
+            Products.name.label("product_name"),
+            rn
+        ).join(Category, Category.id == Products.category_id).subquery()
+
+        rows = db.session.query(subquery).filter(subquery.c.rn <= limit).all()
+
+        grouped = defaultdict(list)
+
+        for r in rows:
+            grouped[r.category_id].append({
+                "id": r.product_id,
+                "name": r.product_name
+            })
+
+        result = [
+            {
+                "id": cat_id,
+                "name": next(r.category_name for r in rows if r.category_id == cat_id),
+                "products": products
+            }
+            for cat_id, products in grouped.items()
+        ]
+
+        return {"categories": result}
+    except Exception as e:
+        return jsonify({
+            "message" : "Error fetching products",
+            "error" : str(e)
+        })
 
 
 
