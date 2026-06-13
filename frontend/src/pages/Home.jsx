@@ -18,7 +18,7 @@ const RenderMain = memo(function RenderMain({ active }) {
 
   return (
     <div className="flex w-full max-w-6xl justify-center px-4 py-6">
-      <ProductSection category={active} />
+      <ProductSection />
     </div>
   );
 });
@@ -36,7 +36,7 @@ const Home = memo(function Home() {
     <div>
       <Header />
       <main className="flex justify-center">{mainContent}</main>
-      <Fotter />
+      {/* <Fotter /> */}
     </div>
   );
 });

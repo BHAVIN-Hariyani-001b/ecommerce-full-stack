@@ -1,5 +1,4 @@
 import { memo, useEffect, useRef, useState } from "react";
-import PageWapper from "../layout/PageWapper";
 import { IoIosArrowDropleftCircle } from "react-icons/io";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 
@@ -41,7 +40,6 @@ const HeroBanner = memo(function HeroBanner() {
 
   return (
     <div className="max-[600px]:hidden">
-      <PageWapper>
         <div className="flex flex-col justify-center items-center rounded-md my-5  relative border border-gray-200">
           <div className="flex justify-center items-center transition-all">
             <img
@@ -77,7 +75,6 @@ const HeroBanner = memo(function HeroBanner() {
             ))}
           </div>
         </div>
-      </PageWapper>
     </div>
   );
 });
