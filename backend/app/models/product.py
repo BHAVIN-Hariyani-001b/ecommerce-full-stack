@@ -71,3 +71,17 @@ class Products(db.Model):
             ),
             'images' : [img.to_dict() for img in self.images if not img.is_primary],            
         }
+
+    def to_dictt(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'BPrice': self.Base_price,
+            'PPrice': self.Product_price,
+            'discount': self.discount,
+            'category': str(self.category.name) if self.category else None,
+            'image': next(
+                (img.to_dict() for img in self.images if img.is_primary),
+                None
+            ),
+        }

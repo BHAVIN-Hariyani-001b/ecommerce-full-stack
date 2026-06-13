@@ -8,8 +8,7 @@ from app.util.imageUpload import save_image as save_uploaded_file
 import json
 from app.util.admin import admin_required
 from sqlalchemy import update,delete,select
-
-from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 from collections import defaultdict
 
 product_bp = Blueprint('product',__name__)
@@ -397,56 +396,51 @@ def get_products():
         else:
             products = Products.query.all()
 
-        return jsonify({"products" : [i.to_dict() for i in products]})
+        return jsonify({"products" : [i.to_dictt() for i in products]})
     except Exception as e:
         return jsonify({
             "message" : "An error occurred while fetching the all products ",
             "error" : str(e)
         }),500
 
+
 @product_bp.route("/products/homepage/product-summary")
 def get_products_page():
-
     try:
-        limit = int(request.args.get('limit',10))
-        rn = func.row_number().over(
-            partition_by=Products.category_id,
-            order_by=Products.id
-        ).label("rn")
-
-        subquery = db.session.query(
-            Category.id.label("category_id"),
-            Category.name.label("category_name"),
-            Products.id.label("product_id"),
-            Products.name.label("product_name"),
-            rn
-        ).join(Category, Category.id == Products.category_id).subquery()
-
-        rows = db.session.query(subquery).filter(subquery.c.rn <= limit).all()
+        products = (
+            db.session.query(Products)
+            .options(
+                joinedload(Products.category),     
+                joinedload(Products.images),     
+            )
+            .all()
+        )
 
         grouped = defaultdict(list)
+        category_meta = {}
 
-        for r in rows:
-            grouped[r.category_id].append({
-                "id": r.product_id,
-                "name": r.product_name
-            })
+        for product in products:
+            cat_id = product.category_id
+            grouped[cat_id].append(product.to_dictt())
+
+            if cat_id not in category_meta:
+                category_meta[cat_id] = product.category.name if product.category else None
 
         result = [
             {
                 "id": cat_id,
-                "name": next(r.category_name for r in rows if r.category_id == cat_id),
-                "products": products
+                "categoryName": category_meta[cat_id],
+                "products": products_list,
             }
-            for cat_id, products in grouped.items()
+            for cat_id, products_list in grouped.items()
         ]
 
-        return {"categories": result}
+        return jsonify({"categories": result})
+
     except Exception as e:
         return jsonify({
-            "message" : "Error fetching products",
-            "error" : str(e)
-        })
-
+            "message": "Error fetching products",
+            "error": str(e)
+        }), 500
 
 
