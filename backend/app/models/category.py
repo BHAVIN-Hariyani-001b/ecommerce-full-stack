@@ -16,7 +16,6 @@ class Category(db.Model):
     status = db.Column(saEnum(Status), default=Status.ACTIVE, nullable=False)
     created_at = db.Column(db.DateTime,server_default=db.func.now())
 
-
     def to_dict(self):
         return {
             'id'          : self.id,

@@ -58,11 +58,15 @@ def create_app():
     from app.routes.auth_routes import auth_bp
     from app.routes.product_routes import product_bp
     from app.routes.category_routes import category_bp
+    from app.routes.cart_routes import cart_bp
+    from app.routes.search_routes import search_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
     app.register_blueprint(product_bp,url_prefix='/api')
     app.register_blueprint(category_bp,url_prefix='/api')
+    app.register_blueprint(cart_bp,url_prefix='/api')
+    app.register_blueprint(search_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)

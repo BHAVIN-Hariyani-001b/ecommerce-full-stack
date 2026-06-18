@@ -5,6 +5,7 @@ from app.models.productImage import ProductImage
 from app.models.users import User
 from app.models.product import Gender
 from app.models.productAttribute import ProductAttribute
+from app.models.cart import Cart
 
 from app.db import db
 from dotenv import load_dotenv
@@ -26,7 +27,7 @@ with app.app_context():
     #     "Home"        : Category(name="Home",image="home.png"),
     #     "Food"        : Category(name="Food",image="food.png"),
     # }
-
+    
     # db.session.add_all(categories.values())
     # db.session.commit()  # 👈 Commit first to generate IDs
 
@@ -60,6 +61,14 @@ with app.app_context():
     #         product.images.append(img)
 
     #     db.session.add(product)
+
+    db.session.add(
+        Cart(
+            user_id='b37bf835-0daf-4b7b-b2be-570eb5abef8c',product_id='4e7421b3-2ed3-499a-bc40-4c2d0459ac35',qty=2
+            )
+        )
+    
+
 
     db.session.commit()
 

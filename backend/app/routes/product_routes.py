@@ -9,7 +9,7 @@ import json
 from app.util.admin import admin_required
 from sqlalchemy import update,delete,select
 from sqlalchemy.orm import joinedload
-from collections import defaultdict
+from collections import defaultdict 
 
 product_bp = Blueprint('product',__name__)
 
@@ -17,7 +17,7 @@ product_bp = Blueprint('product',__name__)
 def get_product(id) -> Response:
     """get id of the product and return product detail's base on id"""
     try:
-        product = db.session.get(Products,(id))
+        product = db.session.get(Products,str(id))
         if not product:
             return jsonify({'message': 'Product not found'}), 404
         
@@ -388,14 +388,16 @@ def get_products():
     """get category in perameter in url OR not get perameter and defualt all Product. return all product base on category"""
     try:
         category = request.args.get('category')
-        print(category)
+        role = request.args.get('role')
         if category:
             products = Products.query.filter(
                 Products.category.has(name=category)
             ).all()
         else:
             products = Products.query.all()
-
+        if role == "admin":
+            return jsonify({"products" : [i.to_dict() for i in products]})
+            
         return jsonify({"products" : [i.to_dictt() for i in products]})
     except Exception as e:
         return jsonify({
