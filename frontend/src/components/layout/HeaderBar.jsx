@@ -9,14 +9,20 @@ import { useSelector } from "react-redux";
 import Search from "../common/Search";
 import Logout from "../Popup/Logout";
 
-const HeaderBar = memo(function HeaderBar({ onLoginClick }) {
+const HeaderBar = memo(function HeaderBar({
+  onLoginClick,
+  setSideBar,
+  sideBar,
+  onSearch,
+}) {
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isSearchPage = location.pathname === "/search";
 
+  const count = useSelector((state) => state.cart.count);
+
   return (
     <div className="border-b border-gray-200 sticky top-0 bg-white z-10">
-
       <header>
         <div className="flex items-center justify-between py-1 px-30  text-[#586274] gap-3 max-[1000px]:px-10 max-[600px]:px-6 max-[600px]:pb-16 max-[600px]:gap-2 max-[600px]:relative">
           <div>
@@ -37,7 +43,7 @@ const HeaderBar = memo(function HeaderBar({ onLoginClick }) {
           </div>
           <div className="w-full max-w-svw flex items-center justify-center cursor-pointer pr-4 max-[600px]:absolute max-[600px]:left-0 max-[600px]:right-0 max-[600px]:mx-auto max-[600px]:top-21 max-[600px]:px-4">
             {isSearchPage ? (
-              <Search />
+              <Search onSearch={onSearch} />
             ) : (
               <NavLink
                 to={"/search"}
@@ -53,7 +59,7 @@ const HeaderBar = memo(function HeaderBar({ onLoginClick }) {
               <button
                 type="button"
                 onClick={onLoginClick}
-                className="flex items-center flex-col justify-center gap-1 cursor-pointer"
+                className="flex items-center flex-col justify-center cursor-pointer"
               >
                 <FaRegCircleUser className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5" />
                 <p>Login</p>
@@ -61,12 +67,19 @@ const HeaderBar = memo(function HeaderBar({ onLoginClick }) {
             ) : (
               <Logout />
             )}
-            <div className="flex items-center flex-col justify-center gap-1 cursor-pointer relative">
-              <GrCart className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5" />
-              <p>Cart</p>
-              <span className=" flex items-center justify-center -right-2 -top-2 absolute bg-[#8685ef] text-white w-6 h-6 rounded-full font-medium max-[500px]:w-5 max-[500px]:h-5">
-                1
-              </span>
+            <div className="flex items-center flex-col justify-center cursor-pointer relative">
+              <button
+                className="cursor-pointer"
+                onClick={() => setSideBar(!sideBar)}
+              >
+                <GrCart className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5" />
+                <p>Cart</p>
+                {count !== 0 && (
+                  <div className="flex items-center justify-center -right-3 -top-3 text-[12px] absolute bg-[#8685ef] text-white min-w-6 min-h-6 rounded-full">
+                    <span className="h-full w-full px-1">{count < 10 ? count : "10+"}</span>
+                  </div>
+                )}
+              </button>
             </div>
           </div>
         </div>

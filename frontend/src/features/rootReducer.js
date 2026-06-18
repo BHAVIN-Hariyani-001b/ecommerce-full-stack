@@ -7,6 +7,8 @@ import { persistReducer } from "redux-persist";
 import adminCategoryReducer from "../admin/features/category/categorySlice";
 import homePageProductReducer from "../features/producthome/productHomeSlice";
 import categoryProductReducer from "../features/categoryProduct/categoryProductSlice";
+import cartReducer from "./card/cardSlice.js";
+import searchReducer from "./search/searchSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -28,6 +30,12 @@ const persistConfigCategoryProduct = {
   whitelist: ["products"],
 };
 
+const persistConfigCart = {
+  key: "cart",
+  storage,
+  whitelist: ["items", "totalPrice", "count"],
+};
+
 const rootReducer = combineReducers({
   userCategory: persistReducer(persistConfigCategory, userCategoryReducer),
   auth: persistReducer(persistConfigAuth, authReducer),
@@ -38,6 +46,8 @@ const rootReducer = combineReducers({
     persistConfigCategoryProduct,
     categoryProductReducer,
   ),
+  cart: persistReducer(persistConfigCart, cartReducer),
+  searchProduct: searchReducer,
 });
 
 export default rootReducer;

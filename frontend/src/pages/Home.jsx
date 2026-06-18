@@ -1,11 +1,10 @@
 import { memo, useMemo } from "react";
-import Header from "../components/layout/Header";
-import Fotter from "../components/layout/Footer";
 import { useSelector } from "react-redux";
 import All from "../components/cards/All";
 import ProductSection from "../components/cards/ProductSection";
 import { Navigate } from "react-router-dom";
 import useAdminVerify from "../hook/useAdminVerify";
+import { Helmet } from "react-helmet-async";
 
 const RenderMain = memo(function RenderMain({ active }) {
   if (active === "All") {
@@ -34,9 +33,14 @@ const Home = memo(function Home() {
 
   return (
     <div>
-      <Header />
+      <Helmet>
+        <title>Venture - Shop Online</title>
+        <meta
+          name="description"
+          content="Shop fashion, mobile and more at Venture"
+        />
+      </Helmet>
       <main className="flex justify-center">{mainContent}</main>
-      {/* <Fotter /> */}
     </div>
   );
 });

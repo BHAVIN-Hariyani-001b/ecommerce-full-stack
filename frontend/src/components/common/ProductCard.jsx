@@ -1,16 +1,83 @@
-import React from "react";
+import React, { memo } from "react";
+import { IoMdAdd, IoMdRemove } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addGuestCartItem,
+  decrementQty,
+  incrementQty,
+} from "../../features/card/cardSlice";
+import {
+  addToCart,
+  decrementCartItem,
+  incrementCartItem,
+} from "../../features/card/cardThunk";
+
+const findCartLine = (cartItems, productId) =>
+  cartItems.find(
+    (line) =>
+      line.id === productId ||
+      line.product_id === productId ||
+      line.product?.id === productId,
+  );
 
 const ProductCard = ({ item }) => {
-  console.log(item)
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const cartItems = useSelector((state) => state.cart?.items) ?? [];
+
+  const cartLine = findCartLine(cartItems, item?.id);
+  const isInCart = Boolean(cartLine);
+  const currentQty = cartLine?.qty ?? 0;
+
+  const handleAdd = () => {
+    if (isLoggedIn && user?.id) {
+      dispatch(
+        addToCart({
+          user_id: user.id,
+          product_id: item.id,
+        }),
+      );
+      return;
+    }
+    dispatch(addGuestCartItem(item));
+  };
+
+  const handleIncrement = () => {
+    if (isLoggedIn && user?.id && cartLine?.cart_id) {
+      dispatch(
+        incrementCartItem({
+          cart_id: cartLine.cart_id,
+          user,
+        }),
+      );
+      return;
+    }
+    dispatch(incrementQty(item?.id));
+  };
+
+  const handleDecrement = () => {
+    if (isLoggedIn && user?.id && cartLine?.cart_id) {
+      dispatch(
+        decrementCartItem({
+          cart_id: cartLine.cart_id,
+          user,
+        }),
+      );
+      return;
+    }
+    dispatch(decrementQty(item?.id));
+  };
+
   return (
     <div>
-      <div className="p-2 w-45 rounded-xl">
-        <div className="flex h-55 items-center justify-center border border-gray-200 px-1 rounded-2xl">
+      <div className="p-2 w-45 max-[400px]:w-40 rounded-xl">
+        <div className="flex h-55 max-[400px]:h-40 items-center justify-center border border-gray-200 px-1 rounded-2xl">
           <img
             src={`../../../public/image/product_img/${item?.image?.image_name}`}
             alt={item?.name}
             loading="lazy"
-            className="max-h-50 h-fit rounded-2xl object-contain"
+            className="max-h-50 max-[400px]:h-35 h-fit rounded-2xl object-contain"
           />
         </div>
         <div className="p-1 space-y-3">
@@ -19,18 +86,39 @@ const ProductCard = ({ item }) => {
           </div>
           <div className="flex justify-between items-center">
             <div className="space-x-2 flex flex-col">
-              <span className="text-[16px]">{item?.PPrice}</span>
+              <span className="text-[16px]">&#8377;{item?.PPrice}</span>
               <span className="text-[13px] line-through text-gray-400">
-                {item?.BPrice}
+                &#8377;{item?.BPrice}
               </span>
             </div>
             <div>
-              <button
-                type="button"
-                className="cursor-pointer text-green-600 border border-green-600 rounded-lg px-5 py-2"
-              >
-                Add
-              </button>
+              {isInCart ? (
+                <div className="bg-green-600 grid grid-cols-3 place-items-center text-white h-10 w-20 max-[400px]:w-19 rounded-lg">
+                  <button
+                    type="button"
+                    className="h-full cursor-pointer hover:scale-90"
+                    onClick={handleDecrement}
+                  >
+                    <IoMdRemove />
+                  </button>
+                  <p>{currentQty}</p>
+                  <button
+                    type="button"
+                    className="h-full cursor-pointer hover:scale-90"
+                    onClick={handleIncrement}
+                  >
+                    <IoMdAdd />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="cursor-pointer text-green-600 border border-green-600 hover:scale-101 rounded-lg w-20 max-[400px]:w-19 h-10"
+                  onClick={handleAdd}
+                >
+                  Add
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -39,4 +127,4 @@ const ProductCard = ({ item }) => {
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);

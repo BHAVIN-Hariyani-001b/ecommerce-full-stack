@@ -18,7 +18,6 @@ const productHomePage = createSlice({
       })
       .addCase(fetchHomePageProduct.fulfilled, (state, action) => {
         state.HomePageProduct = action.payload.categories;
-        console.log(action.payload)
         state.loading = false;
       })
       .addCase(fetchHomePageProduct.rejected, (state, action) => {

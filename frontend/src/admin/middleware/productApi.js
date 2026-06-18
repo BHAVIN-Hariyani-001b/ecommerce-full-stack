@@ -1,7 +1,7 @@
 import api from "../../middleware";
 
 export const getProductRequest = async () => {
-  const response = await api.get("/product");
+  const response = await api.get("/product?role=admin");
   return response.data;
 };
 

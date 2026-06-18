@@ -6,7 +6,7 @@ export const fetchHomePageProduct = createAsyncThunk(
   async (limit, { rejectWithValue }) => {
     try{
         const response = await getHomePageProduct(limit = 10);
-        console.log(response)
+        // console.log(response)
         return response;
     } catch{
         return rejectWithValue("Faild to Fetch Home page Product")

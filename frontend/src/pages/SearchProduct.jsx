@@ -1,17 +1,106 @@
-import { memo } from "react";
-import Footer from "../components/layout/Footer";
-import Header from "../components/layout/Header";
+import { memo, useEffect, useRef, useState } from "react";
+import Cart from "../components/cart/Cart";
+import { useDispatch, useSelector } from "react-redux";
+import ProductCard from "../components/common/ProductCard";
+import { SearchProductAPI } from "../features/search/searchThunk";
+import { useOutletContext } from "react-router-dom";
+import { IoMdReturnRight } from "react-icons/io";
+import PageWapper from "../components/layout/PageWapper";
+import { clearSearch } from "../features/search/searchSlice";
+import ProductLoading from "../components/ProductLoading/ProductLoading";
+import { toast } from "react-toastify";
+import { Helmet } from "react-helmet-async";
 
 const SearchProduct = memo(function SearchProduct() {
+  const [sideBar, setSideBar] = useState(false);
+  const { searchQuery } = useOutletContext();
+
+  const countProduct = useSelector(
+    (state) => state.searchProduct.searchProductCount,
+  );
+  const searchProduct = useSelector((state) => state.searchProduct?.product);
+  const { loading, error } = useSelector((state) => state.searchProduct);
+  console.log(searchProduct);
+
+  const dispatch = useDispatch();
+  const timerRef = useRef(null);
+
+  const ProductSearchUser = (query) => {
+    if (!query || query.trim() === "") {
+      dispatch(clearSearch());
+      return;
+    }
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(async () => {
+      try {
+        await dispatch(SearchProductAPI(query));
+      } catch {
+        console.log("Faild to search Product");
+      }
+    }, 1000);
+  };
+
+  useEffect(() => {
+    ProductSearchUser(searchQuery);
+    return () => clearTimeout(timerRef.current);
+  }, [searchQuery, dispatch]);
+
+  if (error) {
+    toast.error(error);
+    return;
+  }
+
   return (
-    <div>
-      <Header />
-      <main>
-        <div className="flex w-full max-w-6xl justify-center px-4 py-6">
-          <h1>Search Product</h1>
-        </div>
+    <div className="h-screen">
+      <Helmet>
+        <title>Venture | Search</title>
+        <meta
+          name="description"
+          content="Shop fashion, mobile and more at Venture"
+        />
+      </Helmet>
+      <main className="flex justify-center overflow-hidden">
+        <PageWapper className={`w-screen`}>
+          <div className="overflow-y-auto">
+            {searchQuery && (
+              <div className="flex justify-between items-center mb-4 w-full p-2">
+                <div className="text-sm text-gray-500">
+                  {countProduct} Results for{" "}
+                  <span className="font-medium text-gray-800">
+                    "{searchQuery}"
+                  </span>
+                </div>
+                <div>
+                  <select className="text-sm border border-gray-200 rounded-md px-2 py-1">
+                    <option>Relevance</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {loading && (
+              <div className="flex justify-center items-center">
+                <ProductLoading />
+              </div>
+            )}
+
+            <div className="grid grid-cols-6 max-[1000px]:grid-cols-4 max-[700px]:flex max-[700px]:flex-wrap place-content-center place-items-center overflow-auto">
+              {searchProduct &&
+                searchProduct?.map((item) => (
+                  <ProductCard key={item?.id} item={item} />
+                ))}
+            </div>
+          </div>
+
+          {sideBar && (
+            <aside className="w-64 shrink-0 border-l border-gray-200 bg-white px-4 py-5 flex flex-col overflow-y-auto">
+              <Cart setSideBar={setSideBar} sideBarOpen={sideBar} />
+            </aside>
+          )}
+        </PageWapper>
       </main>
-      <Footer />
     </div>
   );
 });

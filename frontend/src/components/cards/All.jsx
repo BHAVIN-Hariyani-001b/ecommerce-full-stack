@@ -4,6 +4,8 @@ import { fetchHomePageProduct } from "../../features/producthome/productHomeThun
 import ProductCard from "../common/ProductCard";
 import ProductCardList from "../common/ProductCardList";
 import PageWapper from "../layout/PageWapper";
+import HomePageLoading from "../ProductLoading/HomePageLoading";
+import { toast } from "react-toastify";
 
 const HeroBanner = lazy(() => import("../product/HeroBanner"));
 
@@ -12,7 +14,7 @@ const All = memo(function All() {
   const HomePageProduct = useSelector(
     (state) => state.homePageProduct?.HomePageProduct,
   );
-  console.log(HomePageProduct);
+  // console.log(HomePageProduct);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -20,14 +22,14 @@ const All = memo(function All() {
   }, [dispatch]);
 
   if (loading)
-    return <div className="text-center py-8">Loading products...</div>;
+    return <HomePageLoading />;
   if (error)
-    return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+    return toast.error(error);
 
   return (
     <div>
       <PageWapper>
-        <Suspense fallback={<div>loding...</div>}>
+        <Suspense fallback={<div>Loading.......</div>}>
           <HeroBanner />
         </Suspense>
         <div className="">

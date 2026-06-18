@@ -39,8 +39,8 @@ const HeroBanner = memo(function HeroBanner() {
   }, [images.length]);
 
   return (
-    <div className="max-[600px]:hidden">
-        <div className="flex flex-col justify-center items-center rounded-md my-5  relative border border-gray-200">
+    <div className="max-[600px]:hidden px-2">
+        <div className="flex flex-col justify-center items-center rounded-md my-5 relative border border-gray-200">
           <div className="flex justify-center items-center transition-all">
             <img
               src={images[current]}

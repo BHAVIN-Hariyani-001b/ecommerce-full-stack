@@ -3,13 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCategoryProduct } from "../../features/categoryProduct/categoryProductThunk";
 import ProductCard from "../common/ProductCard";
 import PageWapper from "../layout/PageWapper";
+import ProductLoading from "../ProductLoading/ProductLoading";
+import { toast } from "react-toastify";
 
 const ProductSection = memo(function ProductSection() {
   const categoryProduct = useSelector(
     (state) => state.categoryProduct.products,
   );
+  const { loading, error } = useSelector((state) => state.categoryProduct);
   const active = useSelector((state) => state.userCategory.active);
-  console.log(categoryProduct);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -17,15 +19,25 @@ const ProductSection = memo(function ProductSection() {
       dispatch(fetchCategoryProduct(String(active)));
     }
   }, [dispatch, active]);
+
+  if (error) {
+    return toast.error(error);
+  }
+
   return (
     <div>
       <PageWapper>
-        <h1 className="py-4 px-3 text-2xl font-semibold">{active}</h1>
-        <div className="flex flex-wrap justify-center items-center max-[600px]:grid max-[600px]:grid-cols-2 max-[600px]:gap-4 max-[600px]:place-items-center">
-          {categoryProduct.map((item) => (
-            <ProductCard key={item?.id} item={item} />
-          ))}
-        </div>
+        {loading && <ProductLoading />}
+        {!loading && (
+          <>
+            <h1 className="py-4 px-3 text-2xl font-semibold">{active}</h1>
+            <div className="grid grid-cols-6 max-[900px]:grid-cols-4 max-[700px]:grid-cols-3 max-[600px]:flex max-[600px]:flex-wrap max-[600px]:justify-center place-items-center">
+              {categoryProduct.map((item) => (
+                <ProductCard key={item?.id} item={item} />
+              ))}
+            </div>
+          </>
+        )}
       </PageWapper>
     </div>
   );

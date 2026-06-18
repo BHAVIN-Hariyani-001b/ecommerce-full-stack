@@ -5,6 +5,8 @@ import {
   getProfileApi,
   checkAdmin,
 } from "../../middleware/authApi";
+import { addToCart, fetchCartItem } from "../card/cardThunk";
+import { clearCart } from "../card/cardSlice";
 
 const getErrorMessage = (error) => {
   const data = error?.response?.data;
@@ -20,9 +22,25 @@ const getErrorMessage = (error) => {
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue, dispatch, getState }) => {
     try {
       const data = await loginApi({ email, password });
+      const guestItems = getState().cart.items;
+      // console.log(data);
+      if (guestItems.length > 0 && data.role !== "admin") {
+        for (const item of guestItems) {
+          await dispatch(
+            addToCart({
+              user_id: data.user?.id,
+              product_id: item?.id || item?.product_id,
+              qty: item?.qty || 1,
+            }),
+          );
+        }
+        dispatch(clearCart());
+      }
+
+      dispatch(fetchCartItem(data.user?.id));
       return data;
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));

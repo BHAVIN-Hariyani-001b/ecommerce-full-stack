@@ -14,7 +14,9 @@ const Container = ({ children, setActivePage }) => {
           <div>Back</div>
         </button>
       </div>
-      <div>{children}</div>
+      <div>
+        <div>{children}</div>
+      </div>
     </div>
   );
 };

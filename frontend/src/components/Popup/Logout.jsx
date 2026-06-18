@@ -26,7 +26,7 @@ const Logout = memo(function Logout() {
       <button
         type="button"
         onClick={openModal}
-        className="flex items-center flex-col justify-center gap-1 cursor-pointer"
+        className="flex items-center flex-col justify-center cursor-pointer"
         aria-label="Open profile menu"
       >
         <FaRegCircleUser className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5" />
