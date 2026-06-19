@@ -6,6 +6,7 @@ import ProductCardList from "../common/ProductCardList";
 import PageWapper from "../layout/PageWapper";
 import HomePageLoading from "../ProductLoading/HomePageLoading";
 import { toast } from "react-toastify";
+import Loding from "../common/Loding"
 
 const HeroBanner = lazy(() => import("../product/HeroBanner"));
 
@@ -14,7 +15,6 @@ const All = memo(function All() {
   const HomePageProduct = useSelector(
     (state) => state.homePageProduct?.HomePageProduct,
   );
-  // console.log(HomePageProduct);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,10 +29,10 @@ const All = memo(function All() {
   return (
     <div>
       <PageWapper>
-        <Suspense fallback={<div>Loading.......</div>}>
+        <Suspense fallback={<Loding />}>
           <HeroBanner />
         </Suspense>
-        <div className="">
+        <div>
           <div>
             {HomePageProduct.map((item) => (
               <ProductCardList key={item?.id} product={item} />
