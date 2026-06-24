@@ -13,7 +13,7 @@ const ProductPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const product = useSelector((state) => state.product.product);
-  console.log(product?.attributes);
+  console.log(product);
   const [productAttributes, setProductAttributes] = useState({
     Color: [],
     Size: [],
@@ -51,24 +51,37 @@ const ProductPage = () => {
     <div>
       <PageWapper className={"space-y-3"}>
         <div className="grid grid-cols-2 max-[700px]:flex max-[700px]:flex-wrap h-full my-5 w-full gap-5 p-2">
-          <div className="border border-gray-200 h-full w-full rounded-2xl p-5">
+          <div className="sticky top-25 max-[800px]:static  border border-gray-200 h-fit w-full rounded-2xl p-5 space-y-4">
             {/* this is product image show */}
+
             <div className="flex items-center justify-center">
               <img
-                src="../../public/image/product_img/0116db92-8640-4e0d-919f-ad63e4cbbe89.webp"
-                alt=""
-                className="w-full rounded-2xl"
+                src={`../../public/image/product_img/${product?.image?.image_name}`}
+                alt={product?.name}
+                className="object-contain w-full rounded-2xl"
               />
             </div>
+
+            <div className="flex gap-1 overflow-x-auto w-full max-w-fit scrollbar-none">
+              {(product?.images ?? []).map((item) => (
+                <div
+                  key={item?.id}
+                  className="w-20 h-20 shrink-0 border m-1 border-gray-200 rounded-lg cursor-pointer"
+                >
+                  <img
+                    src={`../../public/image/product_img/${item?.image_name}`}
+                    className="object-cover object-center w-20 h-20 rounded-lg p-1"
+                    alt={product?.name}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+
           <div className="border border-gray-200 h-full w-full rounded-2xl p-5">
             {/* this is the product all info */}
             <div className="space-y-5">
-              <div className="line-clamp-4 text-2xl">
-                OnePlus 13 | Smarter with OnePlus AI | Lifetime Display Warranty
-                |12GB RAM 256GB Storage Midnight Ocean | Official Smartphone for
-                BGMS 2025
-              </div>
+              <div className="line-clamp-4 text-2xl">{product?.name}</div>
               <div className="flex gap-1 items-center">
                 <span className="text-[12px]">2.5%</span>
                 <Stack spacing={1}>
@@ -84,15 +97,17 @@ const ProductPage = () => {
               <div className="">
                 <div className="space-x-2 flex">
                   <div className="text-3xl flex gap-2 items-center">
-                    <span className="text-xl">&#8377;</span> 67,908
+                    <span className="text-xl">&#8377;</span> {product?.PPrice}
                   </div>
                   <div className="text-green-700 text-[16px] pb-0.5 items-end font-bold flex gap-1">
-                    <span>21%</span>
+                    <span>{product?.discount}%</span>
                     <span>off</span>
                   </div>
                 </div>
                 <div className="text-gray-400 pl-1 space-x-2">
-                  <span className="line-through">&#8377; 78666</span>
+                  <span className="line-through">
+                    &#8377; {product?.BPrice}
+                  </span>
                   <span>MRP (include with text)</span>
                 </div>
               </div>
@@ -124,19 +139,12 @@ const ProductPage = () => {
                 </div>
               </div>
               <div>
-                <pre className="p-1 text-wrap ">
-                  Brand Samsung Operating System Android 16, One UI 8.5
-                  Operating System Android 16, One UI 8.5 Operating System
-                  Android 16, One UI 8.5 Operating System Android 16, One UI 8.5
-                  Operating System Android 16, One UI 8.5 Ram Memory Installed
-                  Size 12 GB Operating System Android 16, One UI 8.5 Memory
-                  Storage Capacity 512 GB Screen Size 6.9 Inches Refresh Rate
-                  120 Model Name Samsung Galaxy S26 Ultra Wireless Carrier
-                  Unlocked for All Carriers Cellular Technology 5G Connectivity
-                  Technology 5G, Bluetooth, NFC, USB, Wi-Fi
-                </pre>
+                <div
+                  className="p-1 text-wrap "
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
               </div>
-              <div className="">
+              <div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -181,27 +189,10 @@ const ProductPage = () => {
           <div>
             <div className="w-full border border-gray-200 p-5 rounded-2xl">
               <h1 className="text-2xl font-semibold">About This Item</h1>
-              <div className="py-2">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. A
-                consectetur autem id eveniet officia corrupti harum! Temporibus
-                quas ratione quam dolore facilis sit eaque. Obcaecati, ratione.
-                Fugiat tenetur laboriosam nemo. Suscipit minima necessitatibus
-                dolorem cumque reprehenderit magnam? Quisquam doloremque minus
-                vero praesentium officiis labore. Non commodi culpa expedita
-                quaerat error aliquid quo alias laboriosam velit esse, rerum
-                provident nam. Repellat. Saepe in voluptates maxime officiis
-                amet dicta, nobis beatae quos provident similique culpa
-                asperiores vero voluptate, tenetur quisquam! Dolorem iste ab,
-                aliquam quia ipsam hic eum magnam vel molestiae ex. Id debitis
-                quia quam ipsam magni dicta unde impedit officiis deleniti
-                vitae. Dolores est, eaque ad eos voluptates fugiat ipsam porro
-                laboriosam, voluptatum cumque enim similique soluta tenetur
-                velit obcaecati. Aliquid quidem voluptatum nihil veritatis
-                debitis tempore doloribus itaque aperiam corporis, qui tempora
-                commodi voluptatibus sed quibusdam molestias maxime, ut
-                voluptates? Repellat molestias minima illum, et enim placeat
-                distinctio assumenda?
-              </div>
+              <div
+                className="py-2"
+                dangerouslySetInnerHTML={{ __html: product.aboutItem }}
+              />
             </div>
           </div>
         </div>

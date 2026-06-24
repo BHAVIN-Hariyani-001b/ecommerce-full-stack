@@ -25,7 +25,7 @@ class Products(db.Model):
     __tablename__ = 'products'
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    name = db.Column(db.String(120),nullable=False)
+    name = db.Column(db.String(255),nullable=False)
 
     Base_price = db.Column(Numeric(10, 2),nullable=False)
     Product_price = db.Column(Numeric(10, 2),nullable=False)
