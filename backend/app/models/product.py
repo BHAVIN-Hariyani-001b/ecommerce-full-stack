@@ -3,6 +3,13 @@ import uuid
 from sqlalchemy import Enum as saEnum
 from sqlalchemy import Numeric
 from enum import Enum as pyEnum
+from collections import defaultdict
+
+def get_grouped_attributes(self):
+    grouped = defaultdict(list)
+    for attr in self.attributes:
+        grouped[attr.type].append(attr.to_dict())
+    return dict(grouped)
 
 class Gender(pyEnum):
     MALE = "male"
@@ -31,6 +38,8 @@ class Products(db.Model):
     category = db.relationship('Category', backref='products')
 
     description = db.Column(db.Text, nullable=True)
+    aboutItem = db.Column(db.Text, nullable=True)
+
     gender = db.Column(saEnum(Gender),default=Gender.UNISEX,nullable=False)
 
     status = db.Column(saEnum(Status),default=Status.PUBLIC,nullable=False)
@@ -58,6 +67,7 @@ class Products(db.Model):
             'PPrice': self.Product_price,
             'sku': self.sku,
             'qty': self.qty,
+            'aboutItem' : self.aboutItem,
             'description': self.description,
             'gender': self.gender.value,
             'status': self.status.value,

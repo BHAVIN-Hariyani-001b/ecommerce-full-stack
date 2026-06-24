@@ -21,11 +21,10 @@ def get_product(id) -> Response:
         if not product:
             return jsonify({'message': 'Product not found'}), 404
         
-        return jsonify([
-            {'message' : 'success',
+        return jsonify({
+            'message' : 'success',
               'product' : product.to_dict()
-            }
-        ]),200
+            }),200
     except Exception as e:
         return jsonify({
             "message":"An error occurred while fetching the product",
@@ -106,6 +105,7 @@ def create_product():
             discount=discount,
             category_id=category.id,
             description=data.get('description', '').strip() or None,
+            aboutItem=data.get('aboutItem', '').strip() or None,
             gender=gender,
             status=status
         )
@@ -294,6 +294,7 @@ def update_product(id) -> Response:
         existing.description = data.get('description',existing.description) or None
         existing.gender = gender
         existing.status = status
+        existing.aboutItem = data.get('aboutItem',existing.aboutItem) or None
 
 
         # update primary image

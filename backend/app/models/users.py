@@ -47,8 +47,7 @@ class User(db.Model):
     @validates('email')
     def validates_email(self,key,email):
         email = email.strip().lower()
-        pattern = r"^[a-z0-9.]+@[a-z0-9.]+\.[a-z]{2,}$"
-
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(pattern,email):
             raise ValueError("Invalid email format")
         
