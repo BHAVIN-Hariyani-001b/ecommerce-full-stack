@@ -5,6 +5,8 @@ import ProductCard from "../common/ProductCard";
 import PageWapper from "../layout/PageWapper";
 import ProductLoading from "../ProductLoading/ProductLoading";
 import { toast } from "react-toastify";
+import HeroBanner from "../product/HeroBanner";
+import { NavLink } from "react-router-dom";
 
 const ProductSection = memo(function ProductSection() {
   const categoryProduct = useSelector(
@@ -25,21 +27,22 @@ const ProductSection = memo(function ProductSection() {
   }
 
   return (
-    <div>
-      <PageWapper>
-        {loading && <ProductLoading />}
-        {!loading && (
-          <>
-            <h1 className="py-4 px-3 text-2xl font-semibold">{active}</h1>
-            <div className="grid grid-cols-6 max-[1100px]:grid-cols-5 max-[900px]:grid-cols-4 max-[700px]:grid-cols-3 max-[600px]:flex max-[600px]:flex-wrap max-[600px]:justify-center place-items-center">
-              {categoryProduct.map((item) => (
-                <ProductCard key={item?.id} item={item} />
-              ))}
-            </div>
-          </>
-        )}
-      </PageWapper>
-    </div>
+    <PageWapper>
+      {loading && <ProductLoading />}
+      {!loading && (
+        <>
+          <HeroBanner />
+          <h1 className="py-4 px-3 text-2xl font-semibold">{active}</h1>
+          <div className="grid w-full min-w-0 grid-cols-6 max-[1100px]:grid-cols-5 max-[900px]:grid-cols-4 max-[700px]:grid-cols-3 max-[600px]:flex max-[600px]:flex-wrap max-[600px]:justify-center place-items-center">
+            {categoryProduct.map((item) => (
+              <NavLink key={item?.id} to={`/product/${item?.id}`}>
+                <ProductCard item={item} />
+              </NavLink>
+            ))}
+          </div>
+        </>
+      )}
+    </PageWapper>
   );
 });
 

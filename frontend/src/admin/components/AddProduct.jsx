@@ -30,6 +30,7 @@ const INITIAL_PRODUCT_DATA = {
   qty: "",
   discount: "",
   description: "",
+  aboutItem: "",
   gender: "",
   status: "public",
   image: { image_url: "", image_name: "", is_primary: true, sort_order: 1 },
@@ -59,7 +60,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
   const addImageRef = useRef(null);
   const atributeRef = useRef(null);
   const [productData, setProductData] = useState(INITIAL_PRODUCT_DATA);
-
+  console.log(productData)
   const isUpdateProduct = useSelector(
     (state) => state.productAdd.isUpdateProduct,
   );
@@ -76,6 +77,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         qty: isUpdateProduct?.qty ?? "",
         discount: isUpdateProduct?.discount ?? "",
         description: isUpdateProduct?.description ?? "",
+        aboutItem: isUpdateProduct?.aboutItem ?? "",
         gender: isUpdateProduct?.gender ?? "",
         status: isUpdateProduct?.status ?? "public",
         image: {
@@ -128,6 +130,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         formData.append("qty", String(productData.qty || 0));
         formData.append("discount", String(productData.discount || 0));
         formData.append("description", productData.description || "");
+        formData.append("aboutItem", productData.aboutItem || "");
         formData.append("gender", productData.gender || "");
         formData.append("status", status);
 

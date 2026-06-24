@@ -30,7 +30,9 @@ const ProductCard = ({ item }) => {
   const isInCart = Boolean(cartLine);
   const currentQty = cartLine?.qty ?? 0;
 
-  const handleAdd = () => {
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (isLoggedIn && user?.id) {
       dispatch(
         addToCart({
@@ -43,7 +45,9 @@ const ProductCard = ({ item }) => {
     dispatch(addGuestCartItem(item));
   };
 
-  const handleIncrement = () => {
+  const handleIncrement = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (isLoggedIn && user?.id && cartLine?.cart_id) {
       dispatch(
         incrementCartItem({
@@ -56,7 +60,9 @@ const ProductCard = ({ item }) => {
     dispatch(incrementQty(item?.id));
   };
 
-  const handleDecrement = () => {
+  const handleDecrement = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (isLoggedIn && user?.id && cartLine?.cart_id) {
       dispatch(
         decrementCartItem({
@@ -70,14 +76,14 @@ const ProductCard = ({ item }) => {
   };
 
   return (
-    <div>
+    <div className="shrink-0">
       <div className="p-2 w-45 max-[400px]:w-40 rounded-xl">
-        <div className="flex h-55 max-[400px]:h-40 items-center justify-center border border-gray-200 px-1 rounded-2xl">
+        <div className="flex h-55 max-[400px]:h-40 group items-center justify-center border border-gray-200 px-1 rounded-2xl">
           <img
             src={`../../../public/image/product_img/${item?.image?.image_name}`}
             alt={item?.name}
             loading="lazy"
-            className="max-h-50 max-[400px]:h-35 h-fit rounded-2xl object-contain"
+            className="max-h-50 max-[400px]:h-35 h-fit rounded-2xl object-contain group-hover:scale-105 duration-300 ease-in-out"
           />
         </div>
         <div className="p-1 space-y-3">
@@ -91,12 +97,12 @@ const ProductCard = ({ item }) => {
                 &#8377;{item?.BPrice}
               </span>
             </div>
-            <div>
+            <div className="group">
               {isInCart ? (
-                <div className="bg-green-600 grid grid-cols-3 place-items-center text-white h-10 w-20 max-[400px]:w-19 rounded-lg">
+                <div className="bg-green-600 grid grid-cols-3 duration-150 ease-in-out group-hover:scale-105 place-items-center text-white h-10 w-20 max-[400px]:w-19 rounded-lg">
                   <button
                     type="button"
-                    className="h-full cursor-pointer hover:scale-90"
+                    className="h-full place-items-center w-full cursor-pointer hover:scale-90"
                     onClick={handleDecrement}
                   >
                     <IoMdRemove />
@@ -104,7 +110,7 @@ const ProductCard = ({ item }) => {
                   <p>{currentQty}</p>
                   <button
                     type="button"
-                    className="h-full cursor-pointer hover:scale-90"
+                    className="h-full w-full place-items-center cursor-pointer hover:scale-90"
                     onClick={handleIncrement}
                   >
                     <IoMdAdd />

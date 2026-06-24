@@ -3,7 +3,7 @@ import Cart from "../components/cart/Cart";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../components/common/ProductCard";
 import { SearchProductAPI } from "../features/search/searchThunk";
-import { useOutletContext } from "react-router-dom";
+import { NavLink, useOutletContext } from "react-router-dom";
 import { IoMdReturnRight } from "react-icons/io";
 import PageWapper from "../components/layout/PageWapper";
 import { clearSearch } from "../features/search/searchSlice";
@@ -89,7 +89,9 @@ const SearchProduct = memo(function SearchProduct() {
             <div className="grid grid-cols-6 max-[1000px]:grid-cols-4 max-[700px]:flex max-[700px]:flex-wrap place-content-center place-items-center overflow-auto">
               {searchProduct &&
                 searchProduct?.map((item) => (
-                  <ProductCard key={item?.id} item={item} />
+                  <NavLink key={item?.id} to={`/product/${item?.id}`}>
+                    <ProductCard item={item} />
+                  </NavLink>
                 ))}
             </div>
           </div>

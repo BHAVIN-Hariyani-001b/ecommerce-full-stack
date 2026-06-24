@@ -7,6 +7,9 @@ import {
 } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { RxCrossCircled } from "react-icons/rx";
+import Modal from "../../../components/common/Modal";
+import Description from "./Description";
+
 const ATTRIBUTE_TYPES = ["Text", "Color", "Size", "Number"];
 const DEFAULT_COLOR = "#fff";
 const PLACEHOLDERS = {
@@ -52,6 +55,11 @@ const AddAtribute = memo(function AddAtribute({
   const [attributes, setAttributes] = useState([]);
   const [attributeType, setAttributeType] = useState("Text");
   const [attributeValue, setAttributeValue] = useState("");
+
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+
+  const openDescription = () => setIsDescriptionOpen(true);
+  const closeDescription = () => setIsDescriptionOpen(false);
 
   useImperativeHandle(
     ref,
@@ -136,6 +144,10 @@ const AddAtribute = memo(function AddAtribute({
     );
   }, [productData?.id]);
 
+  const handleOnchange = (e) => {
+    setProductData((prev) => ({ ...prev, aboutItem: e.target.value }));
+  };
+
   return (
     <div>
       <h1 className="text-lg p-2 font-medium">Add Attributes</h1>
@@ -219,6 +231,43 @@ const AddAtribute = memo(function AddAtribute({
           ))}
         </div>
       ) : null}
+
+      <div className="flex flex-col relative py-3">
+        <label
+          htmlFor="ProductDescription"
+          className="font-semibold p-1 text-xl"
+        >
+          About This Item
+        </label>
+        <div className="p-2">
+          <div
+            className="outline-none bg-blue-50 border px-3 py-3 rounded-lg h-40 border-gray-200 resize-none overflow-scroll scrollbar-none cursor-pointer"
+            onClick={openDescription}
+          >
+            {productData?.aboutItem ? (
+              <div
+                dangerouslySetInnerHTML={{ __html: productData.aboutItem }}
+              />
+            ) : (
+              <span className="text-gray-400">
+                Click to add a about this item
+              </span>
+            )}
+          </div>
+        </div>
+        <Modal
+          open={isDescriptionOpen}
+          onClose={closeDescription}
+          title="About This Item"
+          width={"w-100"}
+          widthClassName={"max-w-200"}
+        >
+          <Description
+            handleOnchange={handleOnchange}
+            values={productData?.aboutItem}
+          />
+        </Modal>
+      </div>
     </div>
   );
 });

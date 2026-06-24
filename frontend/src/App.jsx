@@ -1,16 +1,25 @@
-import { memo, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { memo, useEffect, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Cart from "./components/cart/Cart";
+import useAdminVerify from "./hook/useAdminVerify";
 
 const App = memo(function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sideBar, setSideBar] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const { isAdmin, isLoading, token } = useAdminVerify();
+
+  useEffect(() => {
+    if (token && !isLoading && isAdmin) {
+      navigate("/admin", { replace: true });
+    }
+  }, [isAdmin, token, navigate, isLoading]);
   return (
     <div>
       {!isAdminRoute && (

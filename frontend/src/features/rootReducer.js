@@ -9,6 +9,7 @@ import homePageProductReducer from "../features/producthome/productHomeSlice";
 import categoryProductReducer from "../features/categoryProduct/categoryProductSlice";
 import cartReducer from "./card/cardSlice.js";
 import searchReducer from "./search/searchSlice";
+import productReducer from "./productPage/productPageSlice.js";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -36,18 +37,28 @@ const persistConfigCart = {
   whitelist: ["items", "totalPrice", "count"],
 };
 
+const persistConfigHomePageProduct = {
+  key: "productHomePage",
+  storage,
+  whitelist: ["productHomePage"],
+};
+
 const rootReducer = combineReducers({
   userCategory: persistReducer(persistConfigCategory, userCategoryReducer),
   auth: persistReducer(persistConfigAuth, authReducer),
   productAdd: productAddReducer,
   adminCategory: persistReducer(persistConfigCategory, adminCategoryReducer),
-  homePageProduct: homePageProductReducer,
+  homePageProduct: persistReducer(
+    persistConfigHomePageProduct,
+    homePageProductReducer,
+  ),
   categoryProduct: persistReducer(
     persistConfigCategoryProduct,
     categoryProductReducer,
   ),
   cart: persistReducer(persistConfigCart, cartReducer),
   searchProduct: searchReducer,
+  product: productReducer,
 });
 
 export default rootReducer;

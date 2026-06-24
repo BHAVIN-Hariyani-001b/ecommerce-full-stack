@@ -49,7 +49,9 @@ const Header = memo(function Header({ setSideBar, sideBar, setQuery }) {
 
   const closeAuth = useCallback(() => setAuthOpen(false), []);
 
-  const showNavbar = location.pathname !== "/search";
+  const showNavbar = !(
+    location.pathname === "/search" || location.pathname.startsWith("/product/")
+  );
 
   return (
     <>

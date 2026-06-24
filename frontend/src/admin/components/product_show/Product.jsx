@@ -18,7 +18,7 @@ const Product = ({ setActivePage }) => {
           <button
             type="button"
             onClick={() => setActivePage("Add Product")}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 font-semibold max-[600x]:text-[24px]"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-blue-600 transition-all duration-300 hover:scale-105 flex items-center gap-2 font-semibold max-[600px]:text-[24px]"
           >
             <span className="max-[600px]:text-[14px]">Add Product</span>
           </button>

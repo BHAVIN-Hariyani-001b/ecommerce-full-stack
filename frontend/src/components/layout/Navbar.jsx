@@ -14,7 +14,7 @@ const CategoryButton = memo(function CategoryButton({
     <button
       type="button"
       onClick={() => onSelect(name)}
-      className={[
+      className={[  
         "cursor-pointer text-black relative font-medium px-4 py-2 flex justify-center items-center gap-1 rounded",
         isActive
           ? "border-b-2 border-blue-500 ease-in transition-all delay-250"

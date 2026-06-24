@@ -14,6 +14,7 @@ import "./index.css";
 const SearchProduct = lazy(() => import("./pages/SearchProduct"));
 const Dashboard = lazy(() => import("./admin/pages/Dashboard/Dashboard"));
 const Home = lazy(() => import("./pages/Home"));
+const ProductPage = lazy(()=> import("./pages/ProductPage"));
 
 // Setup axios interceptors after store is created
 setupInterceptors(store);
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element: <Dashboard />,
+      },
+      {
+        path: "/product/:id",
+        element: <ProductPage />,
       },
     ],
   },

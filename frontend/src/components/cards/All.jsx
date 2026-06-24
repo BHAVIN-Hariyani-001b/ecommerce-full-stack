@@ -1,12 +1,12 @@
 import { lazy, memo, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHomePageProduct } from "../../features/producthome/productHomeThunk";
-import ProductCard from "../common/ProductCard";
 import ProductCardList from "../common/ProductCardList";
 import PageWapper from "../layout/PageWapper";
 import HomePageLoading from "../ProductLoading/HomePageLoading";
 import { toast } from "react-toastify";
 import Loding from "../common/Loding"
+
 
 const HeroBanner = lazy(() => import("../product/HeroBanner"));
 
@@ -27,20 +27,14 @@ const All = memo(function All() {
     return toast.error(error);
 
   return (
-    <div>
-      <PageWapper>
-        <Suspense fallback={<Loding />}>
-          <HeroBanner />
-        </Suspense>
-        <div>
-          <div>
-            {HomePageProduct.map((item) => (
-              <ProductCardList key={item?.id} product={item} />
-            ))}
-          </div>
-        </div>
-      </PageWapper>
-    </div>
+    <PageWapper>
+      <Suspense fallback={<Loding />}>
+        <HeroBanner />
+      </Suspense>
+      {HomePageProduct.map((item) => (
+        <ProductCardList key={item?.id} product={item} />
+      ))}
+    </PageWapper>
   );
 });
 

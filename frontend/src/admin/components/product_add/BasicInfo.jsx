@@ -1,13 +1,16 @@
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../../features/category/categoryThunk";
+import Description from "./Description";
+import Modal from "../../../components/common/Modal";
 
-const BasicInfo = memo(function BasicInfo({
-  productData,
-  handleOnChange,
-}) {
+const BasicInfo = memo(function BasicInfo({ productData, handleOnChange }) {
   const category = useSelector((state) => state.userCategory.category);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+
+  const openDescription = () => setIsDescriptionOpen(true);
+  const closeDescription = () => setIsDescriptionOpen(false);
 
   const dispatch = useDispatch();
 
@@ -81,32 +84,40 @@ const BasicInfo = memo(function BasicInfo({
           value={productData?.gender}
         >
           <option value="option">Select Any One</option>
-
           <option value="male">Male</option>
-
           <option value="female">Female</option>
-
           <option value="unisex">Unisex</option>
         </select>
-
         <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />
       </div>
-
       <div className="flex flex-col relative">
         <label htmlFor="ProductDescription" className="font-semibold py-2">
-          Product Description
+          Short Description
         </label>
-
-        <textarea
-          name="description"
-          id="ProductDescription"
-          autoComplete="off"
-          required={true}
-          placeholder="Product Description"
-          className="outline-none bg-blue-50 border px-3 py-3 rounded-lg h-30 border-gray-200 resize-none"
-          onChange={handleOnChange}
-          value={productData?.description}
-        ></textarea>
+        <div
+          className="outline-none bg-blue-50 border px-3  py-3 rounded-lg h-30 border-gray-200 resize-none overflow-scroll scrollbar-none cursor-pointer"
+          onClick={openDescription}
+        >
+          {productData?.description ? (
+            <div
+              dangerouslySetInnerHTML={{ __html: productData.description }}
+            />
+          ) : (
+            <span className="text-gray-400">Click to add a description</span>
+          )}
+        </div>
+        <Modal
+          open={isDescriptionOpen}
+          onClose={closeDescription}
+          title="Short Description"
+          width={"w-100"}
+          widthClassName={"max-w-200"}
+        >
+          <Description
+            handleOnchange={handleOnChange}
+            values={productData?.description}
+          />
+        </Modal>
       </div>
     </div>
   );

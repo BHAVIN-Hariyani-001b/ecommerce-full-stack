@@ -9,6 +9,7 @@ const Modal = memo(function Modal({
   onClose,
   children,
   widthClassName = "max-w-md",
+  width,
 }) {
   const dispatch = useDispatch();
 
@@ -32,9 +33,10 @@ const Modal = memo(function Modal({
       [
         "relative w-full",
         widthClassName,
+        width,
         "rounded-2xl bg-white shadow-xl border border-gray-200",
       ].join(" "),
-    [widthClassName],
+    [widthClassName, width],
   );
 
   if (!open) return null;
