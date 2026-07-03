@@ -6,6 +6,7 @@ from app.models.users import User
 from app.models.product import Gender
 from app.models.productAttribute import ProductAttribute
 from app.models.cart import Cart
+from app.models.subCategory import SubCategory
 
 from app.db import db
 from dotenv import load_dotenv

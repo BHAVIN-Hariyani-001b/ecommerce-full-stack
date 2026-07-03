@@ -20,6 +20,9 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(saEnum(userRole),default=userRole.USER,nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    otp          = db.Column(db.String(6),   nullable=True)
+    otp_expiry   = db.Column(db.DateTime,    nullable=True)
+    otp_attempts = db.Column(db.Integer,     default=0)
 
     @validates('username')
     def validate_username(self,key,username):

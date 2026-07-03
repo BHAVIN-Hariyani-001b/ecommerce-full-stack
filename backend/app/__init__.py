@@ -7,23 +7,27 @@ from app.models.category import Category
 from app.models.product import Products
 from app.config import Config
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
+from app.extensions import mail
 
 BLOCKLIST = set()
 
 def create_app():
     app = Flask(__name__)
     # configure the database URI
-
     app.config.from_object(Config)
+
+    ## migrate the db if any change in db model and manage
+    Migrate(app,db)
+    # Mail(ap)
     # app.secret_key = os.getenv("SECRET_KEY")
     # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATA_URL')
     # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    CORS(app
-        , resources={r"/api/*": {"origins": app.config['FRONTEND_URL']}}
-        , supports_credentials=True
-        ,  allow_headers=["Content-Type", "Authorization"]
-        )
+    CORS(app,
+        resources={r"/api/*": {"origins": app.config['FRONTEND_URL']}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"])
     
     # Initialize JWT Manager
     # works with flask_jwt_extended 
@@ -60,6 +64,7 @@ def create_app():
     from app.routes.category_routes import category_bp
     from app.routes.cart_routes import cart_bp
     from app.routes.search_routes import search_bp
+    from app.routes.mail_send_route import auth_forgot_password_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -67,9 +72,11 @@ def create_app():
     app.register_blueprint(category_bp,url_prefix='/api')
     app.register_blueprint(cart_bp,url_prefix='/api')
     app.register_blueprint(search_bp,url_prefix="/api")
+    app.register_blueprint(auth_forgot_password_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)
+    mail.init_app(app)
 
     # Auto-create tables if not exists
     # with app.app_context():

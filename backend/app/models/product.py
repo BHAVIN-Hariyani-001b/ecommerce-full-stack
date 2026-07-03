@@ -35,7 +35,10 @@ class Products(db.Model):
     discount = db.Column(db.Integer,default=0)
 
     category_id = db.Column(db.Integer,db.ForeignKey("category.id"),nullable=True)
-    category = db.relationship('Category', backref='products')
+    category = db.relationship('Category', backref='products',foreign_keys=[category_id])
+
+    subcategory_id = db.Column(db.Integer,db.ForeignKey("category.id"),nullable=True)
+    subcategory = db.relationship("Category",foreign_keys=[subcategory_id])
 
     description = db.Column(db.Text, nullable=True)
     aboutItem = db.Column(db.Text, nullable=True)
@@ -63,8 +66,8 @@ class Products(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'BPrice': self.Base_price,
-            'PPrice': self.Product_price,
+            'BPrice': float(self.Base_price),
+            'PPrice': float(self.Product_price),
             'sku': self.sku,
             'qty': self.qty,
             'aboutItem' : self.aboutItem,
@@ -72,8 +75,10 @@ class Products(db.Model):
             'gender': self.gender.value,
             'status': self.status.value,
             'category_id' : self.category_id,
-            'discount': self.discount,
             'category' : str(self.category.name) if self.category else None,
+            'subcategory_id' : self.subcategory_id,
+            'SubCategory' : str(self.subcategory.name) if self.subcategory else None,   
+            'discount': self.discount,
             'attributes' : [attr.to_dict() for attr in self.attributes],
             'image' : next(
                 (img.to_dict() for img in self.images if img.is_primary),
@@ -86,10 +91,11 @@ class Products(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'BPrice': self.Base_price,
-            'PPrice': self.Product_price,
+            'BPrice': float(self.Base_price),
+            'PPrice': float(self.Product_price),
             'discount': self.discount,
             'category': str(self.category.name) if self.category else None,
+            'SubCategory': str(self.subcategory.name) if self.subcategory else None,
             'image': next(
                 (img.to_dict() for img in self.images if img.is_primary),
                 None

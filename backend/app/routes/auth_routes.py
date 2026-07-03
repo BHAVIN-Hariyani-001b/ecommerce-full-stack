@@ -1,5 +1,5 @@
-from flask import Blueprint,jsonify,request
-from flask_jwt_extended import create_access_token , verify_jwt_in_request, get_jwt_identity, jwt_required,get_jwt
+from flask import Blueprint,jsonify,request,current_app
+from flask_jwt_extended import create_access_token, create_refresh_token , verify_jwt_in_request, get_jwt_identity, jwt_required,get_jwt
 from app.models.users import User 
 from app.db import db
 from sqlalchemy.exc import IntegrityError
@@ -10,40 +10,61 @@ auth_bp = Blueprint('auth',__name__)
 # login route
 @auth_bp.route("/auth/login",methods=["POST"])
 def login():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No input data provided"}), 400
-    
-    required = ["email","password"]
-    missing = [f for f in required if not data.get(f)]
+        if not data:
+            return jsonify({"error": "No input data provided"}), 400
+        
+        required = ["email","password"]
+        missing = [f for f in required if not data.get(f)]
 
-    if missing:
-        return jsonify({"error":f"Missing fields: {', '.join(missing)}"}),400
-    
-    user = User.query.filter_by(email=data['email']).first()
-    
-    if not user:
-        return jsonify({"error" : "Invalid email or password"}),401
-    
-    if not user.check_password(data['password']):
-        return jsonify({"error" : "Invalid password"}), 401
-    
-    token = create_access_token(
-        identity=str(user.id),
-        additional_claims={"role": user.role.value}
-    )
+        if missing:
+            return jsonify({"error":f"Missing fields: {', '.join(missing)}"}),400
+        
+        user = User.query.filter_by(email=data['email']).first()
 
-    return jsonify({
-        "message" : "Login successful",
-        "token" : token,
-        "user": {
-            "id":       str(user.id),
-            "username": user.username,
-            "email":    user.email,
-            "role":     user.role.value
-        }
-    }),200
+        if not user and not user.check_password(data['password']):
+            return jsonify({"error": "Invalid email or password"}), 401
+        elif not user:
+            return jsonify({"error" : "Invalid email or password"}),401
+        elif not user.check_password(data['password']):
+            return jsonify({"error" : "Invalid password"}), 401
+
+        claims = {"role": user.role.value}
+
+        access_token  = create_access_token(identity=str(user.id), additional_claims=claims)
+        refresh_token = create_refresh_token(identity=str(user.id), additional_claims=claims)
+
+
+        response = jsonify({
+            "message" : "Login successful",
+            "token" : access_token,
+            "user": {
+                "id":       str(user.id),
+                "username": user.username,
+                "email":    user.email,
+                "role":     user.role.value
+            }
+        })
+
+        is_production = current_app.config.get('IS_PRODUCTION',False)
+
+
+        response.set_cookie(
+            "refreshToken",
+            refresh_token,
+            httponly  = True,                    # JS cannot access
+            secure    = is_production,           # HTTPS only in prod
+            samesite  = "Strict",                # CSRF protection
+            path      = "/auth/refresh",         # only sent to refresh endpoint
+            max_age   = 7 * 24 * 60 * 60        # 7 days in seconds
+        )
+
+        return response,200
+
+    except Exception as e:
+        return jsonify({"error": "Login failed, please try again"}), 500
 
 # register route
 @auth_bp.route("/auth/register",methods=["POST"])
@@ -88,6 +109,38 @@ def register():
     except IntegrityError:
         db.session.rollback()
         return jsonify({"error": "Email already exists"}), 409
+
+
+@auth_bp.route("/auth/logout",methods=["POST"])
+def logout():
+    response = jsonify({"message" : "Logged out successfully"})
+
+    response.delete_cookie(
+        "refreshToken",
+        path     = "/auth/refresh",
+        httponly = True,
+        samesite = "Strict"
+    )
+
+    return response, 200
+
+@auth_bp.route("/auth/refresh", methods=["POST"])
+@jwt_required(refresh=True, locations=["cookies"])
+def refresh():
+    try:
+        identity = get_jwt_identity()
+        claims   = get_jwt()
+
+        new_access_token = create_access_token(
+            identity         = identity,
+            additional_claims= {"role": claims["role"]}
+        )
+
+        return jsonify({"token": new_access_token}), 200
+
+    except Exception as e:
+        return jsonify({"error": "Token refresh failed"}), 401
+
     
 @auth_bp.route("/auth/profile",methods=["GET"])
 @jwt_required()
@@ -101,6 +154,7 @@ def get_user():
     return jsonify({
         "user": user.to_dict()
     }), 200
+
 
 @auth_bp.route('/auth/verify', methods=['GET'])
 @jwt_required()

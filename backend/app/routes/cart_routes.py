@@ -36,6 +36,7 @@ def add_cart():
         user_id = data.get('user_id')
         product_id = data.get('product_id')
         qty = data.get('qty', 1)
+        attributes = data.get('')
 
         try:
             qty = int(qty)

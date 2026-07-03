@@ -12,4 +12,4 @@ class ProductAttribute(db.Model):
             'product_id' : self.product_id,
             'type' : self.type,
             'value' : self.value
-        }
+        }   

@@ -36,7 +36,6 @@ def create_category():
         name = request.form.get('name')
         description = request.form.get('description')
         status = request.form.get('status')
-
         image_file = request.files.get('catImage')
 
         image = None
@@ -47,12 +46,31 @@ def create_category():
 
         if not name and image:
             return jsonify({"message": "Name and Image are required fields"}), 400
-        
+
+
+        parentCategory = request.form.get('parentCategory')
+        print(parentCategory)
+
+        parent_category_name = request.form.get("parentCategory")
+        if parent_category_name and parent_category_name != "option":
+            pcat = Category.query.filter_by(name=parent_category_name).first()
+        else:
+            pcat = Category.query.first()
+            
+
+        if not pcat:
+            return jsonify({
+                "message": "Category not found"
+            }), 404
+
+        print(pcat)
+
         result = Category(
             name=name,
             description=description,
             image=image,
             status=status,
+            parent_id=pcat.id
         )
 
         db.session.add(result)
@@ -83,12 +101,26 @@ def update_category(id):
                 filename = save_image(image_file, UPLOAD_FOLDER = '../../../frontend/public/image/category_img')
                 if filename:
                     image = filename
+
+        parent_category_name = request.form.get("parentCategory")
+        if parent_category_name and parent_category_name != "option":
+            pcat = Category.query.filter_by(name=parent_category_name).first()
+        else:
+            pcat = Category.query.first()
+            
+
+        if not pcat:
+            return jsonify({
+                "message": "Category not found"
+            }), 404
+        
         
         result = update(Category).where(Category.id == id).values(
             name=request.form.get('name'),
             description=request.form.get('description'),
             image=image,
-            status=request.form.get('status')
+            status=request.form.get('status'),
+            parent_id = pcat.id,
         )
 
         db.session.execute(result)

@@ -80,6 +80,19 @@ def create_product():
                 "message": "Category not found"
             }), 404
 
+        parent_category_name = data.get("SubCategory")
+        print(str(parent_category_name))
+        if parent_category_name and parent_category_name != "option":
+            parentCategory = Category.query.filter_by(name=parent_category_name).first()
+        else:
+            parentCategory = Category.query.first()
+
+        if not parentCategory:
+            return jsonify({
+                "message" : "Parent Category Not Found"
+            }),400
+
+
         gender = data.get("gender")
         if isinstance(gender, str):
             gender = gender.lower()
@@ -104,6 +117,7 @@ def create_product():
             qty=qty,
             discount=discount,
             category_id=category.id,
+            subcategory_id = parentCategory.id if parentCategory else None,
             description=data.get('description', '').strip() or None,
             aboutItem=data.get('aboutItem', '').strip() or None,
             gender=gender,
@@ -244,7 +258,6 @@ def update_product(id) -> Response:
         if not existing:
             return jsonify({"error" : "Product not found"})
         
-        print(existing)
 
         try:
             base_price = float(data.get('Base_price') or 0)
@@ -266,6 +279,18 @@ def update_product(id) -> Response:
             return jsonify({
                 "message" : "Category not found"
             }),404
+
+        parent_category_name = data.get("SubCategory")
+        if parent_category_name:
+            parentCategory = Category.query.filter_by(name=parent_category_name).first()
+        else:
+            parentCategory = Category.query.first()
+
+        if not parentCategory:
+            return jsonify({
+                "message" : "Parent Category Not Found"
+            })
+
         
         gender = data.get("gender","").lower()
     
@@ -295,9 +320,9 @@ def update_product(id) -> Response:
         existing.gender = gender
         existing.status = status
         existing.aboutItem = data.get('aboutItem',existing.aboutItem) or None
+        existing.subcategory_id = parentCategory.id
 
-
-        # update primary image
+        # update primary image``
         primary_image_file = None
         if 'image' in request.files:
             primary_image_file = request.files.get('image')
@@ -353,7 +378,8 @@ def update_product(id) -> Response:
         db.session.commit()
 
         return jsonify({
-            "message" : "Product update successfully" 
+            "message" : "Product update successfully" ,
+            "product" : existing.to_dict()
         }), 200 
     
     except Exception as e:

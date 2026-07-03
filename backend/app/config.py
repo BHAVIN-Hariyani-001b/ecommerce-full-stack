@@ -14,6 +14,30 @@ class Config:
 
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    JWT_ACCESS_TOKEN_EXPIRES  = timedelta(minutes=15)  
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
+    JWT_ALGORITHM = "HS256"
+
+    # token location - access from header , refresh from cookie 
+    JWT_TOKEN_LOCATION        = ["headers", "cookies"]
+    JWT_HEADER_NAME           = "Authorization"
+    JWT_HEADER_TYPE           = "Bearer"
+
+    #  Cookie security
+    IS_PRODUCTION             = os.getenv('FLASK_ENV') == 'production'
+    JWT_COOKIE_SECURE         = IS_PRODUCTION   # HTTPS only in prod
+    JWT_COOKIE_SAMESITE       = "Strict"        # CSRF protection
+    JWT_COOKIE_CSRF_PROTECT   = IS_PRODUCTION   # CSRF token in prod
+    JWT_REFRESH_COOKIE_PATH   = "/auth/refresh" # cookie only sent to this path
+    JWT_ACCESS_COOKIE_PATH    = "/"
+
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = os.getenv('MAIL_USER_NAME')
+    MAIL_PASSWORD= os.getenv('GMAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_USER_NAME')
 
     # File upload configuration
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 5 MB max file size
@@ -21,6 +45,3 @@ class Config:
 
     # FORONTEND URL for CORS
     FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
-
-    JWT_ACCESS_TOKEN_EXPIRES  = timedelta(hours=1)  
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
