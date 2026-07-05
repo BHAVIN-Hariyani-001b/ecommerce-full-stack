@@ -1,10 +1,11 @@
 import { memo, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer,Slide } from "react-toastify";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Cart from "./components/cart/Cart";
 import useAdminVerify from "./hook/useAdminVerify";
+
 
 const App = memo(function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,7 +30,20 @@ const App = memo(function App() {
           sideBar={sideBar}
         />
       )}
-      <ToastContainer position="top-right" autoClose={1500} />
+      <ToastContainer
+        position="top-right"
+        autoClose={1500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        transition={Slide}  
+        pauseOnHover
+        theme="colored"
+        className="custom-toast-container"
+      />
 
       <Outlet context={{ searchQuery, setSearchQuery, sideBar, setSideBar }} />
 

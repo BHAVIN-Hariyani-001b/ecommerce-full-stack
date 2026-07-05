@@ -1,3 +1,4 @@
+import NotFound from "./pages/NotFound.jsx";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
@@ -14,7 +15,7 @@ import "./index.css";
 const SearchProduct = lazy(() => import("./pages/SearchProduct"));
 const Dashboard = lazy(() => import("./admin/pages/Dashboard/Dashboard"));
 const Home = lazy(() => import("./pages/Home"));
-const ProductPage = lazy(()=> import("./pages/ProductPage"));
+const ProductPage = lazy(() => import("./pages/ProductPage"));
 
 // Setup axios interceptors after store is created
 setupInterceptors(store);
@@ -29,18 +30,22 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/search",
+        path: "search",
         element: <SearchProduct />,
       },
       {
-        path: "/admin",
+        path: "admin",
         element: <Dashboard />,
       },
       {
-        path: "/product/:id",
+        path: "product/:id",
         element: <ProductPage />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 

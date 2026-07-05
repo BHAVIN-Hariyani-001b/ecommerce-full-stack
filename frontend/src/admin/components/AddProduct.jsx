@@ -24,6 +24,7 @@ const AddImage = lazy(() => import("./product_add/AddImage"));
 const INITIAL_PRODUCT_DATA = {
   name: "",
   Category: "",
+  SubCategory : "",
   Base_price: "",
   Product_price: "",
   sku: "",
@@ -64,6 +65,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
   const isUpdateProduct = useSelector(
     (state) => state.productAdd.isUpdateProduct,
   );
+  console.log(isUpdateProduct);
 
   useEffect(() => {
     if (isUpdateProduct?.id) {
@@ -71,6 +73,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         id: isUpdateProduct?.id,
         name: isUpdateProduct?.name ?? "",
         Category: isUpdateProduct?.category ?? "",
+        SubCategory : isUpdateProduct?.SubCategory ?? "",
         Base_price: isUpdateProduct?.BPrice ?? "",
         Product_price: isUpdateProduct?.PPrice ?? "",
         sku: isUpdateProduct?.sku ?? "",
@@ -121,6 +124,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         const formData = new FormData();
         formData.append("name", productData.name || "");
         formData.append("category", productData.Category || "");
+        formData.append("SubCategory", productData.SubCategory || "");
         formData.append("Base_price", String(productData.Base_price || ""));
         formData.append(
           "Product_price",

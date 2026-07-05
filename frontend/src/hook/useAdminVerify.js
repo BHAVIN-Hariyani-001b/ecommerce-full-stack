@@ -10,7 +10,9 @@ const useAdminVerify = () => {
   const token = useSelector((state) => state.auth?.token);
 
   useEffect(() => {
+    console.log("Hello")
     if (!token) return;
+    console.log("Hello how are you")
     dispatch(fetchAdminStatus());
   }, [dispatch, token]); 
 

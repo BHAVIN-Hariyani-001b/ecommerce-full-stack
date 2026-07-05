@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { fetchCategories } from "../../../features/category/categoryThunk";
+import { IoIosArrowDown } from "react-icons/io";
 import {
   NewaddCategory,
   updateCategory,
@@ -15,20 +16,25 @@ import {
 
 const AddCategory = ({ data }) => {
   const catImageRef = useRef(null);
+  const category = useSelector((state) => state.userCategory.category);
   const dispatch = useDispatch();
   const [categoryData, setCategoryData] = useState({
     name: "",
     description: "",
+    parentCategory: null,
     catImageUrl: "",
     catImage: "",
     status: false,
   });
+
+  console.log(categoryData);
 
   useEffect(() => {
     if (data?.id) {
       setCategoryData({
         name: data.name ?? "",
         description: data.description ?? "",
+        parentCategory: data.parentCategory ?? null,
         catImageUrl: data.image
           ? `../../../../public/image/category_img/${data.image}`
           : "",
@@ -39,6 +45,7 @@ const AddCategory = ({ data }) => {
       setCategoryData({
         name: "",
         description: "",
+        parentCategory: null,
         catImageUrl: "",
         catImage: "",
         status: false,
@@ -71,6 +78,7 @@ const AddCategory = ({ data }) => {
         "status",
         categoryData.status === true ? "ACTIVE" : "INACTIVE",
       );
+      formData.append("parentCategory",categoryData.parentCategory);
 
       // Only append file if it's a File object (new upload)
       if (categoryData.catImage instanceof File) {
@@ -96,6 +104,7 @@ const AddCategory = ({ data }) => {
       setCategoryData({
         name: "",
         description: "",
+        parentCategory:null,
         catImageUrl: "",
         catImage: "",
         status: false,
@@ -116,6 +125,7 @@ const AddCategory = ({ data }) => {
     setCategoryData({
       name: "",
       description: "",
+      parentCategory:null,
       catImageUrl: "",
       catImage: "",
       status: false,
@@ -184,10 +194,46 @@ const AddCategory = ({ data }) => {
             className="outline-none border border-gray-300 p-2 rounded-lg"
           />
         </div>
+        <div className="flex flex-col relative">
+          <label className="font-semibold py-2">
+            Parent Category
+          </label>
+          <select
+            name="parentCategory"
+            id="ProductParentCategory"
+            required={true}
+            autoComplete="off"
+            className="outline-none bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
+            onChange={handleOnChange}
+            value={categoryData?.parentCategory ?? "option"}
+          >
+            {(() => {
+              const filtered = category.filter(
+                (cat) => cat?.id !== 1 && !cat?.parent_id,
+              );
+
+              return filtered.length > 0 ? (
+                <>
+                  <option value="option">Select Any One</option>
+                  {filtered.map((cat) => (
+                    <option value={cat?.name} key={cat?.id}>
+                      {cat?.name}
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <option value="option" selected={true}>
+                  Not Category Found
+                </option>
+              );
+            })()}
+          </select>
+
+          <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />
+        </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="CatDes" className="font-semibold">
-            {" "}
-            Description{" "}
+            Description
           </label>
           <textarea
             type="text"

@@ -47,11 +47,15 @@ const categorySlice = createSlice({
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedCategory = action.payload.category;
+        const updatedCategory = action.payload?.category;
+
+        console.log(updatedCategory);
 
         const index = state.category.findIndex(
           (cat) => cat.id === updatedCategory.id,
         );
+
+        console.log(index)
 
         if (index !== -1) {
           state.category[index] = updatedCategory;

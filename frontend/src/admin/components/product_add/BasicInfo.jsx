@@ -68,6 +68,34 @@ const BasicInfo = memo(function BasicInfo({ productData, handleOnChange }) {
 
         <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />
       </div>
+      <div className="flex flex-col relative">
+        <label htmlFor="ProductSubCategory" className="font-semibold py-2">
+          Sub Category
+        </label>
+
+        <select
+          name="SubCategory"
+          id="ProductSubCategory"
+          required={true}
+          autoComplete="off"
+          className="outline-none bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
+          onChange={handleOnChange}
+          value={productData?.SubCategory ?? "option"}
+        >
+          <option value="option">Select Any One</option>
+
+          {category.map(
+            (cat) =>
+              (cat?.id !== 1 && cat?.parentCategory )&& (
+                <option value={cat?.name} key={cat?.id}>
+                  {cat?.name}
+                </option>
+              ),
+          )}
+        </select>
+
+        <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />
+      </div>
 
       <div className="flex flex-col relative">
         <label htmlFor="Gender" className="font-semibold py-2">

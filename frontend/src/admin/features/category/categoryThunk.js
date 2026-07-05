@@ -21,7 +21,7 @@ export const updateCategory = createAsyncThunk(
   async ({ id, formData }, { rejectWithValue }) => {
     try {
       const response = await updateCategoryAPI(id,formData)
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Update Category Error:", error);
       return rejectWithValue(

@@ -7,6 +7,7 @@ import {
 } from "../../middleware/authApi";
 import { addToCart, fetchCartItem } from "../card/cardThunk";
 import { clearCart } from "../card/cardSlice";
+// import { logout } from "./authSlice";
 
 const getErrorMessage = (error) => {
   const data = error?.response?.data;
@@ -83,3 +84,18 @@ export const fetchAdminStatus = createAsyncThunk(
     }
   },
 );
+
+// export const logoutUser = createAsyncThunk(
+//   "auth/logout",
+//   async (_, { dispatch, rejectWithValue }) => {
+//     try {
+//       await loginApi();          // server deletes cookie
+//       dispatch(logout());         // clear Redux state
+//     } catch (err) {
+//       dispatch(logout());         // clear Redux even if server fails
+//       return rejectWithValue(
+//         err.response?.data?.error || "Logout failed"
+//       );
+//     }
+//   }
+// );

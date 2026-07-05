@@ -52,7 +52,7 @@ const Navbar = memo(function Navbar() {
       <PageWapper className={"overflow-x-auto scrollbar-none rounded"}>
         <div className="flex items-center gap-10 max-[1000px]:gap-5">
           {category?.map((item) =>
-            item?.status === "active" ? (
+            (item?.status === "active" && !item?.parent_id) ? (
               <CategoryButton
                 key={item?.id}
                 name={item?.name}
