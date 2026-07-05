@@ -6,38 +6,41 @@ from sqlalchemy.orm import validates
 import re
 import uuid
 
+
 class userRole(pyEnum):
     ADMIN = "admin"
     MODERATOR = "moderator"
     USER = "user"
+
 
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20), unique=True,nullable=True)
+    phone = db.Column(db.String(20), unique=True, nullable=True)
     password = db.Column(db.String(200), nullable=False)
-    role = db.Column(saEnum(userRole),default=userRole.USER,nullable=False)
+    role = db.Column(saEnum(userRole), default=userRole.USER, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-    otp          = db.Column(db.String(6),   nullable=True)
-    otp_expiry   = db.Column(db.DateTime,    nullable=True)
-    otp_attempts = db.Column(db.Integer,     default=0)
+    otp = db.Column(db.String(6), nullable=True)
+    otp_expiry = db.Column(db.DateTime, nullable=True)
+    otp_attempts = db.Column(db.Integer, default=0)
+    otp_verified = db.Column(db.Boolean, default=False, nullable=False)
 
-    @validates('username')
-    def validate_username(self,key,username):
+    @validates("username")
+    def validate_username(self, key, username):
         username = username.strip()
         if not (3 < len(username) <= 80):
             raise ValueError("Username must be between 3 and 80 characters.")
         if not re.match(r"^[a-zA-Z0-9_.-]+$", username):
             raise ValueError("Username may only contain letters, numbers, _, ., or -")
         return username
-    
-    @validates('phone')
-    def validate_phone(self,key,phone):
+
+    @validates("phone")
+    def validate_phone(self, key, phone):
         if not phone:
             return phone
-        
+
         phone = re.sub(r"[\s\-\(\)]", "", phone)
 
         # India-friendly + generic
@@ -46,17 +49,16 @@ class User(db.Model):
 
         return phone
 
-    
-    @validates('email')
-    def validates_email(self,key,email):
+    @validates("email")
+    def validates_email(self, key, email):
         email = email.strip().lower()
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        if not re.match(pattern,email):
+        if not re.match(pattern, email):
             raise ValueError("Invalid email format")
-        
+
         return email
-    
-    def set_password(self,raw_password):
+
+    def set_password(self, raw_password):
         raw_password = str(raw_password).strip()
 
         errors = []
@@ -82,7 +84,7 @@ class User(db.Model):
         # Hash password
         self.password = generate_password_hash(raw_password)
 
-    def check_password(self,raw_password):
+    def check_password(self, raw_password):
         return check_password_hash(self.password, raw_password)
 
     def to_dict(self):
@@ -94,7 +96,7 @@ class User(db.Model):
             "role": self.role.value,
             "created_at": self.timestamp.isoformat(),
         }
-    
+
     def to_dict_(self):
         return {
             "username": self.username,
