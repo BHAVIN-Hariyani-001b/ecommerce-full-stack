@@ -17,6 +17,9 @@ const CategoryList = ({ popup }) => {
           className="border border-gray-200 rounded-xl flex items-center justify-between p-4 group cursor-all-scroll"
         >
           <div className="flex gap-5">
+            <div className="flex justify-center items-center text-[14px]">
+              #{item?.sort_order}
+            </div>
             <div className="w-15 h-15 border border-gray-200 rounded">
               <img
                 src={`../../../../public/image/category_img/${item?.image}`}

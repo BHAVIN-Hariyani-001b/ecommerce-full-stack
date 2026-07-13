@@ -11,6 +11,7 @@ import cartReducer from "./card/cardSlice.js";
 import searchReducer from "./search/searchSlice";
 import productReducer from "./productPage/productPageSlice.js";
 import forgotPasswordReducer from "./forgotPassword/forgotPasswordSlice";
+import brandReducer from "../admin/features/Brand/brandSlice.js";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -23,13 +24,13 @@ const persistConfigCategory = {
 const persistConfigAuth = {
   key: "auth",
   storage,
-  whitelist: ["user", "isLoggedIn", "userRole","token"],
+  whitelist: ["user", "isLoggedIn", "userRole", "token"],
 };
 
 const persistConfigCart = {
   key: "cart",
   storage,
-  whitelist: ["items", "count","totalPrice"],
+  whitelist: ["items", "count", "totalPrice"],
 };
 
 const rootReducer = combineReducers({
@@ -43,6 +44,7 @@ const rootReducer = combineReducers({
   searchProduct: searchReducer,
   product: productReducer,
   forgotPassword: forgotPasswordReducer,
+  brand: brandReducer,
 });
 
 export default rootReducer;

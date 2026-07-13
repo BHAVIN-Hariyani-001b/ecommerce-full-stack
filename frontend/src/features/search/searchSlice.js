@@ -26,8 +26,8 @@ const searchProductSlice = createSlice({
       })
       .addCase(SearchProductAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.product = action.payload?.results;
-        state.searchProductCount = action.payload?.count;
+        state.product = action.payload?.results ?? [];
+        state.searchProductCount = action.payload?.count ?? 0;
       })
       .addCase(SearchProductAPI.rejected, (state, action) => {
         state.error = action.payload;

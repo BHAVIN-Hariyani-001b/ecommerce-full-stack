@@ -14,10 +14,12 @@ import { Helmet } from "react-helmet-async";
 const SearchProduct = memo(function SearchProduct() {
   const [sideBar, setSideBar] = useState(false);
   const { searchQuery } = useOutletContext();
+  const [order, setOrder] = useState("");
 
   const countProduct = useSelector(
     (state) => state.searchProduct.searchProductCount,
   );
+
   const searchProduct = useSelector((state) => state.searchProduct?.product);
   const { loading, error } = useSelector((state) => state.searchProduct);
   console.log(searchProduct);
@@ -33,7 +35,7 @@ const SearchProduct = memo(function SearchProduct() {
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
       try {
-        await dispatch(SearchProductAPI(query));
+        await dispatch(SearchProductAPI({ query, filterData: order }));
       } catch {
         console.log("Faild to search Product");
       }
@@ -43,12 +45,18 @@ const SearchProduct = memo(function SearchProduct() {
   useEffect(() => {
     ProductSearchUser(searchQuery);
     return () => clearTimeout(timerRef.current);
-  }, [searchQuery, dispatch]);
+  }, [searchQuery, dispatch, order]);
 
-  if (error) {
-    toast.error(error);
-    return;
-  }
+  useEffect(() => {
+    dispatch(clearSearch());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      return;
+    }
+  }, [error]);
 
   return (
     <div className="h-screen">
@@ -59,11 +67,12 @@ const SearchProduct = memo(function SearchProduct() {
           content="Shop fashion, mobile and more at Venture"
         />
       </Helmet>
+      
       <main className="flex justify-center overflow-hidden">
         <PageWapper className={`w-screen`}>
           <div className="overflow-y-auto">
             {searchQuery && (
-              <div className="flex justify-between items-center mb-4 w-full p-2">
+              <div className="flex justify-between items-center mb-4 w-full p-2 px-4">
                 <div className="text-sm text-gray-500">
                   {countProduct} Results for{" "}
                   <span className="font-medium text-gray-800">
@@ -71,10 +80,14 @@ const SearchProduct = memo(function SearchProduct() {
                   </span>
                 </div>
                 <div>
-                  <select className="text-sm border border-gray-200 rounded-md px-2 py-1">
-                    <option>Relevance</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
+                  <select
+                    className="text-sm border border-gray-200 rounded-md px-2 py-1 outline-none"
+                    onChange={(e) => setOrder(e.target.value)}
+                    value={order}
+                  >
+                    <option value="Relevance">Relevance</option>
+                    <option value="Low_to_High">Price: Low to High</option>
+                    <option value="High_to_Low">Price: High to Low</option>
                   </select>
                 </div>
               </div>

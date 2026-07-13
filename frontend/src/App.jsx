@@ -14,6 +14,8 @@ const App = memo(function App() {
   const navigate = useNavigate();
 
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const isSearch = location.pathname.startsWith("/search");
+
   const { isAdmin, isLoading, token } = useAdminVerify();
 
   useEffect(() => {
@@ -21,6 +23,7 @@ const App = memo(function App() {
       navigate("/admin", { replace: true });
     }
   }, [isAdmin, token, navigate, isLoading]);
+  
   return (
     <div>
       {!isAdminRoute && (
@@ -30,6 +33,7 @@ const App = memo(function App() {
           sideBar={sideBar}
         />
       )}
+
       <ToastContainer
         position="top-right"
         autoClose={1500}
@@ -47,7 +51,7 @@ const App = memo(function App() {
 
       <Outlet context={{ searchQuery, setSearchQuery, sideBar, setSideBar }} />
 
-      {!isAdminRoute && (
+      {(!isAdminRoute && !isSearch) && (
         <>
           <Cart setSideBar={setSideBar} sideBarOpen={sideBar} />
           <Footer />

@@ -11,13 +11,15 @@ const HomePageLoading = () => {
           <div className="flex justify-center items-center max-[600px]:hidden">
             <Skeleton variant="rounded" className="w-280" height={300} />
           </div>
-          <div className="flex flex-wrap gap-2 justify-center">
-            <Skeleton variant="rounded" width={180} height={200} />
-            <Skeleton variant="rounded" width={180} height={200} />
-            <Skeleton variant="rounded" width={180} height={200} />
-            <Skeleton variant="rounded" width={180} height={200} />
-            <Skeleton variant="rounded" width={180} height={200} />
-            <Skeleton variant="rounded" width={180} height={200} />
+          <div className="flex flex-wrap gap-1 justify-center">
+            {Array.from({ length: 20 }, (_, index) => (
+              <Skeleton
+                key={index}
+                variant="rounded"
+                className="w-35 max-[400px]:w-28"
+                height={160}
+              />
+            ))}
           </div>
         </Stack>
       </PageWapper>

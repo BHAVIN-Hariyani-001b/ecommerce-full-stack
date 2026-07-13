@@ -1,18 +1,14 @@
 import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
-import { useSelector } from "react-redux";
 
 const ProductLoading = () => {
-  const countProduct = useSelector(
-    (state) => state.searchProduct.searchProductCount,
-  ) || 10;
   return (
-    <div className="p-10">
+    <div className="p-1">
       <Stack spacing={1}>
-        <div className="flex gap-4 flex-wrap">
-          {Array.from({ length: countProduct }, (_, index) => (
-            <Skeleton key={index} variant="rounded" width={160} height={200} />
+        <div className="flex gap-2 flex-wrap justify-center items-center">
+          {Array.from({ length: 20 }, (_, index) => (
+            <Skeleton key={index} variant="rounded" className="w-35 max-[400px]:w-28" height={180} />
           ))}
         </div>
       </Stack>

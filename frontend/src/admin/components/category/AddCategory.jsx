@@ -25,6 +25,7 @@ const AddCategory = ({ data }) => {
     catImageUrl: "",
     catImage: "",
     status: false,
+    order: null,
   });
 
   console.log(categoryData);
@@ -40,6 +41,7 @@ const AddCategory = ({ data }) => {
           : "",
         catImage: data.image ?? "",
         status: data.status === "ACTIVE" ? true : false,
+        order: data.sort_order ?? null,
       });
     } else if (data === false) {
       setCategoryData({
@@ -49,6 +51,7 @@ const AddCategory = ({ data }) => {
         catImageUrl: "",
         catImage: "",
         status: false,
+        order: null,
       });
     }
   }, [data]);
@@ -78,7 +81,8 @@ const AddCategory = ({ data }) => {
         "status",
         categoryData.status === true ? "ACTIVE" : "INACTIVE",
       );
-      formData.append("parentCategory",categoryData.parentCategory);
+      formData.append("parentCategory", categoryData.parentCategory);
+      formData.append("sort_order", categoryData.order);
 
       // Only append file if it's a File object (new upload)
       if (categoryData.catImage instanceof File) {
@@ -100,14 +104,14 @@ const AddCategory = ({ data }) => {
 
       await dispatch(fetchCategories());
 
-      // ✅ Reset form only after success
       setCategoryData({
         name: "",
         description: "",
-        parentCategory:null,
+        parentCategory: null,
         catImageUrl: "",
         catImage: "",
         status: false,
+        order: null,
       });
       dispatch(setCategory(null));
 
@@ -125,10 +129,11 @@ const AddCategory = ({ data }) => {
     setCategoryData({
       name: "",
       description: "",
-      parentCategory:null,
+      parentCategory: null,
       catImageUrl: "",
       catImage: "",
       status: false,
+      order: null,
     });
     dispatch(setCategory(null));
   }, [categoryData, dispatch, data]);
@@ -194,10 +199,23 @@ const AddCategory = ({ data }) => {
             className="outline-none border border-gray-300 p-2 rounded-lg"
           />
         </div>
-        <div className="flex flex-col relative">
-          <label className="font-semibold py-2">
-            Parent Category
+        <div className="flex flex-col gap-2">
+          <label htmlFor="catOrder" className="font-semibold">
+            Category Order
           </label>
+          <input
+            type="number"
+            name="order"
+            id="catOrder"
+            placeholder="0"
+            min={0}
+            value={categoryData.order ?? ""}
+            onChange={handleOnChange}
+            className="outline-none border border-gray-300 p-2 rounded-lg"
+          />
+        </div>
+        <div className="flex flex-col relative">
+          <label className="font-semibold py-2">Parent Category</label>
           <select
             name="parentCategory"
             id="ProductParentCategory"
@@ -223,7 +241,7 @@ const AddCategory = ({ data }) => {
                 </>
               ) : (
                 <option value="option" selected={true}>
-                  Not Category Found
+                  Not Categor y Found
                 </option>
               );
             })()}
@@ -283,7 +301,7 @@ const AddCategory = ({ data }) => {
           </button>
           <div className="flex items-center p-4 justify-center border border-gray-300 rounded-lg h-50 object-contain max-[600px]:max-h-40">
             {!categoryData.catImage && !categoryData.catImageUrl ? (
-              <span className="bg-gray-300 px-2 py-1 rounded-3xl text-[12px]">
+              <span className="bg-gray-300 px-2 py-1 rounded-3xl text-[12px] text-center">
                 image preview
               </span>
             ) : (
