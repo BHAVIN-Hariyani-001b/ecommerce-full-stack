@@ -13,6 +13,7 @@ class Category(db.Model):
     slug = db.Column(db.String(100), unique=True, nullable=True)
     parent_id = db.Column(db.Integer,db.ForeignKey("category.id",ondelete="SET NULL"),nullable=True,index=True)
     description = db.Column(db.Text, nullable=True)
+    sort_order = db.Column(db.Integer, nullable=True, default=1)
     image = db.Column(db.String(255), nullable=True)
     status = db.Column(saEnum(Status), default=Status.ACTIVE, nullable=False)
     created_at = db.Column(db.DateTime,server_default=db.func.now())
@@ -26,6 +27,7 @@ class Category(db.Model):
             'slug'        : self.slug,
             'parentCategory': self.parent.name if self.parent else None,
             'description' : self.description,
+            'sort_order' : self.sort_order,
             'image'       : self.image,
             'status'      : self.status.value,
         }

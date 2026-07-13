@@ -1,4 +1,9 @@
 venv
-__pycache__
+*/__pycache__/
+__pycache__/
 .env
 *.pyc
+*.tldr
+migrations/
+otp.py
+seeder.py
