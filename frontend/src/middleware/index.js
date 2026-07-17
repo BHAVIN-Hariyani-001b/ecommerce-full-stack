@@ -7,42 +7,41 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Function to set up interceptor after store is created
-export const setupInterceptors = (store) => {
-  api.interceptors.request.use(
-    (config) => {
-      const state = store.getState();
-      const token = state.auth?.token;
+let store; 
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    },
-  );
+export const setupInterceptors = (_store) => {
+  store = _store;
 };
+
+const refreshToken = async () => {
+  await api.post("/auth/refresh");
+}
 
 api.interceptors.response.use(
   (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-  (error) => {
-    if (error.response?.status === 401) {
-      const message = error.response.data?.message;
-
-      if (message === "Token has expired") {
-        localStorage.clear();
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        await refreshToken()
+        return api(originalRequest);
+      } catch (refreshError) {
         toast.error("Session expired. Please login again.");
-
+        if (store) {
+          const { logout } = await import("../features/auth/authSlice");
+          store.dispatch(logout());
+        }
         setTimeout(() => {
           window.location.href = "/";
         }, 1500);
+        return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;

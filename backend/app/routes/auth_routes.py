@@ -2,12 +2,12 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
-    verify_jwt_in_request,
     get_jwt_identity,
     jwt_required,
     set_refresh_cookies,
     set_access_cookies,
     get_jwt,
+    unset_jwt_cookies,
 )
 from app.models.users import User
 from app.db import db
@@ -31,7 +31,7 @@ def login():
 
         if missing:
             return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
-        
+
         user = User.query.filter_by(email=data["email"]).first()
 
         if not user and not user.check_password(data["password"]):
@@ -65,9 +65,9 @@ def login():
 
         print(response)
 
-        set_access_cookies(response,access_token)
-        set_refresh_cookies(response,refresh_token)
-        
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+
         return response, 200
 
     except Exception as e:
@@ -128,9 +128,7 @@ def register():
 def logout():
     response = jsonify({"message": "Logged out successfully"})
 
-    response.delete_cookie(
-        "refreshToken", path="/auth/refresh", httponly=True, samesite="Strict"
-    )
+    unset_jwt_cookies(response)
 
     return response, 200
 
@@ -146,7 +144,10 @@ def refresh():
             identity=identity, additional_claims={"role": claims["role"]}
         )
 
-        return jsonify({"token": new_access_token}), 200
+        response = jsonify({"token": new_access_token})
+        set_access_cookies(response, new_access_token)
+
+        return response, 200
 
     except Exception as e:
         return jsonify({"error": "Token refresh failed"}), 401

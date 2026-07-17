@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/auth/authSlice";
 import Modal from "../common/Modal";
 import { FaRegCircleUser } from "react-icons/fa6";
+import { logoutUser } from "../../features/auth/authThunk";
 
 const Logout = memo(function Logout() {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const Logout = memo(function Logout() {
 
   const handleLogout = useCallback(() => {
     dispatch(logout());
+    dispatch(logoutUser());
     setLogoutOpen(false);
   }, [dispatch]);
 

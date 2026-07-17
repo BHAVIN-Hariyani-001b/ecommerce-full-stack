@@ -4,6 +4,7 @@ import {
   registerApi,
   getProfileApi,
   checkAdmin,
+  logoutApi,
 } from "../../middleware/authApi";
 import { addToCart, fetchCartItem } from "../card/cardThunk";
 import { clearCart } from "../card/cardSlice";
@@ -85,17 +86,13 @@ export const fetchAdminStatus = createAsyncThunk(
   },
 );
 
-// export const logoutUser = createAsyncThunk(
-//   "auth/logout",
-//   async (_, { dispatch, rejectWithValue }) => {
-//     try {
-//       await loginApi();          // server deletes cookie
-//       dispatch(logout());         // clear Redux state
-//     } catch (err) {
-//       dispatch(logout());         // clear Redux even if server fails
-//       return rejectWithValue(
-//         err.response?.data?.error || "Logout failed"
-//       );
-//     }
-//   }
-// );
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue,dispatch }) => {
+    try {
+      dispatch(logoutApi())
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || "Logout failed");
+    }
+  }
+);
