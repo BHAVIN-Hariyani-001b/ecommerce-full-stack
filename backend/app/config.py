@@ -20,16 +20,15 @@ class Config:
 
     # token location - access from header , refresh from cookie 
     JWT_TOKEN_LOCATION        = ["headers", "cookies"]
-    JWT_HEADER_NAME           = "Authorization"
-    JWT_HEADER_TYPE           = "Bearer"
+    JWT_HEADER_NAME            = "Authorization"
+    JWT_HEADER_TYPE            = "Bearer"
 
-    #  Cookie security
-    IS_PRODUCTION             = os.getenv('FLASK_ENV') == 'production'
-    JWT_COOKIE_SECURE         = IS_PRODUCTION   # HTTPS only in prod
-    JWT_COOKIE_SAMESITE       = "Strict"        # CSRF protection
-    JWT_COOKIE_CSRF_PROTECT   = IS_PRODUCTION   # CSRF token in prod
-    JWT_REFRESH_COOKIE_PATH   = "/auth/refresh" # cookie only sent to this path
-    JWT_ACCESS_COOKIE_PATH    = "/"
+    IS_PRODUCTION              = os.getenv('FLASK_ENV') == 'production'
+    JWT_COOKIE_SECURE          = IS_PRODUCTION
+    JWT_COOKIE_SAMESITE        = "Lax"
+    JWT_COOKIE_CSRF_PROTECT    = IS_PRODUCTION
+    JWT_ACCESS_COOKIE_PATH     = "/"                    # fixed: no trailing spaces
+    JWT_REFRESH_COOKIE_PATH    = "/api/auth/refresh"    # fixed: matches url_prefix
 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587

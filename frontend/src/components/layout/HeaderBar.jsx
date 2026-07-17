@@ -17,8 +17,10 @@ const HeaderBar = memo(function HeaderBar({
   onSearch,
 }) {
   const location = useLocation();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector((state) => state.auth?.user);
   const isSearchPage = location.pathname === "/search";
+
+  // console.log(useSelector((state) => state.auth));
 
   const count = useSelector((state) => state.cart.count);
 

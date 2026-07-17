@@ -16,13 +16,13 @@ const App = memo(function App() {
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isSearch = location.pathname.startsWith("/search");
 
-  const { isAdmin, isLoading, token } = useAdminVerify();
+  const { isAdmin, isLoading } = useAdminVerify();
 
   useEffect(() => {
-    if (token && !isLoading && isAdmin) {
+    if (!isLoading && isAdmin) {
       navigate("/admin", { replace: true });
     }
-  }, [isAdmin, token, navigate, isLoading]);
+  }, [isAdmin, navigate, isLoading]);
   
   return (
     <div>

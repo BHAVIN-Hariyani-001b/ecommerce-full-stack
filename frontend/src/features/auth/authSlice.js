@@ -11,13 +11,10 @@ const initialState = {
   error: null,
   user: null,
   userRole: "user",
-  token: null,
   isLoggedIn: false,
   isAdmin: false,
   sessionExpired: false,
 };
-
-const pickToken = (data) => data?.token;
 
 const pickUser = (data) => data?.user;
 
@@ -40,7 +37,6 @@ const authSlice = createSlice({
       state.error = null;
       state.user = null;
       state.userRole = "user";
-      state.token = null;
       state.isLoggedIn = false;
       state.isAdmin = false;
     },
@@ -55,8 +51,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = pickUser(action.payload);
-        state.token = pickToken(action.payload) || state.token;
-        state.isLoggedIn = Boolean(state.token);
+        state.isLoggedIn = Boolean(state.user);  ;
         state.userRole = state.user?.role || "user";
         state.isAdmin =
           state.user?.role === "admin" || state.userRole === "admin";
@@ -68,23 +63,18 @@ const authSlice = createSlice({
       })
 
       // registration cases
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.token = pickToken(action.payload) || state.token;
-        state.isAdmin =
-          state.user?.role === "admin" || state.userRole === "admin";
-        state.userRole = state.user?.role || "user";
-        state.user = pickUser(action.payload);
-        state.isLoggedIn = Boolean(state.token);
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload || "Registration failed";
-      })
+        .addCase(registerUser.pending, (state) => {
+          state.isLoading = true;
+          state.error = null;
+        })
+        .addCase(registerUser.fulfilled, (state) => {
+          state.isLoading = false;
+          state.error = null;
+        })
+        .addCase(registerUser.rejected, (state, action) => {
+          state.isLoading = false;
+          state.error = action.payload || "Registration failed";
+        })
 
       // get profile for token validation (optional)
       .addCase(getUserProfile.pending, (state) => {

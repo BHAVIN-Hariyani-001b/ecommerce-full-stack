@@ -4,9 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../../features/category/categoryThunk";
 import Description from "./Description";
 import Modal from "../../../components/common/Modal";
+import { fetchBrand } from "../../features/Brand/brandThunk";
 
 const BasicInfo = memo(function BasicInfo({ productData, handleOnChange }) {
   const category = useSelector((state) => state.userCategory.category);
+  const brand = useSelector((state) => state.brand.brand);
+  console.log(brand);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
   const openDescription = () => setIsDescriptionOpen(true);
@@ -16,6 +19,10 @@ const BasicInfo = memo(function BasicInfo({ productData, handleOnChange }) {
 
   useEffect(() => {
     dispatch(fetchCategories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchBrand());
   }, [dispatch]);
 
   return (
@@ -58,7 +65,7 @@ const BasicInfo = memo(function BasicInfo({ productData, handleOnChange }) {
 
           {category.map(
             (cat) =>
-              cat?.id !== 1 && (
+              cat?.name.toLowerCase() !== "all" && (
                 <option value={cat?.name} key={cat?.id}>
                   {cat?.name}
                 </option>
@@ -86,12 +93,39 @@ const BasicInfo = memo(function BasicInfo({ productData, handleOnChange }) {
 
           {category.map(
             (cat) =>
-              (cat?.id !== 1 && cat?.parentCategory )&& (
+              cat?.name.toLowerCase() !== "all" &&
+              cat?.parentCategory && (
                 <option value={cat?.name} key={cat?.id}>
                   {cat?.name}
                 </option>
               ),
           )}
+        </select>
+
+        <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />
+      </div>
+
+      <div className="flex flex-col relative">
+        <label htmlFor="ProductSubCategory" className="font-semibold py-2">
+          Select Brand
+        </label>
+
+        <select
+          name="brand"
+          id="ProductSubCategory"
+          required={true}
+          autoComplete="off"
+          className="outline-none bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
+          onChange={handleOnChange}
+          value={productData?.brand ?? "option"}
+        >
+          <option value="option">Select Any One</option>
+
+          {brand.map((bId) => (
+            <option value={bId?.name} key={bId?.id}>
+              {bId?.name}
+            </option>
+          ))}
         </select>
 
         <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />

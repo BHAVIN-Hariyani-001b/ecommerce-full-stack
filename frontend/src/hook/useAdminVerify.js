@@ -7,16 +7,15 @@ const useAdminVerify = () => {
   const dispatch = useDispatch();
   const isAdmin = useSelector((state) => state.auth?.isAdmin);
   const isLoading = useSelector((state) => state.auth?.isLoading);
-  const token = useSelector((state) => state.auth?.token);
+  const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn);
 
   useEffect(() => {
-    console.log("Hello")
-    if (!token) return;
-    console.log("Hello how are you")
-    dispatch(fetchAdminStatus());
-  }, [dispatch, token]); 
+    console.log("hello")
+    if (!isLoggedIn) return;
+    dispatch(fetchAdminStatus()); // cookie sent automatically by browser
+  }, [dispatch, isLoggedIn]);
 
-  return { isAdmin, isLoading, token };
+  return { isAdmin, isLoading };
 };
 
 export default useAdminVerify;

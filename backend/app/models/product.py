@@ -39,6 +39,9 @@ class Products(db.Model):
 
     subcategory_id = db.Column(db.Integer,db.ForeignKey("category.id"),nullable=True)
     subcategory = db.relationship("Category",foreign_keys=[subcategory_id])
+    
+    brand_id = db.Column(db.Integer,db.ForeignKey("brand.id"),nullable=True)
+    brand = db.relationship('Brand', backref='products',foreign_keys=[brand_id])
 
     description = db.Column(db.Text, nullable=True)
     aboutItem = db.Column(db.Text, nullable=True)
