@@ -8,19 +8,7 @@ import {
 } from "../../middleware/authApi";
 import { addToCart, fetchCartItem } from "../card/cardThunk";
 import { clearCart } from "../card/cardSlice";
-// import { logout } from "./authSlice";
 
-const getErrorMessage = (error) => {
-  const data = error?.response?.data;
-  return (
-    data?.message ||
-    data?.error ||
-    data?.detail ||
-    (typeof data === "string" ? data : null) ||
-    error?.message ||
-    "Request failed"
-  );
-};
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -45,7 +33,7 @@ export const loginUser = createAsyncThunk(
       dispatch(fetchCartItem(data.user?.id));
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error));
+      return rejectWithValue(error.response?.data?.error || "please try again");
     }
   },
 );
@@ -57,7 +45,7 @@ export const registerUser = createAsyncThunk(
       const data = await registerApi({ username, email, password });
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error));
+      return rejectWithValue(error.response?.data?.error || "please try again");
     }
   },
 );
@@ -69,7 +57,7 @@ export const getUserProfile = createAsyncThunk(
       const data = await getProfileApi();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error));
+      return rejectWithValue(error.response?.data?.error || "please try again");
     }
   },
 );
@@ -81,7 +69,7 @@ export const fetchAdminStatus = createAsyncThunk(
       const data = await checkAdmin();
       return data;
     } catch (error) {
-      return rejectWithValue(getErrorMessage(error));
+      return rejectWithValue(error.response?.data?.error || "failed to fetch admin status");
     }
   },
 );

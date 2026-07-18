@@ -12,7 +12,6 @@ from flask_jwt_extended import (
 from app.models.users import User
 from app.db import db
 from sqlalchemy.exc import IntegrityError
-from app.util.auth_middleware import login_required
 
 auth_bp = Blueprint("auth", __name__)
 

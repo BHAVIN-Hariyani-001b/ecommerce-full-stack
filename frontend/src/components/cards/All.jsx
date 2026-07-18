@@ -5,8 +5,8 @@ import ProductCardList from "../common/ProductCardList";
 import PageWapper from "../layout/PageWapper";
 import HomePageLoading from "../ProductLoading/HomePageLoading";
 import { toast } from "react-toastify";
-import Loding from "../common/Loding"
-
+import Loding from "../common/Loding";
+import { getErrorMessage } from "../../util/getErrorMessage";
 
 const HeroBanner = lazy(() => import("../product/HeroBanner"));
 
@@ -21,10 +21,13 @@ const All = memo(function All() {
     dispatch(fetchHomePageProduct());
   }, [dispatch]);
 
-  if (loading)
-    return <HomePageLoading />;
-  if (error)
-    return toast.error(error);
+  useEffect(() => {
+    if (error) {
+      toast.error(getErrorMessage(error));
+    }
+  },[error]);
+
+  if (loading) return <HomePageLoading />;  
 
   return (
     <PageWapper>
