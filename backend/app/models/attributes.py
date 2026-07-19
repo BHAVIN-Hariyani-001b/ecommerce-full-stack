@@ -2,7 +2,7 @@ from app.db import db
 from app.models.category import Status
 
 class Attributes(db.Model):
-    __tablename__ = 'attributes'
+    __tablename__ = 'attributes_'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     value = db.Column(db.String(100), nullable=False)
