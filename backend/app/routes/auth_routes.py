@@ -31,11 +31,11 @@ def login():
         if missing:
             return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
+        
         user = User.query.filter_by(email=data["email"]).first()
+   
 
-        if not user and not user.check_password(data["password"]):
-            return jsonify({"error": "Invalid email or password"}), 401
-        elif not user:
+        if not user:
             return jsonify({"error": "Invalid email or password"}), 401
         elif not user.check_password(data["password"]):
             return jsonify({"error": "Invalid password"}), 401
@@ -94,11 +94,6 @@ def register():
         user.set_password(data["password"])
         db.session.add(user)
         db.session.commit()
-
-        token = create_access_token(
-            identity=str(user.id), additional_claims={"role": user.role.value}
-        )
-
         return (
             jsonify(
                 {
@@ -136,6 +131,7 @@ def logout():
 @jwt_required(refresh=True, locations=["cookies"])
 def refresh():
     try:
+        print(">>> REFRESH ROUTE HIT <<<")
         identity = get_jwt_identity()
         claims = get_jwt()
 
