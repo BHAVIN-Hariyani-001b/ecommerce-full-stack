@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-import jwt
 from app.db import db
 from app.models.productImage import ProductImage
 from app.models.category import Category
 from app.models.product import Products
+from app.models.Attribute import Attribute
+from app.models.AttributeValue import AttributeValue
 from app.config import Config
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
@@ -66,6 +67,7 @@ def create_app():
     from app.routes.search_routes import search_bp
     from app.routes.mail_send_route import auth_forgot_password_bp
     from app.routes.brand_route import brand_bp
+    from app.routes.attributes_routes import attributes_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -75,6 +77,7 @@ def create_app():
     app.register_blueprint(search_bp,url_prefix="/api")
     app.register_blueprint(auth_forgot_password_bp,url_prefix="/api")
     app.register_blueprint(brand_bp,url_prefix="/api")
+    app.register_blueprint(attributes_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)
