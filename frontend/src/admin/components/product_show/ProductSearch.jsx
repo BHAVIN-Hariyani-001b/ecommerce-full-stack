@@ -20,7 +20,7 @@ const ProductSearch = ({
           name="stock"
           value={stockFilter}
           onChange={(e) => setStockFilter(e.target.value)}
-          className="appearance-none outline-none w-full h-full cursor-pointer bg-transparent text-sm"
+          className="appearance-none outline-none w-full h-full cursor-pointer bg-transparent text-sm p-2"
         >
           <option value="All">All Stock</option>
           <option value="InStock">In Stock</option>
@@ -36,7 +36,7 @@ const ProductSearch = ({
           name="Status"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="appearance-none outline-none w-full h-full cursor-pointer bg-transparent text-sm"
+          className="appearance-none outline-none w-full h-full cursor-pointer bg-transparent text-sm p-2"
         >
           <option value="All">All Status</option>
           <option value="public">Published</option>

@@ -14,7 +14,7 @@ class Config:
 
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-    JWT_ACCESS_TOKEN_EXPIRES  = timedelta(minutes=15)  
+    JWT_ACCESS_TOKEN_EXPIRES  = timedelta(minutes=1)  
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
     JWT_ALGORITHM = "HS256"
 
@@ -30,6 +30,7 @@ class Config:
     JWT_ACCESS_COOKIE_PATH     = "/"                    # fixed: no trailing spaces
     JWT_REFRESH_COOKIE_PATH    = "/api/auth/refresh"    # fixed: matches url_prefix
 
+    ## mail send 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
