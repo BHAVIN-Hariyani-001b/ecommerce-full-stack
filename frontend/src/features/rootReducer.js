@@ -12,6 +12,7 @@ import searchReducer from "./search/searchSlice";
 import productReducer from "./productPage/productPageSlice.js";
 import forgotPasswordReducer from "./forgotPassword/forgotPasswordSlice";
 import brandReducer from "../admin/features/Brand/brandSlice.js";
+import attributeReducer from "../admin/features/attributes/attributesSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   product: productReducer,
   forgotPassword: forgotPasswordReducer,
   brand: brandReducer,
+  attribute: attributeReducer,
 });
 
 export default rootReducer;

@@ -9,16 +9,13 @@ import { IoIosArrowDown } from "react-icons/io";
 import { RxCrossCircled } from "react-icons/rx";
 import Modal from "../../../components/common/Modal";
 import Description from "./Description";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAttributesAPI } from "../../features/attributes/attributesThunk";
 
-const ATTRIBUTE_TYPES = ["Text", "Color", "Size", "Number"];
 const DEFAULT_COLOR = "#fff";
-const PLACEHOLDERS = {
-  Text: "e.g. Cotton",
-  Size: "e.g. XL",
-  Number: "e.g. 42",
-};
 
 const AttributeChip = memo(function AttributeChip({ item, onRemove }) {
+  // console.log(item);
   return (
     <div className="flex items-center gap-2 bg-blue-50 border border-gray-200 rounded-lg px-3 py-2">
       <span className="text-xs font-semibold text-gray-500">{item.type}</span>
@@ -53,13 +50,43 @@ const AddAtribute = memo(function AddAtribute({
   ref,
 }) {
   const [attributes, setAttributes] = useState([]);
-  const [attributeType, setAttributeType] = useState("Text");
+  const [attributeType, setAttributeType] = useState("");
   const [attributeValue, setAttributeValue] = useState("");
 
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
   const openDescription = () => setIsDescriptionOpen(true);
   const closeDescription = () => setIsDescriptionOpen(false);
+
+  const dispatch = useDispatch();
+
+  console.log(productData);
+  // console.log(attributeValue);
+
+  useEffect(() => {
+    dispatch(fetchAttributesAPI());
+  }, [dispatch]);
+
+  // NOTE: confirm this matches the key your attributesSlice.reducer is
+  // registered under in configureStore({ reducer: { attributes: ... } })
+  const attributeTypes = useSelector(
+    (state) => state.attribute.attributes ?? [],
+  );
+
+  // console.log(attributeType);
+
+  // Once the DB list loads, default attributeType to the first entry
+  // (or reset it if the current selection no longer exists in the list)
+  useEffect(() => {
+    if (
+      attributeTypes.length &&
+      !attributeTypes.some((t) => t.name === attributeType)
+    ) {
+      setAttributeType(attributeTypes[0].name);
+    }
+  }, [attributeTypes]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const selectedType = attributeTypes.find((t) => t.name === attributeType);
 
   useImperativeHandle(
     ref,
@@ -74,22 +101,33 @@ const AddAtribute = memo(function AddAtribute({
 
   const addAttribute = useCallback(() => {
     const value = attributeValue.trim();
-    if (!value) return;
+    // console.log(value);
+    // console.log(attributeType);
+    if (!value || !attributeType) return;
 
     setAttributes((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), type: attributeType, value },
+      {
+        id: crypto.randomUUID(),
+        Aid: selectedType?.id,
+        type: attributeType,
+        value,
+      },
     ]);
     setProductData((prev) => ({
       ...prev,
-      attributes: [...prev.attributes, { type: attributeType, value }],
+      attributes: [
+        ...prev.attributes,
+        { id: selectedType?.id, type: attributeType, value },
+      ],
     }));
 
     setAttributeValue(attributeType === "Color" ? DEFAULT_COLOR : "");
-  }, [attributeType, attributeValue, setProductData]);
+  }, [attributeType, attributeValue, setProductData, selectedType]);
 
   const removeAttribute = useCallback(
     (id) => {
+      console.log("call to the remove attribute")
       setAttributes((prev) => {
         const target = prev.find((item) => item.id === id);
         if (!target) return prev;
@@ -137,8 +175,8 @@ const AddAtribute = memo(function AddAtribute({
   useEffect(() => {
     setAttributes(
       productData?.attributes?.map((attr) => ({
-        id: crypto.randomUUID(),
-        type: attr?.type,
+        id: attr?.id ?? crypto.randomUUID(),
+        type: attr?.type ?? attr?.name,
         value: attr?.value,
       })) ?? [],
     );
@@ -157,24 +195,33 @@ const AddAtribute = memo(function AddAtribute({
           Attributes Name
         </label>
 
-        <div className="w-full flex gap-4 px-1 relative">
-          <select
-            name="AttributesName"
-            id="NameAtb"
-            value={attributeType}
-            onChange={handleTypeChange}
-            required={true}
-            className="outline-none w-full bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
-          >
-            {ATTRIBUTE_TYPES.map((type, index) => (
-              <option key={index} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+        {attributeTypes.length === 0 ? (
+          <div className="text-sm text-gray-400 px-3 py-3 bg-blue-50 border border-gray-200 rounded-lg">
+            Loading attribute types...
+          </div>
+        ) : (
+          <div className="w-full flex gap-4 px-1 relative">
+            <select
+              name="AttributesName"
+              id="NameAtb"
+              value={attributeType}
+              onChange={handleTypeChange}
+              required
+              className="outline-none w-full bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
+            >
+              {attributeTypes.map((type) => (
+                <option key={type.id} value={type.attribute_name}>
+                  {type.attribute_name}
+                </option>
+              ))}
+            </select>
+            <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px] pointer-events-none" />
+          </div>
+        )}
 
-          <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px] pointer-events-none" />
-        </div>
+        {selectedType?.desc ? (
+          <p className="text-xs text-gray-400 px-1 pt-1">{selectedType.desc}</p>
+        ) : null}
       </div>
 
       <div className="flex flex-col p-1">
@@ -188,7 +235,7 @@ const AddAtribute = memo(function AddAtribute({
               <input
                 type="color"
                 name="Attributes"
-                required={true}
+                required
                 id="ATB"
                 value={attributeValue || DEFAULT_COLOR}
                 onChange={(e) => setAttributeValue(e.target.value)}
@@ -200,12 +247,12 @@ const AddAtribute = memo(function AddAtribute({
               type={inputType}
               name="Attributes"
               id="ATB"
-              required={true}
+              required
               autoComplete="off"
               value={attributeValue}
               onChange={(e) => setAttributeValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={PLACEHOLDERS[attributeType]}
+              placeholder={selectedType?.placeholder || "Enter value"}
               className="outline-none w-full bg-blue-50 border px-3 py-3 rounded-lg border-gray-200"
             />
           )}
@@ -219,7 +266,7 @@ const AddAtribute = memo(function AddAtribute({
           </button>
         </div>
       </div>
-
+      {/* {console.log(attributes)} */}
       {attributes.length > 0 ? (
         <div className="flex flex-wrap gap-2 p-2 mt-2">
           {attributes.map((item) => (

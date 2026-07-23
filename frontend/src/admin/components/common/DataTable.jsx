@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 
 function DataTable({ rows, columns, getRowId }) {
   return (
-    <Paper sx={{ height: 400, width: "100%" }}>
+    <Paper sx={{ height: 500, width: "100%" }}>
       <DataGrid
         rows={rows}
         columns={columns}

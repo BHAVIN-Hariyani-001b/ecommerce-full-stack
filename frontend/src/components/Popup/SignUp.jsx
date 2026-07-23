@@ -11,7 +11,8 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { loading, error } = useSelector((state) => state.auth);
+  const { isLoading, error } = useSelector((state) => state.auth);
+  console.log(isLoading)
   const dispatch = useDispatch();
 
   const passwordMismatch = useMemo(
@@ -41,12 +42,12 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
         await dispatch(registerUser({ username, email, password })).unwrap();
         setPassword("");
         setConfirmPassword("");
-        onClose?.();
+        onSwitchToSignIn();
       } catch {
         toast.error("please try again");
       }
     },
-    [dispatch, username, email, password, confirmPassword, onClose],
+    [dispatch, username, email, password, confirmPassword, onSwitchToSignIn],
   );
 
   return (
@@ -134,10 +135,10 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
 
         <button
           type="submit"
-          disabled={loading || passwordMismatch}
+          disabled={isLoading || passwordMismatch}
           className="w-full rounded-xl cursor-pointer bg-[#8685ef] text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity"
         >
-          {loading ? "Creating..." : "Create account"}
+          {isLoading ? "Creating..." : "Create account"}
         </button>
 
         <p className="text-sm text-center text-[#586274]">

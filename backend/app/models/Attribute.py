@@ -11,12 +11,14 @@ class Attribute(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(100), nullable=False,unique=True)          # e.x. "color", "size"
     example_value = db.Column(db.String(255), nullable=True)    # e.x. "red", "XL"
+    description = db.Column(db.String(255),nullable=True)
 
     values = db.relationship('AttributeValue', back_populates='attribute', cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
             'id': self.id,
-            'name': self.name,
+            'attribute_name': self.name,
+            'desc' : self.description,
             'placeholder': self.example_value
         }

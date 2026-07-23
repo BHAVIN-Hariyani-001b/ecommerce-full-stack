@@ -94,7 +94,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         })),
         attributes: (isUpdateProduct?.attributes ?? []).map((attr) => ({
           id: attr.id,
-          type: attr.type,
+          type: attr.name,
           value: attr.value,
         })),
         removeImg: [],

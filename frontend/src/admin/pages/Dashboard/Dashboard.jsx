@@ -11,6 +11,7 @@ import Container from "../../components/common/Container";
 import Product from "../../components/product_show/Product";
 import BrandAdd from "../../components/brand/BrandAdd";
 import ShowUser from "../../components/user/ShowUser";
+import AddAttributes from "../../components/attribute/AddAttributes";
 
 const DashMain = lazy(() => import("../../components/DashMain"));
 // const AddProduct = lazy(() => import("../../components/AddProduct"));
@@ -51,6 +52,7 @@ const Dashboard = memo(function Dashboard() {
               <BrandAdd setActivePage={setActivePage} />
             )}
             {activePage == "User" && <ShowUser setActivePage={setActivePage} />}
+            {activePage == "Attribute" && <AddAttributes /> }
           </Container>
         )}
         <SideBar

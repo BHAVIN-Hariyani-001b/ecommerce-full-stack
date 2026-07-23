@@ -6,16 +6,16 @@ from app.models.Attribute import Attribute
 attributes_bp = Blueprint("attributes", __name__)
 
 
-@attributes_bp.route("/attributes", methods=["GET"])
-def get_attributes():
-    try:
-        attributes = AttributeValue.query.all()
-        return jsonify([attribute.to_dict() for attribute in attributes]), 200
-    except Exception as e:
-        return jsonify({"message": "data not fetch", "error": str(e)}), 500
+# @attributes_bp.route("/attributes", methods=["GET"])
+# def get_attributes():
+#     try:
+#         attributes = AttributeValue.query.all()
+#         return jsonify([attribute.to_dict() for attribute in attributes]), 200
+#     except Exception as e:
+#         return jsonify({"message": "data not fetch", "error": str(e)}), 500
 
 
-@attributes_bp.route("/attributes/type", methods=["GET"])
+@attributes_bp.route("/attributes/get", methods=["GET"])
 def get_attributes_type():
     try:
         attributes = Attribute.query.all()
@@ -24,19 +24,21 @@ def get_attributes_type():
         return jsonify({"message": "data not fetch", "error": str(e)}), 500
 
 
-@attributes_bp.route("/attributes", methods=["POST"])
+@attributes_bp.route("/attributes/add", methods=["POST"])
 def create_attribute():
     try:
         data = request.get_json()
         aname = data.get("name")
         value = data.get("value")
+        desc = data.get("desc")
+
 
         print(data)
 
         if not aname or not value:
             return jsonify({"error": "Name and value are required"}), 400
 
-        new_attribute = Attribute(name=aname, example_value=value)
+        new_attribute = Attribute(name=aname, example_value=value,description=desc)
         db.session.add(new_attribute)
         db.session.commit()
 
@@ -68,12 +70,16 @@ def update_attribute(attribute_id):
         data = request.get_json()
         name = data.get("name")
         value = data.get("value")
+        desc = data.get("desc")
 
         if name:
             attribute.name = name
 
         if value:
             attribute.example_value = value
+
+        if desc:
+            attribute.description = desc
 
         db.session.commit()
 

@@ -6,7 +6,7 @@ const ShowUser = () => {
   return (
     <div>
       <PageWapper>
-        <DataTable />
+        {/* <DataTable /> */}
       </PageWapper>
     </div>
   );

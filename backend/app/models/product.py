@@ -60,7 +60,7 @@ class Products(db.Model):
     )
 
     attributes = db.relationship(
-        'ProductAttribute',
+        'AttributeValue',
         backref='product',
         cascade='all, delete-orphan'        
     )

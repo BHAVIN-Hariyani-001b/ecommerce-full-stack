@@ -15,7 +15,7 @@ const SignIn = memo(function SignIn({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { isLoading, error } = useSelector((state) => state.auth);
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -81,10 +81,10 @@ const SignIn = memo(function SignIn({
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={isLoading}
             className="w-full rounded-xl cursor-pointer bg-[#8685ef] text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {isLoading ? "Signing in..." : "Sign In"}
           </button>
           <p className="text-sm text-center text-[#586274]">
             Don&apos;t have an account?{" "}

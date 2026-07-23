@@ -11,7 +11,8 @@ const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
     "Category",
     "HeroSection",
     "Brand",
-    "User"
+    "User",
+    "Attribute"
   ];
 
   return (

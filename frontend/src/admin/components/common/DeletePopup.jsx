@@ -5,7 +5,7 @@ const DeletePopup = ({ onClose, handleDelete }) => {
     <div className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center  justify-center z-50">
       <div className="bg-white p-6 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
-        <p className="mb-6">Are you sure you want to delete this category?</p>
+        <p className="mb-6">Are you sure you want to delete this Item?</p>
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}

@@ -3,12 +3,18 @@ import { IoIosArrowForward } from "react-icons/io";
 import { MdOutlineDelete } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsUpdated } from "../../../admin/features/category/categorySlice";
-// import { toast } from "react-toastify";
+import { useEffect } from "react";
+import { fetchCategories } from "../../../features/category/categoryThunk";
 
 const CategoryList = ({ popup }) => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.adminCategory.category);
-  console.log(categories)
+  console.log(categories);
+
+  useEffect(() => {
+    dispatch(fetchCategories()).unwrap();
+  }, [dispatch]);
+
   return (
     <>
       {categories?.map((item, index) => (

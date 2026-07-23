@@ -12,7 +12,7 @@ const Footer = memo(function Footer() {
   }, []);
 
   return (
-    <footer className="mt-10 border-t border-gray-200 bg-white">
+    <footer className="mt-10 border-t border-gray-200 bg-white max-[600px]:hidden">
       <PageWapper className="mx-auto px-6 max-[1000px]:px-10 max-[600px]:px-6 bg-white">
           <div className="grid grid-cols-12 gap-8 py-10">
             <div className="col-span-12 md:col-span-5">
