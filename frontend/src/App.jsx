@@ -1,11 +1,11 @@
 import { memo, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer,Slide } from "react-toastify";
+import { ToastContainer, Slide } from "react-toastify";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Cart from "./components/cart/Cart";
 import useAdminVerify from "./hook/useAdminVerify";
-
+import BottomMenu from "./admin/components/common/BottomMenu";
 
 const App = memo(function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,7 +23,7 @@ const App = memo(function App() {
       navigate("/admin", { replace: true });
     }
   }, [isAdmin, navigate, isLoading]);
-  
+
   return (
     <div>
       {!isAdminRoute && (
@@ -43,7 +43,7 @@ const App = memo(function App() {
         rtl={false}
         pauseOnFocusLoss
         draggable
-        transition={Slide}  
+        transition={Slide}
         pauseOnHover
         theme="colored"
         className="custom-toast-container"
@@ -51,7 +51,7 @@ const App = memo(function App() {
 
       <Outlet context={{ searchQuery, setSearchQuery, sideBar, setSideBar }} />
 
-      {(!isAdminRoute && !isSearch) && (
+      {!isAdminRoute && !isSearch && (
         <>
           <Cart setSideBar={setSideBar} sideBarOpen={sideBar} />
           <Footer />

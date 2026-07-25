@@ -14,7 +14,7 @@ import OtpInput from "./OtpInput";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import NewPassword from "./NewPassword";
 
-const OTP_VALIDITY_SECONDS = 5 * 60;
+const OTP_VALIDITY_SECONDS = 2 * 60;
 
 const ForgotPassword = memo(function ForgotPassword({
   open,
@@ -31,6 +31,7 @@ const ForgotPassword = memo(function ForgotPassword({
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
 
   useEffect(() => {
     if (!open) {
@@ -186,10 +187,10 @@ const ForgotPassword = memo(function ForgotPassword({
             </button>
             <button
               type="submit"
-              disabled={isPasswordMatch}
-              className={`w-full rounded-xl text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity ${!isPasswordMatch ? "bg-[#8785ef8c] cursor-not-allowed" : "cursor-pointer bg-[#8685ef]"}`}
+              disabled={btnDisable}
+              className={`w-full rounded-xl text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity ${btnDisable ? "bg-[#8785ef8c] cursor-not-allowed" : "cursor-pointer bg-[#8685ef]"}`}
             >
-              {loading ? "OTP Sending" : "Resend OTP"}
+              {loading ? "OTP Sending..." : "Resend OTP"}
             </button>
           </div>
         </form>

@@ -6,6 +6,7 @@ from app.models.category import Category
 from app.models.product import Products
 from app.models.Attribute import Attribute
 from app.models.AttributeValue import AttributeValue
+from app.models.ForgotPassword import ForgotPassword
 from app.config import Config
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate

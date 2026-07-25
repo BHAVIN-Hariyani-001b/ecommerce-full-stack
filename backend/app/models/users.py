@@ -22,18 +22,16 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(saEnum(userRole), default=userRole.USER, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-    otp = db.Column(db.String(6), nullable=True)
-    otp_expiry = db.Column(db.DateTime, nullable=True)
-    otp_attempts = db.Column(db.Integer, default=0)
-    otp_verified = db.Column(db.Boolean, default=False, nullable=False)
+    
 
     @validates("username")
     def validate_username(self, key, username):
         username = username.strip()
+
         if not (3 < len(username) <= 80):
             raise ValueError("Username must be between 3 and 80 characters.")
-        if not re.match(r"^[a-zA-Z0-9_.-]+$", username):
-            raise ValueError("Username may only contain letters, numbers, _, ., or -")
+        if not re.match(r"^[a-zA-Z_.-]+$", username):
+            raise ValueError("Username may only contain letters, _, ., or -")
         return username
 
     @validates("phone")

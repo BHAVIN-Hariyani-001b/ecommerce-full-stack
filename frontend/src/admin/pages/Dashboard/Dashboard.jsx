@@ -1,11 +1,11 @@
 import { lazy, memo, Suspense, useState } from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import DashHeader from "../../components/DashHeader";
-import BottomMenu from "../../components/BottomMenu";
+import DashHeader from "../../components/Dashbord/DashHeader";
+import BottomMenu from "../../components/common/BottomMenu";
 import SkeletonDash from "../../components/common/SkeletonDash";
 import SideBar from "../../components/Sidebar/SideBar";
-import AddProduct from "../../components/AddProduct";
+import AddProduct from "../../components/product_add/AddProduct";
 import Category from "../../components/category/Category";
 import Container from "../../components/common/Container";
 import Product from "../../components/product_show/Product";
@@ -13,7 +13,31 @@ import BrandAdd from "../../components/brand/BrandAdd";
 import ShowUser from "../../components/user/ShowUser";
 import AddAttributes from "../../components/attribute/AddAttributes";
 
-const DashMain = lazy(() => import("../../components/DashMain"));
+import { MdDashboard } from "react-icons/md";
+import { FaBoxArchive } from "react-icons/fa6";
+import { MdShoppingCart } from "react-icons/md";
+import { AiFillSetting } from "react-icons/ai";
+
+const BOTTOM_MENU_ITEMS = [
+  {
+    icon: <MdDashboard size={25} color="#5c647a" />,
+    itemName: "Dashboard",
+  },
+  {
+    icon: <FaBoxArchive size={21} color="#5c647a" />,
+    itemName: "Products",
+  },
+  {
+    icon: <MdShoppingCart size={25} color="#5c647a" />,
+    itemName: "Orders",
+  },
+  {
+    icon: <AiFillSetting size={25} color="#5c647a" />,
+    itemName: "Settings",
+  },
+];
+
+const DashMain = lazy(() => import("../../components/Dashbord/DashMain"));
 // const AddProduct = lazy(() => import("../../components/AddProduct"));
 
 const Dashboard = memo(function Dashboard() {
@@ -52,7 +76,7 @@ const Dashboard = memo(function Dashboard() {
               <BrandAdd setActivePage={setActivePage} />
             )}
             {activePage == "User" && <ShowUser setActivePage={setActivePage} />}
-            {activePage == "Attribute" && <AddAttributes /> }
+            {activePage == "Attribute" && <AddAttributes />}
           </Container>
         )}
         <SideBar
@@ -62,7 +86,7 @@ const Dashboard = memo(function Dashboard() {
         />
       </main>
       <footer className="flex-1 shadow-[0_-8px_16px_rgba(0,0,0,0.15)] border-t border-[#c3bfd5] p-1">
-        <BottomMenu setActivePage={setActivePage} />
+        <BottomMenu BOTTOM_MENU_ITEMS={BOTTOM_MENU_ITEMS} setActivePage={setActivePage} />
       </footer>
     </div>
   );

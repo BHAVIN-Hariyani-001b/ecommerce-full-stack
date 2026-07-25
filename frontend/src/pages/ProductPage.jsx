@@ -25,8 +25,8 @@ const ProductPage = () => {
     const grouped = { Color: [], Size: [], Text: [], Number: [] };
 
     (product?.attributes ?? []).forEach((item) => {
-      if (grouped[item?.type]) {
-        grouped[item.type].push(item);
+      if (grouped[item?.name]) {
+        grouped[item.name].push(item);
       } else {
         grouped.Text.push(item); // fallback bucket for unknown types
       }
@@ -114,22 +114,22 @@ const ProductPage = () => {
               <div>
                 <div className="flex gap-10 w-full flex-wrap">
                   {Object.entries(productAttributes).map(
-                    ([type, items]) =>
+                    ([name, items]) =>
                       items.length > 0 && (
-                        <div key={type} className="flex flex-col gap-2">
-                          <span className="text-sm font-medium">{type}</span>
+                        <div key={name} className="flex flex-col gap-2">
+                          <span className="text-sm font-medium">{name}</span>
                           <div className="flex gap-2">
                             {items.map((item) => (
                               <span
                                 key={item.product_id + item.value}
                                 className="w-10 h-10 flex shadow-2xl rounded-md border border-gray-200 justify-center items-center"
                                 style={
-                                  type === "Color"
+                                  name === "Color"
                                     ? { backgroundColor: item?.value }
                                     : undefined
                                 }
                               >
-                                {type !== "Color" && item?.value}
+                                {name !== "Color" && item?.value}
                               </span>
                             ))}
                           </div>

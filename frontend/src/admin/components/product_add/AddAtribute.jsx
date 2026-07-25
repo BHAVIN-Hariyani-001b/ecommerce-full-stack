@@ -52,6 +52,9 @@ const AddAtribute = memo(function AddAtribute({
   const [attributes, setAttributes] = useState([]);
   const [attributeType, setAttributeType] = useState("");
   const [attributeValue, setAttributeValue] = useState("");
+  console.log(attributeType)
+  console.log(attributeValue)
+  console.log(attributes)
 
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
@@ -80,14 +83,15 @@ const AddAtribute = memo(function AddAtribute({
   useEffect(() => {
     if (
       attributeTypes.length &&
-      !attributeTypes.some((t) => t.name === attributeType)
+      !attributeTypes.some((t) => t.attribute_name  === attributeType)
     ) {
-      setAttributeType(attributeTypes[0].name);
+      setAttributeType(attributeTypes[0].attribute_name);
     }
   }, [attributeTypes]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const selectedType = attributeTypes.find((t) => t.name === attributeType);
-
+  const selectedType = attributeTypes.find((t) => t.attribute_name  === attributeType);
+  console.log("this is selec type " + attributeTypes)
+  console.log("this is selec type " + selectedType)
   useImperativeHandle(
     ref,
     () => ({
@@ -175,7 +179,7 @@ const AddAtribute = memo(function AddAtribute({
   useEffect(() => {
     setAttributes(
       productData?.attributes?.map((attr) => ({
-        id: attr?.id ?? crypto.randomUUID(),
+        id: attr?.id  ?? crypto.randomUUID(),
         type: attr?.type ?? attr?.name,
         value: attr?.value,
       })) ?? [],
