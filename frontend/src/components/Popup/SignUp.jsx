@@ -17,8 +17,8 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
 
   const passwordMismatch = useMemo(
     () =>
-      password.length > 0 &&
-      confirmPassword.length > 0 &&
+      password.length >= 0 &&
+      confirmPassword.length >= 0 &&
       password !== confirmPassword,
     [password, confirmPassword],
   );
@@ -37,7 +37,10 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (password !== confirmPassword) return;
+      if (password !== confirmPassword) {
+        toast.error("password are not match?")
+        return;
+      };
       try {
         await dispatch(registerUser({ username, email, password })).unwrap();
         setPassword("");
@@ -136,7 +139,7 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
         <button
           type="submit"
           disabled={isLoading || passwordMismatch}
-          className="w-full rounded-xl cursor-pointer bg-[#8685ef] text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity"
+          className={`w-full rounded-xl cursor-pointer text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity ${(isLoading || passwordMismatch ) ? 'bg-[#8685ef] cursor-not-allowed' : 'bg-[#8685ef]'}`}
         >
           {isLoading ? "Creating..." : "Create account"}
         </button>

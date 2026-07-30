@@ -16,6 +16,13 @@ function DataTable({ rows, columns, getRowId }) {
         }}
         pageSizeOptions={[5, 10, 25, 50]}
         disableRowSelectionOnClick
+        slots={{
+          noRowsOverlay: () => (
+            <div className="flex h-full items-center justify-center text-gray-500">
+              No users found
+            </div>
+          ),
+        }}
       />
     </Paper>
   );

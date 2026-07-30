@@ -54,11 +54,11 @@ const AttributesList = () => {
 
 const List = ({ item, popup }) => {
   const dispatch = useDispatch();
-
+  console.log(item)
   return (
     <div className="border border-gray-200 rounded-xl flex items-center justify-between p-4 group cursor-all-scroll">
       <div className="text-start space-y-1">
-        <p className="text-[18px]">{item.name}</p>
+        <p className="text-[18px]">{item.attribute_name}</p>
         <p className="text-[14px] text-wrap line-clamp-2 max-w-80 max-[1100px]:max-w-60 max-[600px]:max-w-40 max-[600px]:hidden truncate">
           {item.desc}
         </p>

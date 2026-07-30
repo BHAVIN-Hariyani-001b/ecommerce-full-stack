@@ -13,6 +13,7 @@ import productReducer from "./productPage/productPageSlice.js";
 import forgotPasswordReducer from "./forgotPassword/forgotPasswordSlice";
 import brandReducer from "../admin/features/Brand/brandSlice.js";
 import attributeReducer from "../admin/features/attributes/attributesSlice";
+import userReducer from "../admin/features/user/userSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -25,7 +26,7 @@ const persistConfigCategory = {
 const persistConfigAuth = {
   key: "auth",
   storage,
-  whitelist: ["user", "isLoggedIn", "userRole", "token"],
+  whitelist: ["user", "isLoggedIn", "userRole"],
 };
 
 const persistConfigCart = {
@@ -47,6 +48,7 @@ const rootReducer = combineReducers({
   forgotPassword: forgotPasswordReducer,
   brand: brandReducer,
   attribute: attributeReducer,
+  user: userReducer,
 });
 
 export default rootReducer;

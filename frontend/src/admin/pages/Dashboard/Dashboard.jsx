@@ -72,10 +72,8 @@ const Dashboard = memo(function Dashboard() {
             {activePage == "Add Product" && (
               <AddProduct setActivePage={setActivePage} />
             )}
-            {activePage == "Brand" && (
-              <BrandAdd setActivePage={setActivePage} />
-            )}
-            {activePage == "User" && <ShowUser setActivePage={setActivePage} />}
+            {activePage == "Brand" && <BrandAdd />}
+            {activePage == "User" && <ShowUser />}
             {activePage == "Attribute" && <AddAttributes />}
           </Container>
         )}
@@ -86,7 +84,10 @@ const Dashboard = memo(function Dashboard() {
         />
       </main>
       <footer className="flex-1 shadow-[0_-8px_16px_rgba(0,0,0,0.15)] border-t border-[#c3bfd5] p-1">
-        <BottomMenu BOTTOM_MENU_ITEMS={BOTTOM_MENU_ITEMS} setActivePage={setActivePage} />
+        <BottomMenu
+          BOTTOM_MENU_ITEMS={BOTTOM_MENU_ITEMS}
+          setActivePage={setActivePage}
+        />
       </footer>
     </div>
   );

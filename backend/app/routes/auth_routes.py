@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -14,6 +14,7 @@ from app.db import db
 from sqlalchemy.exc import IntegrityError
 
 auth_bp = Blueprint("auth", __name__)
+
 
 
 # login route

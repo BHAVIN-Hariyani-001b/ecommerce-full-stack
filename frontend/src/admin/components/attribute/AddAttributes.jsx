@@ -26,7 +26,7 @@ const AddAttributes = () => {
   useEffect(() => {
     if (isUpdated?.id) {
       setAttributes({
-        AName: isUpdated?.name,
+        AName: isUpdated?.attribute_name,
         ADesc: isUpdated?.desc,
         AExm: isUpdated?.placeholder,
       });

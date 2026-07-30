@@ -69,6 +69,7 @@ def create_app():
     from app.routes.mail_send_route import auth_forgot_password_bp
     from app.routes.brand_route import brand_bp
     from app.routes.attributes_routes import attributes_bp
+    from app.routes.user_route import user_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -79,6 +80,7 @@ def create_app():
     app.register_blueprint(auth_forgot_password_bp,url_prefix="/api")
     app.register_blueprint(brand_bp,url_prefix="/api")
     app.register_blueprint(attributes_bp,url_prefix="/api")
+    app.register_blueprint(user_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)

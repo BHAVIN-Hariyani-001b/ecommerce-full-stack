@@ -44,7 +44,7 @@ const Category = () => {
         <div className="p-4">
           <div className="border border-gray-200 p-5 rounded-xl relative">
             <h1 className="font-semibold py-5 text-xl">Category</h1>
-            <div className="scrollbar-none max-h-125 overflow-y-auto space-y-3">
+            <div className="max-h-125 overflow-y-auto space-y-3">
               <CategoryList popup={setIsOpen} />
             </div>
           </div>
