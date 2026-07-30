@@ -87,7 +87,7 @@ const ProductCard = ({ item }) => {
           />
         </div>
         <div className="p-1 space-y-3">
-          <div className="text-[14px] text-left line-clamp-2">
+          <div className="text-[14px] text-left line-clamp-2 h-10">
             <span>{item?.name}</span>
           </div>
           <div className="flex justify-between items-center">

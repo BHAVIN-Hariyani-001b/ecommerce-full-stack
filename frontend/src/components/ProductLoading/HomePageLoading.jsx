@@ -9,7 +9,7 @@ const HomePageLoading = () => {
       <PageWapper>
         <Stack spacing={3}>
           <div className="flex justify-center items-center max-[600px]:hidden">
-            <Skeleton variant="rounded" className="w-280" height={300} />
+            <Skeleton variant="rounded" className="w-287" height={300} />
           </div>
           <div className="flex flex-wrap gap-1 justify-center">
             {Array.from({ length: 20 }, (_, index) => (
