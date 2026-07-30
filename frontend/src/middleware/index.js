@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { logout } from "../features/auth/authSlice";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api/",
@@ -7,7 +8,7 @@ const api = axios.create({
   timeout: 10000,
 });
 
-let store; 
+let store;
 
 export const setupInterceptors = (_store) => {
   store = _store;
@@ -15,7 +16,7 @@ export const setupInterceptors = (_store) => {
 
 const refreshToken = async () => {
   await api.post("/auth/refresh");
-}
+};
 
 api.interceptors.response.use(
   (response) => response,
@@ -23,14 +24,21 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (
+        originalRequest.url?.includes("/auth/login") ||
+        originalRequest.url?.includes("/auth/refresh")
+      ) {
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
+
       try {
-        await refreshToken()
+        await refreshToken();
         return api(originalRequest);
       } catch (refreshError) {
         toast.error("Session expired. Please login again.");
         if (store) {
-          const { logout } = await import("../features/auth/authSlice");
           store.dispatch(logout());
         }
         setTimeout(() => {
@@ -41,7 +49,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

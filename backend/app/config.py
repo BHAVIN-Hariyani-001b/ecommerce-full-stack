@@ -30,6 +30,7 @@ class Config:
     JWT_ACCESS_COOKIE_PATH     = "/"                    # fixed: no trailing spaces
     JWT_REFRESH_COOKIE_PATH    = "/api/auth/refresh"    # fixed: matches url_prefix
 
+    ## mail send 
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True

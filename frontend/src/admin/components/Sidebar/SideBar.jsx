@@ -10,7 +10,9 @@ const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
     "View Orders",
     "Category",
     "HeroSection",
-    "Brand"
+    "Brand",
+    "User",
+    "Attribute"
   ];
 
   return (

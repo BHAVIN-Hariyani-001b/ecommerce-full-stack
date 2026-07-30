@@ -2,7 +2,7 @@ import os
 import uuid
 from werkzeug.utils import secure_filename
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif','webp'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif','webp','mp4'}
 
 def allowed_file(filename):
     """Check if the uploaded file has an allowed extension."""

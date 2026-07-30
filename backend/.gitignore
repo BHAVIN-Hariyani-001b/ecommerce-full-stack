@@ -1,9 +1,21 @@
-venv
-*/__pycache__/
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
 .env
-*.pyc
-*.tldr
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# other
 migrations/
 otp.py
 seeder.py
+*.tldr

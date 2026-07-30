@@ -3,6 +3,8 @@ from app.models.product import Products, Gender, Status
 from app.models.category import Category
 from app.models.productImage import ProductImage
 from app.models.productAttribute import ProductAttribute
+from app.models.AttributeValue import AttributeValue
+from app.models.Attribute import Attribute
 from app.models.brand import Brand
 from app.db import db
 from app.util.imageUpload import save_image as save_uploaded_file
@@ -253,8 +255,9 @@ def create_product():
             if not isinstance(attr, dict):
                 continue
             product.attributes.append(
-                ProductAttribute(
-                    type=attr.get("type") or attr.get("name"),
+                AttributeValue(
+                    a_id=attr.get("id"),
+                    p_id=product.id,
                     value=attr.get("value"),
                 )
             )
@@ -264,7 +267,10 @@ def create_product():
 
         return (
             jsonify(
-                {"message": "Product created successfully", "product_id": product.id}
+                {
+                    "message": "Product created successfully",
+                    "product": product.to_dict(),
+                }
             ),
             201,
         )
@@ -413,11 +419,40 @@ def update_product(id) -> Response:
                     img.sort_order = new_order
                     new_order += 1
 
+        ## add attributes
+
+        attributes_data = []
+
+        idx = 0
+        while f"attributes[{idx}]" in data:
+            attr_str = data.get(f"attributes[{idx}]")
+            attr_obj = json.loads(attr_str)
+
+            if "id" not in attr_obj:
+                attributes_data.append(attr_obj)
+
+            idx += 1
+
+        for i in attributes_data:
+            attribute = Attribute.query.filter_by(name=i.get("type")).first()
+
+            if not attribute:
+                continue
+
+            db.session.add(
+                AttributeValue(
+                    p_id=existing.id,
+                    value=i.get("value"),
+                    a_id=attribute.id
+                )
+            )
+
+
         # remove deleted attributes
         remove_attr_ids = request.form.getlist("removeAttributes[]")
         for attr_id in remove_attr_ids:
             db.session.execute(
-                delete(ProductAttribute).where(ProductAttribute.id == attr_id)
+                delete(AttributeValue).where(AttributeValue.id == attr_id)
             )
 
         db.session.commit()

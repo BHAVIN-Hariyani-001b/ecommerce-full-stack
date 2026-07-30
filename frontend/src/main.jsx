@@ -9,7 +9,6 @@ import { store, persistor } from "./app/store.js";
 import { setupInterceptors } from "./middleware/index.js";
 import Loding from "./components/common/Loding.jsx";
 import { HelmetProvider } from "react-helmet-async";
-import { CookiesProvider } from "react-cookie";
 import "./index.css";
 
 // const Home = lazy(() => import("./pages/Home"));
@@ -53,7 +52,6 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <HelmetProvider>
-      <CookiesProvider>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
             <Suspense fallback={<Loding />}>
@@ -61,7 +59,6 @@ createRoot(document.getElementById("root")).render(
             </Suspense>
           </PersistGate>
         </Provider>
-      </CookiesProvider>
     </HelmetProvider>
   </StrictMode>,
 );

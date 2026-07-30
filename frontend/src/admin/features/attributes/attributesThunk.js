@@ -7,7 +7,7 @@ import {
 } from "../../middleware/attributes";
 
 export const fetchAttributesAPI = createAsyncThunk(
-  "attributes/fetchAttributes",
+  "attributes/fetchAttributesAPI",
   async (_, { rejectWithValue }) => {
     try {
       const response = await getAttributes();
@@ -19,10 +19,15 @@ export const fetchAttributesAPI = createAsyncThunk(
 );
 
 export const createAttributeAPI = createAsyncThunk(
-  "attributes/createAttribute",
+  "attributes/createAttributeAPI",
   async (attribute, { rejectWithValue }) => {
     try {
-      const response = await createAttribute(attribute);
+      const { AName, AExm, ADesc } = attribute;
+      const response = await createAttribute({
+        name: AName,
+        value: AExm,
+        desc: ADesc,
+      });
       return response;
     } catch {
       return rejectWithValue("Failed to create attribute");
@@ -31,10 +36,11 @@ export const createAttributeAPI = createAsyncThunk(
 );
 
 export const updateAttributeAPI = createAsyncThunk(
-  "attributes/updateAttribute",
-  async (attribute, { rejectWithValue }) => {
+  "attributes/updateAttributeAPI",
+  async ({ id, attribute }, { rejectWithValue }) => {
     try {
-      const response = await updateAttribute(attribute);
+      console.log(id,attribute)
+      const response = await updateAttribute({ id, attribute });
       return response;
     } catch {
       return rejectWithValue("Failed to update attribute");
@@ -43,11 +49,11 @@ export const updateAttributeAPI = createAsyncThunk(
 );
 
 export const deleteAttributeAPI = createAsyncThunk(
-  "attributes/deleteAttribute",
+  "attributes/deleteAttributeAPI",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await deleteAttribute(id);
-      return response;
+      await deleteAttribute(id);
+      return id;
     } catch {
       return rejectWithValue("Failed to delete attribute");
     }

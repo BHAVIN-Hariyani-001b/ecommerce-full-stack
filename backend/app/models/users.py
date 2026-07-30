@@ -1,10 +1,12 @@
 from app.db import db
 from enum import Enum as pyEnum
 from sqlalchemy import Enum as saEnum
-from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import validates
 import re
 import uuid
+from argon2 import PasswordHasher
+
+ph = PasswordHasher()  ## use password hash
 
 
 class userRole(pyEnum):
@@ -22,18 +24,15 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(saEnum(userRole), default=userRole.USER, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-    otp = db.Column(db.String(6), nullable=True)
-    otp_expiry = db.Column(db.DateTime, nullable=True)
-    otp_attempts = db.Column(db.Integer, default=0)
-    otp_verified = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates("username")
     def validate_username(self, key, username):
         username = username.strip()
+
         if not (3 < len(username) <= 80):
             raise ValueError("Username must be between 3 and 80 characters.")
-        if not re.match(r"^[a-zA-Z0-9_.-]+$", username):
-            raise ValueError("Username may only contain letters, numbers, _, ., or -")
+        if not re.match(r"^[a-zA-Z_.-]+$", username):
+            raise ValueError("Username may only contain letters, _, ., or -")
         return username
 
     @validates("phone")
@@ -82,10 +81,10 @@ class User(db.Model):
             raise ValueError(f"Password must contain: {', '.join(errors)}")
 
         # Hash password
-        self.password = generate_password_hash(raw_password)
+        self.password = ph.hash(raw_password)
 
     def check_password(self, raw_password):
-        return check_password_hash(self.password, raw_password)
+        return ph.verify(self.password, raw_password)
 
     def to_dict(self):
         return {
@@ -94,6 +93,17 @@ class User(db.Model):
             "email": self.email,
             "phone": self.phone,
             "role": self.role.value,
+            "created_at": self.timestamp.isoformat(),
+        }
+
+    def to_dict__(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "phone": self.phone,
+            "role": self.role.value,
+            "password": self.password,
             "created_at": self.timestamp.isoformat(),
         }
 

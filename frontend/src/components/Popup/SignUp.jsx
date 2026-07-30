@@ -11,13 +11,14 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { loading, error } = useSelector((state) => state.auth);
+  const { isLoading, error } = useSelector((state) => state.auth);
+  console.log(isLoading)
   const dispatch = useDispatch();
 
   const passwordMismatch = useMemo(
     () =>
-      password.length > 0 &&
-      confirmPassword.length > 0 &&
+      password.length >= 0 &&
+      confirmPassword.length >= 0 &&
       password !== confirmPassword,
     [password, confirmPassword],
   );
@@ -36,17 +37,20 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      if (password !== confirmPassword) return;
+      if (password !== confirmPassword) {
+        toast.error("password are not match?")
+        return;
+      };
       try {
         await dispatch(registerUser({ username, email, password })).unwrap();
         setPassword("");
         setConfirmPassword("");
-        onClose?.();
+        onSwitchToSignIn();
       } catch {
         toast.error("please try again");
       }
     },
-    [dispatch, username, email, password, confirmPassword, onClose],
+    [dispatch, username, email, password, confirmPassword, onSwitchToSignIn],
   );
 
   return (
@@ -134,10 +138,10 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
 
         <button
           type="submit"
-          disabled={loading || passwordMismatch}
-          className="w-full rounded-xl cursor-pointer bg-[#8685ef] text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity"
+          disabled={isLoading || passwordMismatch}
+          className={`w-full rounded-xl cursor-pointer text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity ${(isLoading || passwordMismatch ) ? 'bg-[#8685ef] cursor-not-allowed' : 'bg-[#8685ef]'}`}
         >
-          {loading ? "Creating..." : "Create account"}
+          {isLoading ? "Creating..." : "Create account"}
         </button>
 
         <p className="text-sm text-center text-[#586274]">

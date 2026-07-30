@@ -63,11 +63,11 @@ with app.app_context():
 
     #     db.session.add(product)
 
-    db.session.add(
-        Cart(
-            user_id='b37bf835-0daf-4b7b-b2be-570eb5abef8c',product_id='4e7421b3-2ed3-499a-bc40-4c2d0459ac35',qty=2
-            )
-        )
+    # db.session.add(
+    #     Cart(
+    #         user_id='b37bf835-0daf-4b7b-b2be-570eb5abef8c',product_id='4e7421b3-2ed3-499a-bc40-4c2d0459ac35',qty=2
+    #         )
+    #     )
     
 
 

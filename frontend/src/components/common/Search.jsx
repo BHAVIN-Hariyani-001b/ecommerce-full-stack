@@ -37,11 +37,13 @@ const Search = memo(function Search({ onSearch }) {
 
   return (
     <label className="border border-gray-300 flex items-center justify-center bg-white text-[#454d5c] rounded-xl w-full h-12 py-2 px-4 gap-1">
-      <IoIosArrowBack
-        size={25}
-        className="cursor-pointer hidden max-[600px]:block"
-        onClick={handleBackHome}
-      />
+      {searchPath == "/search" && (
+        <IoIosArrowBack
+          size={25}
+          className="cursor-pointer hidden max-[600px]:block"
+          onClick={handleBackHome}
+        />
+      )}
 
       <MdOutlineSearch className="text-2xl text-[#454d5c] max-[600px]:hidden" />
 

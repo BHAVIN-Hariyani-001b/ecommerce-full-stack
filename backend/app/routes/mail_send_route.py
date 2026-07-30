@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.models.users import User
+from app.models.ForgotPassword import ForgotPassword
 import random
 from datetime import datetime, timedelta
 from app.db import db
@@ -23,6 +24,11 @@ def forgot_password():
         user = User.query.filter_by(email=str(email)).first()
         print(user)
 
+        forgotPassword = ForgotPassword.query.filter_by(user_id=str(user.id)).first()
+        if not forgotPassword:
+            forgotPassword = ForgotPassword(user_id=str(user.id))
+            db.session.add(forgotPassword)
+
         is_prod = os.getenv("FLASK_ENV")
         if not user:
             if is_prod:
@@ -34,11 +40,12 @@ def forgot_password():
                 return jsonify({"error": "No account found with this email"}), 404
 
         otp = str(random.randint(1000, 9999))
-        otp_expiry = datetime.utcnow() + timedelta(minutes=5)
+        otp_expiry = datetime.now() + timedelta(minutes=2)
 
-        user.otp = otp
-        user.otp_expiry = otp_expiry
-        user.otp_attempts = 0
+        forgotPassword.otp = otp
+        forgotPassword.otp_expiry = otp_expiry
+        forgotPassword.otp_attempts = 0
+        forgotPassword.otp_verified = False
 
         db.session.commit()
 
@@ -48,10 +55,9 @@ def forgot_password():
             body=f"""
             Your OTP for password reset is:{otp} 
             
-            This OTP is valid for 5 minutes.
+            This OTP is valid for 2 minutes.
             Do not share this with anyone.
             
-            If you didn't request this, ignore this email.
             """,
         )
         print(msg)
@@ -77,26 +83,27 @@ def verify_otp():
             return jsonify({"error": "Email and OTP are required"}), 400
 
         user = User.query.filter_by(email=str(email)).first()
+        forgotPassword = ForgotPassword.query.filter_by(user_id=str(user.id)).first()
 
-        if not user:
+        if not user and not forgotPassword:
             return jsonify({"error": "No account found with this email"}), 404
 
-        if datetime.utcnow() > user.otp_expiry:
+        if datetime.now() > forgotPassword.otp_expiry:
             return jsonify({"error": "OTP has expired"}), 400
 
-        if user.otp_attempts >= 3:
-            user.otp = None
-            user.otp_expiry = None
+        if forgotPassword.otp_attempts >= 3:
+            forgotPassword.otp = None
+            forgotPassword.otp_expiry = None
             return jsonify({"error": "Maximum OTP attempts exceeded"}), 400
 
-        if user.otp != otp:
-            user.otp_attempts += 1
+        if forgotPassword.otp != otp:
+            forgotPassword.otp_attempts += 1
             db.session.commit()
             return jsonify({"error": "Invalid OTP"}), 400
 
-        user.otp = None
-        user.otp_attempts = 0
-        user.otp_verified = True
+        forgotPassword.otp = None
+        forgotPassword.otp_attempts = 0
+        forgotPassword.otp_verified = True
         db.session.commit()
 
         return jsonify({"message": "OTP verified successfully"}), 200
@@ -121,8 +128,9 @@ def reset_password():
             return jsonify({"error": "new password are required"}), 400
 
         user = User.query.filter_by(email=str(email)).first()
+        forgotPassword = ForgotPassword.query.filter_by(user_id=str(user.id)).first()
 
-        if not user or not user.otp_verified:
+        if not user or not forgotPassword.otp_verified:
             return (
                 jsonify(
                     {"error": "OTP verification required before resetting password"}
@@ -132,10 +140,10 @@ def reset_password():
 
         user.set_password(new_password)
 
-        user.otp_verified = False
-        user.otp = None
-        user.otp_expiry = None
-        user.otp_attempts = 0
+        forgotPassword.otp_verified = False
+        forgotPassword.otp = None
+        forgotPassword.otp_expiry = None
+        forgotPassword.otp_attempts = 0
 
         db.session.commit()
 

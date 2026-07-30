@@ -91,7 +91,6 @@ const authSlice = createSlice({
       .addCase(getUserProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to fetch profile";
-        state.token = null; // invalidate token on profile fetch failure
         state.isLoggedIn = false;
         state.user = null;
         state.isAdmin = false;

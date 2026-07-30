@@ -53,7 +53,7 @@ const productAddSlice = createSlice({
       .addCase(addProduct.fulfilled, (state, action) => {
         state.success = true;
         state.loading = false;
-        state.products.push(action.payload);
+        state.products.push(action.payload?.product);
       })
       .addCase(addProduct.rejected, (state, action) => {
         state.error = action.payload;
@@ -86,9 +86,7 @@ const productAddSlice = createSlice({
       .addCase(deleteProductAPI.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.products = state.products.filter(
-          (p) => p.id !== action.meta.arg, 
-        );
+        state.products = state.products.filter((p) => p.id !== action.meta.arg);
       })
       .addCase(deleteProductAPI.rejected, (state, action) => {
         state.loading = false;
