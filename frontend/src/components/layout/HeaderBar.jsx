@@ -8,7 +8,8 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Search from "../common/Search";
 import Logout from "../Popup/Logout";
-import logo from "../../assets/images/logo/logo.jpeg"
+import logo from "../../assets/images/logo/logo.jpeg";
+import SearchAnimation from "../animation/SearchAnimation";
 
 const HeaderBar = memo(function HeaderBar({
   onLoginClick,
@@ -23,7 +24,6 @@ const HeaderBar = memo(function HeaderBar({
   // console.log(useSelector((state) => state.auth));
 
   const count = useSelector((state) => state.cart.count);
-
   return (
     <div className="border-b border-gray-200 sticky top-0 bg-white z-10">
       <header>
@@ -37,7 +37,7 @@ const HeaderBar = memo(function HeaderBar({
               />
             </NavLink>
           </div>
-          <div className="mr-10">
+          <div className="mr-10 max-[700px]:hidden">
             <p className="flex gap-1 items-center justify-center cursor-pointer max-[600px]:hidden group text-[#474554] font-medium text-nowrap">
               <FaLocationDot />
               <span>Select Location</span>
@@ -50,10 +50,10 @@ const HeaderBar = memo(function HeaderBar({
             ) : (
               <NavLink
                 to={"/search"}
-                className="border border-gray-300 flex items-center cursor-text bg-white text-[#454d5c] rounded-xl w-full h-12 py-2 px-4 gap-1"
+                className="border border-gray-300 flex items-center cursor-text bg-white text-[#454d5c] rounded-lg w-full h-12 py-2 px-4 gap-1 overflow-hidden"
               >
                 <MdOutlineSearch className="text-2xl text-[#454d5c]" />
-                Search...
+                <SearchAnimation />
               </NavLink>
             )}
           </div>

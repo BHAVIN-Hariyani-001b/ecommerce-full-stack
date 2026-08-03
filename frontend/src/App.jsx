@@ -6,6 +6,7 @@ import Footer from "./components/layout/Footer";
 import Cart from "./components/cart/Cart";
 import useAdminVerify from "./hook/useAdminVerify";
 import BottomMenu from "./admin/components/common/BottomMenu";
+import WebPageLoding from "./components/ProductLoading/WebPageLoding";
 
 const App = memo(function App() {
   const [searchQuery, setSearchQuery] = useState("");

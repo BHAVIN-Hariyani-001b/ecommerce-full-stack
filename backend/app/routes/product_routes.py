@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request, Response
 from app.models.product import Products, Gender, Status
 from app.models.category import Category
 from app.models.productImage import ProductImage
-from app.models.productAttribute import ProductAttribute
 from app.models.AttributeValue import AttributeValue
 from app.models.Attribute import Attribute
 from app.models.brand import Brand
@@ -25,7 +24,7 @@ def get_product(id) -> Response:
         if not product:
             return jsonify({"message": "Product not found"}), 404
 
-        return jsonify({"message": "success", "product": product.to_dict()}), 200
+        return jsonify({"message": "success", "product": product.to_dict_product_page()}), 200
     except Exception as e:
         return (
             jsonify(

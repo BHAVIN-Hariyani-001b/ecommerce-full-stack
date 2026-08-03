@@ -40,41 +40,47 @@ const HeroBanner = memo(function HeroBanner() {
 
   return (
     <div className="max-[600px]:hidden px-2">
-        <div className="flex flex-col justify-center items-center rounded-md my-5 relative border border-gray-200">
-          <div className="flex justify-center items-center transition-all">
+      <div className="flex flex-col justify-center items-center rounded-md my-5 relative border border-gray-200 overflow-hidden">
+        <div
+          className="flex transition-transform duration-700 ease-in-out w-full"
+          style={{ transform: `translateX(-${current * 100}%)` }}
+        >
+          {images.map((img, index) => (
             <img
-              src={images[current]}
-              loading="lazy"
-              className="object-contain max-[1000px]:w-full"
+              src={img}
               alt="main page offer image"
+              key={index}
+              loading="lazy"
+              className="w-full flex-shrink-0 object-contain max-[1000px]:w-full"
             />
-            <div className="w-full absolute flex justify-between p-5 text-4xl text-white">
-              <button
-                className="cursor-pointer hover:scale-104 rounded-2xl"
-                onClick={() => handelSlide(current - 1)}
-              >
-                <IoIosArrowDropleftCircle />
-              </button>
-              <button
-                className="cursor-pointer hover:scale-104"
-                onClick={() => handelSlide(current + 1)}
-              >
-                <IoIosArrowDroprightCircle />
-              </button>
-            </div>
-          </div>
-          <div className="w-full h-10 flex gap-3 justify-center items-center">
-            {images.map((item, index) => (
-              <button
-                tabIndex={index}
-                onClick={() => handelSlide(index)}
-                type="button"
-                className={`p-1 rounded-full cursor-pointer transition-all ease-in-out delay-200 ${index === current ? "bg-blue-700 w-5 h-2.5" : "bg-blue-300 w-2.5 h-2.5 hover:bg-blue-400"}`}
-                key={index}
-              ></button>
-            ))}
-          </div>
+          ))}
         </div>
+        <div className="w-full absolute flex justify-between p-5 text-4xl text-white">
+          <button
+            className="cursor-pointer hover:scale-104 rounded-2xl"
+            onClick={() => handelSlide(current - 1)}
+          >
+            <IoIosArrowDropleftCircle />
+          </button>
+          <button
+            className="cursor-pointer hover:scale-104"
+            onClick={() => handelSlide(current + 1)}
+          >
+            <IoIosArrowDroprightCircle />
+          </button>
+        </div>
+        <div className="w-full h-10 flex gap-3 justify-center items-center">
+          {images.map((item, index) => (
+            <button
+              tabIndex={index}
+              onClick={() => handelSlide(index)}
+              type="button"
+              className={`p-1 rounded-full cursor-pointer transition-all ease-in-out delay-200 ${index === current ? "bg-blue-700 w-5 h-2.5" : "bg-blue-300 w-2.5 h-2.5 hover:bg-blue-400"}`}
+              key={index}
+            ></button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 });

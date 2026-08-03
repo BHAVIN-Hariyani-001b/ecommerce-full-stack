@@ -5,7 +5,6 @@ from app.db import db
 
 user_bp = Blueprint("user", __name__)
 
-
 @user_bp.route("/user", methods=["GET"])
 def user_get():
     """get user for show admin"""

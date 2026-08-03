@@ -14,6 +14,10 @@ const initialState = {
   isLoggedIn: false,
   isAdmin: false,
   sessionExpired: false,
+
+  authView: "signin",
+  authOpen: false,
+  forgotPassword: false,
 };
 
 const pickUser = (data) => data?.user;
@@ -40,6 +44,18 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.isAdmin = false;
     },
+
+    setForgotPassword: (state, action) => {
+      state.forgotPassword = action.payload;
+    },
+
+    setAuthView: (state, action) => {
+      state.authView = action.payload;
+    },
+
+    setAuthOpen: (state, action) => {
+      state.authOpen = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -51,7 +67,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = pickUser(action.payload);
-        state.isLoggedIn = Boolean(state.user);  ;
+        state.isLoggedIn = Boolean(state.user);
         state.userRole = state.user?.role || "user";
         state.isAdmin =
           state.user?.role === "admin" || state.userRole === "admin";
@@ -63,18 +79,18 @@ const authSlice = createSlice({
       })
 
       // registration cases
-        .addCase(registerUser.pending, (state) => {
-          state.isLoading = true;
-          state.error = null;
-        })
-        .addCase(registerUser.fulfilled, (state) => {
-          state.isLoading = false;
-          state.error = null;
-        })
-        .addCase(registerUser.rejected, (state, action) => {
-          state.isLoading = false;
-          state.error = action.payload || "Registration failed";
-        })
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || "Registration failed";
+      })
 
       // get profile for token validation (optional)
       .addCase(getUserProfile.pending, (state) => {
@@ -120,4 +136,7 @@ export const {
   logout,
   setSessionExpired,
   clearSessionExpired,
+  setAuthOpen,
+  setForgotPassword,
+  setAuthView,
 } = authSlice.actions;

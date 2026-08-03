@@ -18,25 +18,6 @@ import { FaBoxArchive } from "react-icons/fa6";
 import { MdShoppingCart } from "react-icons/md";
 import { AiFillSetting } from "react-icons/ai";
 
-const BOTTOM_MENU_ITEMS = [
-  {
-    icon: <MdDashboard size={25} color="#5c647a" />,
-    itemName: "Dashboard",
-  },
-  {
-    icon: <FaBoxArchive size={21} color="#5c647a" />,
-    itemName: "Products",
-  },
-  {
-    icon: <MdShoppingCart size={25} color="#5c647a" />,
-    itemName: "Orders",
-  },
-  {
-    icon: <AiFillSetting size={25} color="#5c647a" />,
-    itemName: "Settings",
-  },
-];
-
 const DashMain = lazy(() => import("../../components/Dashbord/DashMain"));
 // const AddProduct = lazy(() => import("../../components/AddProduct"));
 
@@ -50,6 +31,29 @@ const Dashboard = memo(function Dashboard() {
   if (!isAdmin) {
     return <Navigate to="/" />;
   }
+
+  const handleOnChangePage = (item) => {
+    setActivePage(item);
+  };
+
+  const BOTTOM_MENU_ITEMS = [
+    {
+      icon: <MdDashboard size={25} color="#5c647a" />,
+      itemName: "Dashboard",
+    },
+    {
+      icon: <FaBoxArchive size={21} color="#5c647a" />,
+      itemName: "Products",
+    },
+    {
+      icon: <MdShoppingCart size={25} color="#5c647a" />,
+      itemName: "Orders",
+    },
+    {
+      icon: <AiFillSetting size={25} color="#5c647a" />,
+      itemName: "Settings",
+    },
+  ];
 
   return (
     <div className="h-screen flex flex-col">
@@ -86,7 +90,7 @@ const Dashboard = memo(function Dashboard() {
       <footer className="flex-1 shadow-[0_-8px_16px_rgba(0,0,0,0.15)] border-t border-[#c3bfd5] p-1">
         <BottomMenu
           BOTTOM_MENU_ITEMS={BOTTOM_MENU_ITEMS}
-          setActivePage={setActivePage}
+          action={handleOnChangePage}
         />
       </footer>
     </div>

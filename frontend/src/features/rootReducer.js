@@ -14,6 +14,7 @@ import forgotPasswordReducer from "./forgotPassword/forgotPasswordSlice";
 import brandReducer from "../admin/features/Brand/brandSlice.js";
 import attributeReducer from "../admin/features/attributes/attributesSlice";
 import userReducer from "../admin/features/user/userSlice";
+import reviewReducer from "../features/review/ReviewSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -49,6 +50,7 @@ const rootReducer = combineReducers({
   brand: brandReducer,
   attribute: attributeReducer,
   user: userReducer,
+  review: reviewReducer,
 });
 
 export default rootReducer;

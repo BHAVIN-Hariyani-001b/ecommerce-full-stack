@@ -7,6 +7,7 @@ from app.models.product import Products
 from app.models.Attribute import Attribute
 from app.models.AttributeValue import AttributeValue
 from app.models.ForgotPassword import ForgotPassword
+from app.models.ProductReview import ProductReview
 from app.config import Config
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
@@ -70,6 +71,7 @@ def create_app():
     from app.routes.brand_route import brand_bp
     from app.routes.attributes_routes import attributes_bp
     from app.routes.user_route import user_bp
+    from app.routes.product_review_route import product_review_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -81,6 +83,7 @@ def create_app():
     app.register_blueprint(brand_bp,url_prefix="/api")
     app.register_blueprint(attributes_bp,url_prefix="/api")
     app.register_blueprint(user_bp,url_prefix="/api")
+    app.register_blueprint(product_review_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)

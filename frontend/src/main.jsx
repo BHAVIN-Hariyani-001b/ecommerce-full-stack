@@ -7,9 +7,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./app/store.js";
 import { setupInterceptors } from "./middleware/index.js";
-import Loding from "./components/common/Loding.jsx";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
+import WebPageLoding from "./components/ProductLoading/WebPageLoding.jsx";
 
 // const Home = lazy(() => import("./pages/Home"));
 const SearchProduct = lazy(() => import("./pages/SearchProduct"));
@@ -52,13 +52,13 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <HelmetProvider>
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            <Suspense fallback={<Loding />}>
-              <RouterProvider router={router} />
-            </Suspense>
-          </PersistGate>
-        </Provider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <Suspense fallback={<WebPageLoding />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </PersistGate>
+      </Provider>
     </HelmetProvider>
   </StrictMode>,
 );

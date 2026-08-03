@@ -1,26 +1,45 @@
 @import "tailwindcss";
 
 .scrollbar-none {
-    scrollbar-width: none;
-    scroll-behavior: smooth;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 
 .card {
-    backdrop-filter: blur(2px);
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
+  backdrop-filter: blur(2px);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
 }
 
 
 .scrollbar {
-    &::-webkit-scrollbar {
-        width: 5px;
-        border-radius: 10px 0;
-        height: 10px;
-    }
+  &::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 10px 0;
+    height: 10px;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background-color: rgba(128, 128, 128, 0.388);
-    }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(128, 128, 128, 0.388);
+  }
+}
+
+
+@keyframes animation-pageloading {
+  0% {
+    transform: translateY(-3%);
+  }
+
+  50% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(-3%);
+  }
+}
+
+.animation-pageloading {
+  animation: animation-pageloading 7s linear infinite;
 }

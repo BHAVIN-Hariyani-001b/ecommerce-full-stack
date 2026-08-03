@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../components/common/ProductCard";
 import { SearchProductAPI } from "../features/search/searchThunk";
 import { NavLink, useOutletContext } from "react-router-dom";
-import { IoMdReturnRight } from "react-icons/io";
 import PageWapper from "../components/layout/PageWapper";
 import { clearSearch } from "../features/search/searchSlice";
 import ProductLoading from "../components/ProductLoading/ProductLoading";
@@ -14,7 +13,7 @@ import { Helmet } from "react-helmet-async";
 const SearchProduct = memo(function SearchProduct() {
   const [sideBar, setSideBar] = useState(false);
   const { searchQuery } = useOutletContext();
-  const [order, setOrder] = useState("");
+  const [order, setOrder] = useState("Relevance");
 
   const countProduct = useSelector(
     (state) => state.searchProduct.searchProductCount,
@@ -22,7 +21,6 @@ const SearchProduct = memo(function SearchProduct() {
 
   const searchProduct = useSelector((state) => state.searchProduct?.product);
   const { loading, error } = useSelector((state) => state.searchProduct);
-  console.log(searchProduct);
 
   const dispatch = useDispatch();
   const timerRef = useRef(null);
@@ -37,7 +35,7 @@ const SearchProduct = memo(function SearchProduct() {
       try {
         await dispatch(SearchProductAPI({ query, filterData: order }));
       } catch {
-        console.log("Faild to search Product");
+        console.log("Failed to search product");
       }
     }, 1000);
   };
@@ -58,6 +56,9 @@ const SearchProduct = memo(function SearchProduct() {
     }
   }, [error]);
 
+  const hasNoResults =
+    !loading && searchQuery && searchProduct && searchProduct.length === 0;
+
   return (
     <div className="h-screen">
       <Helmet>
@@ -67,7 +68,7 @@ const SearchProduct = memo(function SearchProduct() {
           content="Shop fashion, mobile and more at Venture"
         />
       </Helmet>
-      
+
       <main className="flex justify-center overflow-hidden">
         <PageWapper className={`w-screen`}>
           <div className="overflow-y-auto">
@@ -99,14 +100,22 @@ const SearchProduct = memo(function SearchProduct() {
               </div>
             )}
 
-            <div className="grid grid-cols-6 max-[1000px]:grid-cols-4 max-[700px]:flex max-[700px]:flex-wrap place-content-center place-items-center overflow-auto">
-              {searchProduct &&
-                searchProduct?.map((item) => (
-                  <NavLink key={item?.id} to={`/product/${item?.id}`}>
-                    <ProductCard item={item} />
-                  </NavLink>
-                ))}
-            </div>
+            {hasNoResults && (
+              <p className="text-center text-gray-500 py-10">
+                No results found for "{searchQuery}"
+              </p>
+            )}
+
+            {!loading && (
+              <div className="grid grid-cols-6 max-[1000px]:grid-cols-4 max-[700px]:flex max-[700px]:flex-wrap place-content-center place-items-center overflow-auto">
+                {searchProduct &&
+                  searchProduct?.map((item) => (
+                    <NavLink key={item?.id} to={`/product/${item?.id}`}>
+                      <ProductCard item={item} />
+                    </NavLink>
+                  ))}
+              </div>
+            )}
           </div>
 
           {sideBar && (

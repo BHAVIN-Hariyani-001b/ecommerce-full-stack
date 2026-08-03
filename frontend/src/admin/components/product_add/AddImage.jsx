@@ -273,7 +273,7 @@ const AddImage = memo(function AddImage({
         </div>
 
         <p className="px-3 py-3 font-semibold">Gallery</p>
-        <div className="grid grid-cols-4 max-[1200px]:grid-cols-3 max-[900px]:flex max-[900px]:flex-wrap max-[900px]:gap-4 max-[900px]:justify-center place-items-center">
+        <div className="grid grid-cols-4 space-y-4 max-[1200px]:grid-cols-3 max-[900px]:flex max-[900px]:flex-wrap max-[900px]:gap-4 max-[900px]:justify-center place-items-center">
           {preview.map((img) => (
             <GalleryImage key={img.name} img={img} onRemove={removeImage} />
           ))}

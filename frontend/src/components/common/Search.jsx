@@ -21,6 +21,7 @@ const Search = memo(function Search({ onSearch }) {
 
   const location = useLocation();
   const searchPath = location.pathname === "/search";
+  console.log(searchPath)
   const navigate = useNavigate();
 
   const handleClear = useCallback(() => {
@@ -36,8 +37,8 @@ const Search = memo(function Search({ onSearch }) {
   };
 
   return (
-    <label className="border border-gray-300 flex items-center justify-center bg-white text-[#454d5c] rounded-xl w-full h-12 py-2 px-4 gap-1">
-      {searchPath == "/search" && (
+    <label className="border border-gray-300 flex items-center justify-center bg-white text-[#454d5c] rounded-lg w-full h-12 py-2 px-4 gap-1">
+      {searchPath && (
         <IoIosArrowBack
           size={25}
           className="cursor-pointer hidden max-[600px]:block"
