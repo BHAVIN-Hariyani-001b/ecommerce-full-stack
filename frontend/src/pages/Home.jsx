@@ -44,7 +44,7 @@ const RenderMain = memo(function RenderMain({ active }) {
   }
 
   return (
-    <div className="w-full min-w-0 px-4 py-6">
+    <div className="w-full min-w-0 px-4 py-6 max-[600px]:px-1">
       <ProductSection />
     </div>
   );

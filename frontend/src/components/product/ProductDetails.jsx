@@ -2,8 +2,9 @@ import { FaStar } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
 const ProductDetails = ({ productAttributes }) => {
-
   const product = useSelector((state) => state.product.product);
+  const rating = useSelector((state) => state.review?.review_summary?.average_rating);
+
   return (
     <>
       <div className="border border-gray-200 h-full w-full rounded-2xl p-5">
@@ -19,7 +20,7 @@ const ProductDetails = ({ productAttributes }) => {
                 )}
               </div>
               <div className="flex gap-1 items-center bg-green-200 text-green-700 px-2 py-1 rounded-full">
-                <span className="text-[12px]">2.5%</span>
+                <span className="text-[12px]">{rating || 1}</span>
                 <FaStar size={15} className="rotate-10" />
               </div>
             </div>

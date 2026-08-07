@@ -29,11 +29,11 @@ const ProductSection = memo(function ProductSection() {
   return (
     <PageWapper>
       {loading && <ProductLoading />}
-      {!loading && (
+      {!loading && (  
         <>
           <HeroBanner />
           <h1 className="py-4 px-3 text-2xl font-semibold">{active}</h1>
-          <div className="grid w-full min-w-0 grid-cols-6 max-[1100px]:grid-cols-5 max-[900px]:grid-cols-4 max-[700px]:grid-cols-3 max-[600px]:flex max-[600px]:flex-wrap max-[600px]:justify-center place-items-center">
+          <div className="grid grid-cols-5 max-[1150px]:grid-cols-4 max-[930px]:grid-cols-3 max-[700px]:flex max-[700px]:flex-wrap gap-3 place-content-center place-items-center">
             {categoryProduct.map((item) => (
               <NavLink key={item?.id} to={`/product/${item?.id}`}>
                 <ProductCard item={item} />

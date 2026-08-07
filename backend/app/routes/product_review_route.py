@@ -5,11 +5,12 @@ from app.db import db
 product_review_bp = Blueprint("poduct_review", __name__)
 
 
-
 @product_review_bp.route("/product_review/<uuid:id>", methods=["GET"])
 def product_review_get(id):
     try:
-        productReview = ProductReview.query.filter_by(product_id=str(id)).limit(20).all()
+        productReview = (
+            ProductReview.query.filter_by(product_id=str(id)).limit(20).all()
+        )
         print(productReview)
 
         if not productReview:
@@ -20,11 +21,15 @@ def product_review_get(id):
 
         product_review = [review.to_dict__() for review in productReview]
         print(product_review)
+
+        rating_summary = ProductReview.count_rating(str(id))
+
         return jsonify(
             {
                 "success": True,
                 "message": "product review are fetch",
                 "data": product_review,
+                "review": rating_summary,
             }
         )
     except Exception as e:
@@ -61,6 +66,15 @@ def product_review_add():
                 400,
             )
 
+        existing_record = ProductReview.query.filter_by(
+            user_id=u_id, product_id=p_id
+        ).first()
+
+        if existing_record:
+            return jsonify(
+                {"success": False, "message": "Review already exists for this product"}
+            )
+
         product_review = ProductReview(
             user_id=u_id,
             product_id=p_id,
@@ -71,12 +85,15 @@ def product_review_add():
         db.session.add(product_review)
         db.session.commit()
 
+        rating_summary = ProductReview.count_rating(str(p_id))
+
         return (
             jsonify(
                 {
                     "success": True,
                     "message": "Product review created",
                     "data": product_review.to_dict(),
+                    "review": rating_summary,
                 }
             ),
             201,
@@ -93,6 +110,7 @@ def product_review_add():
 def product_review_update(id):
     try:
         existing = db.session.get(ProductReview, str(id))
+        print(existing)
 
         if not existing:
             return jsonify({"message": "review not found"}), 404
@@ -102,35 +120,33 @@ def product_review_update(id):
         if not data:
             return jsonify({"success": False, "message": "All Data Are reqired"}), 400
 
-        u_id = data.get("user_id")
-        p_id = data.get("product_id")
         rating = data.get("product_rating")
 
-        if not all([u_id, p_id, rating]):
+        if not rating:
             return (
                 jsonify(
                     {
                         "success": False,
-                        "message": "user_id, product_id, and product_rating are required",
+                        "message": "product_rating are required",
                     }
                 ),
                 400,
             )
 
-        existing.user_id = u_id
-        existing.product_id = p_id
         existing.product_rating = rating
         existing.comment = data.get("comment")
 
         db.session.commit()
 
-        db.session.commit()
+        rating_summary = ProductReview.count_rating(str(existing.product_id))
+
         return (
             jsonify(
                 {
                     "success": True,
                     "message": "Product review updated",
                     "data": existing.to_dict(),
+                    "review": rating_summary,
                 }
             ),
             200,
@@ -155,18 +171,23 @@ def product_review_delete(id):
     try:
         existing = db.session.get(ProductReview, str(id))
         print(existing)
+        p_id = existing.product_id
 
         if not existing:
             return jsonify({"message": "User Not Found"}), 404
 
         db.session.delete(existing)
         db.session.commit()
+
+        rating_summary = ProductReview.count_rating(str(p_id))
+
         return (
             jsonify(
                 {
                     "success": True,
                     "message": "Product Review Delete Successfully",
                     "data": id,
+                    "review": rating_summary,
                 }
             ),
             200,

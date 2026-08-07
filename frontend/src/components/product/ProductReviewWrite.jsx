@@ -1,24 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { store } from "../../app/store";
 
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
-import { useDispatch } from "react-redux";
-import { addReviewAPI } from "../../features/review/ReviewThunk";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addReviewAPI,
+  fetchReviewsAPI,
+  updateReviewAPI,
+} from "../../features/review/ReviewThunk";
 
-const ProductReviewWrite = ({ productId }) => {
+const ProductReviewWrite = ({ productId, onClose }) => {
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
   //   console.log(rating);
+
+  const isUpdate = useSelector((state) => state.review?.isUpdate);
+
   console.log(review);
 
   const dispatch = useDispatch();
 
   const handleOnSubmit = () => {
-    const user = store.getState().user;
-    console.log(user.id);
-    // dispatch(addReviewAPI({ productId, rating, review }));
+    if (isUpdate?.id) {
+      console.log(isUpdate);
+      dispatch(
+        updateReviewAPI({
+          reviewId: isUpdate?.id,
+          reviewData: { product_rating: rating, comment: review },
+        }),
+      ).unwrap();
+    } else {
+      const user_id = store.getState()?.auth?.user?.id;
+      dispatch(
+        addReviewAPI({
+          product_id: productId,
+          user_id,
+          product_rating: rating,
+          comment: review,
+        }),
+      ).unwrap();
+    }
+
+    onClose();
+
+    dispatch(fetchReviewsAPI(productId));
   };
+
+  useEffect(() => {
+    if (isUpdate?.id) {
+      setRating(isUpdate.product_rating);
+      setReview(isUpdate.comment);
+    } else {
+      setRating(0);
+      setReview("");
+    }
+  }, [isUpdate]);
 
   return (
     <div>
@@ -38,7 +75,8 @@ const ProductReviewWrite = ({ productId }) => {
               <Rating
                 name="half-rating"
                 value={rating}
-                precision={0.1}
+                defaultValue={5}
+                precision={1}
                 size="large"
                 onChange={(event, newValue) => setRating(newValue ?? 0.1)}
               />
@@ -62,6 +100,7 @@ const ProductReviewWrite = ({ productId }) => {
             onChange={(e) => setReview(e.target.value)}
           ></textarea>
         </div>
+
         <button
           type="button"
           className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 w-full rounded-lg transition-colors whitespace-nowrap"

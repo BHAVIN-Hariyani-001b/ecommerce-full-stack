@@ -7,6 +7,7 @@ import HomePageLoading from "../ProductLoading/HomePageLoading";
 import { toast } from "react-toastify";
 import Loding from "../common/Loding";
 import { getErrorMessage } from "../../util/getErrorMessage";
+import ProductCardOther from "../common/ProductCardOther";
 
 const HeroBanner = lazy(() => import("../product/HeroBanner"));
 
@@ -25,9 +26,9 @@ const All = memo(function All() {
     if (error) {
       toast.error(getErrorMessage(error));
     }
-  },[error]);
+  }, [error]);
 
-  if (loading) return <HomePageLoading />;  
+  if (loading) return <HomePageLoading />;
 
   return (
     <PageWapper>

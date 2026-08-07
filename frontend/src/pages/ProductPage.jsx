@@ -10,6 +10,7 @@ import ProductService from "../components/product/ProductService";
 import ProductAbout from "../components/product/ProductAbout";
 import ProductDetails from "../components/product/ProductDetails";
 import ProductPageImage from "../components/product/ProductPageImage";
+import { fetchReviewsAPI } from "../features/review/ReviewThunk";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -46,6 +47,10 @@ const ProductPage = () => {
   useEffect(() => {
     filterData();
   }, [product]);
+
+  useEffect(() => {
+    dispatch(fetchReviewsAPI(id)).unwrap();
+  }, [id,dispatch]);
 
   useEffect(() => {
     (async () => {

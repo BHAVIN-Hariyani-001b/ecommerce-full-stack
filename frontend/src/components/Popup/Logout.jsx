@@ -31,8 +31,8 @@ const Logout = memo(function Logout() {
         className="flex items-center flex-col justify-center cursor-pointer"
         aria-label="Open profile menu"
       >
-        <FaRegCircleUser className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5" />
-        <p className="max-w-24 truncate" title={displayName}>
+        <FaRegCircleUser className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5 max-[600px]:text-[#5c647a]" />
+        <p className="max-w-24 truncate max-[600px]:text-[#5c647a]" title={displayName}>
           {displayName}
         </p>
       </button>

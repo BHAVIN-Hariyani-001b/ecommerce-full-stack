@@ -22,9 +22,46 @@ class ProductReview(db.Model):
         ),
     )
 
+    @classmethod
+    def count_rating(cls, product_id):
+        """return rating summury for product"""
+        reviews = cls.query.filter_by(product_id=product_id).all()
 
-    def count_rating(self,rat):
-        return 
+        counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        total_review = len(reviews)
+
+        if total_review == 0:
+            breakdown = [{"stars": star, "percent": 0} for star in range(5, 0, -1)]
+            return {
+                "total_review": 0,
+                "average_rating": 0,
+                "breakdown": breakdown,
+            }
+
+        rating_sum = 0
+
+        for review in reviews:
+            rating_sum += float(review.product_rating)
+
+            star = round(float(review.product_rating))
+            star = max(1, min(5, star))
+            counts[star] += 1
+
+        average_rating = round(rating_sum / total_review, 2)
+
+        breakdown = [
+            {
+                "stars": star,
+                "percent": round((counts[star] / total_review) * 100),
+            }
+            for star in range(5, 0, -1)
+        ]
+
+        return {    
+            "total_review": total_review,
+            "average_rating": average_rating,
+            "breakdown": breakdown,
+        }
 
     def to_dict(self):
         return {
@@ -49,7 +86,9 @@ class ProductReview(db.Model):
             "Like": 0 if self.userLike == None else self.userLike,
             "comment": self.comment,
             "date": self.created_at.isoformat() if self.created_at else None,
-            "rating" : {
+        }
 
-            }
+    def review_to_dict(self):
+        return {
+            "rating": ProductReview.count_rating(self.product_id),
         }

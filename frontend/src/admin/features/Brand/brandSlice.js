@@ -86,7 +86,6 @@ const brandSlice = createSlice({
       })
       .addCase(deleteBrand.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload)
         state.brand = state.brand.filter((bId) => bId.id !== action.payload);
         state.isUpdate = true;
       })

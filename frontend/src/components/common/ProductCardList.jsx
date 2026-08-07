@@ -24,7 +24,7 @@ const ProductCardList = ({ product }) => {
           </span>
         </button>
       </div>
-      <div className="flex w-full min-w-0 overflow-x-auto px-2 scrollbar-none">
+      <div className="flex w-full min-w-0 gap-2 overflow-x-auto px-2 py-4 scrollbar-nonep-2 scrollbar-none">
         {product?.products.map((item) => (
           <NavLink key={item?.id} to={`/product/${item?.id}`}>
             <ProductCard item={item} />

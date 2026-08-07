@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { addReview, getReviews, updateReview } from "../../middleware/review";
+import { addReview, deleteReview, getReviews, updateReview } from "../../middleware/review";
 
 export const fetchReviewsAPI = createAsyncThunk(
   "reviews/fetchReviews",
@@ -17,9 +17,12 @@ export const fetchReviewsAPI = createAsyncThunk(
 
 export const addReviewAPI = createAsyncThunk(
   "reviews/addReviewAPI",
-  async ({ rating, review }, { rejectWithValue }) => {
+  async (
+    { user_id, product_id, product_rating, comment },
+    { rejectWithValue },
+  ) => {
     try {
-      const response = await addReview({ rating, review });
+      const response = await addReview({ user_id, product_id, product_rating, comment });
       return response;
     } catch (error) {
       return rejectWithValue(
@@ -31,9 +34,10 @@ export const addReviewAPI = createAsyncThunk(
 
 export const updateReviewAPI = createAsyncThunk(
   "reviews/updateReviewAPI",
-  async ({ productId, reviewData }, { rejectWithValue }) => {
+  async ({ reviewId, reviewData }, { rejectWithValue }) => {
     try {
-      const response = await updateReview({ productId, reviewData });
+      console.log(reviewId,reviewData)
+      const response = await updateReview({ reviewId, reviewData });
       return response;
     } catch (error) {
       return rejectWithValue(
@@ -45,9 +49,9 @@ export const updateReviewAPI = createAsyncThunk(
 
 export const deleteReviewAPI = createAsyncThunk(
   "reviews/deleteReviewAPI",
-  async (productId, { rejectWithValue }) => {
+  async (reviewId, { rejectWithValue }) => {
     try {
-      const response = await updateReview(productId);
+      const response = await deleteReview(reviewId);
       return response;
     } catch (error) {
       return rejectWithValue(

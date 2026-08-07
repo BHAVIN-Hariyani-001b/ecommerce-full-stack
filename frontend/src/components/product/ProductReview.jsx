@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { IoMdThumbsUp } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
@@ -8,105 +8,43 @@ import Stack from "@mui/material/Stack";
 import Modal from "../common/Modal";
 import ProductReviewWrite from "./ProductReviewWrite";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchReviewsAPI } from "../../features/review/ReviewThunk";
+import ReviewCard from "./ReviewCard";
+import {
+  clearAuthError,
+  setAuthOpen,
+  setAuthView,
+} from "../../features/auth/authSlice";
+
+// import { fetchReviewsAPI } from "../../features/review/ReviewThunk";
 
 // TODO: replace with real data from redux/API, e.g.
 // const reviews = useSelector((state) => state.reviews.list);
-
-  const ratingBreakdown = [
-    { stars: 5, percent: 68 },
-    { stars: 4, percent: 20 },
-    { stars: 3, percent: 7 },
-    { stars: 2, percent: 3 },
-    { stars: 1, percent: 2 },
-  ];
-  
-
-const ReviewCard = memo(function ReviewCard({ review }) {
-  const [helpfulCount, setHelpfulCount] = useState(review.helpful);
-  const [marked, setMarked] = useState(false);
-
-  const initials = review.user_name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
-
-  const handleHelpful = () => {
-    if (marked) return;
-    setHelpfulCount((prev) => prev + 1);
-    setMarked(true);
-  };
-
-  return (
-    <div className="border border-gray-200 rounded-2xl p-4 flex flex-col gap-2">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gray-300 text-white flex items-center justify-center text-sm font-semibold shrink-0">
-            {initials}
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5 ">
-              <span className="font-medium text-gray-900 line-clamp-1">
-                {review.user_name}
-              </span>
-            </div>
-            <span className="text-xs text-gray-400">
-              {new Date(review.date).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </span>
-          </div>
-        </div>
-        <div className="w-fit">
-          <Stack spacing={1}>
-            <Rating
-              name="half-rating-read"
-              defaultValue={review.product_rating}
-              precision={0.5}
-              readOnly
-            />
-          </Stack>
-        </div>
-      </div>
-
-      <p className="text-sm text-gray-600 leading-relaxed">{review.comment}</p>
-
-      <button
-        type="button"
-        onClick={handleHelpful}
-        className={`w-fit flex items-center gap-1.5 text-xs mt-1 px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
-          marked
-            ? "border-blue-500 text-blue-600 bg-blue-50"
-            : "border-gray-200 text-gray-500 hover:border-gray-300"
-        }`}
-      >
-        <IoMdThumbsUp size={14} />
-        Helpful ({helpfulCount})
-      </button>
-    </div>
-  );
-});
 
 //user review component
 const ProductReview = ({ productId }) => {
   console.log(productId);
   const [visibleCount, setVisibleCount] = useState(2);
-  const [filterStar, setFilterStar] = useState(null);
 
+  const [filterStar, setFilterStar] = useState(null);
   const [reviewWrite, setReviewWrite] = useState(false);
+
+  const user = useSelector((state) => state.auth?.user);
 
   const dispatch = useDispatch();
 
   const mockReviews = useSelector((state) => state.review?.reviews);
+  const ratingBreakdown = useSelector(
+    (state) => state.review?.review_summary.breakdown ?? [],
+  );
 
-  useEffect(() => {
-    dispatch(fetchReviewsAPI(productId)).unwrap();
-  }, [dispatch, productId]);
+  console.log(ratingBreakdown);
 
   const openReviewWrite = () => {
+    if (!user) {
+      dispatch(setAuthView("signin"));
+      dispatch(setAuthOpen(true));
+      return;
+    }
     setReviewWrite(true);
   };
 
@@ -125,6 +63,9 @@ const ProductReview = ({ productId }) => {
 
   const visibleReviews = filteredReviews.slice(0, visibleCount);
 
+  const alreadyReviewed = mockReviews.some((item) => item?.user_id === user?.id);
+  console.log("is good"+alreadyReviewed);
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">Product Review</h1>
@@ -139,8 +80,8 @@ const ProductReview = ({ productId }) => {
           <Stack spacing={1}>
             <Rating
               name="half-rating-read"
-              defaultValue={avgRating}
-              precision={0.5}
+              value={avgRating}
+              precision={1}
               readOnly
             />
           </Stack>
@@ -185,14 +126,17 @@ const ProductReview = ({ productId }) => {
         </div>
 
         {/* Write review CTA */}
+
         <div className="flex items-center justify-center sm:border-l sm:border-gray-200 sm:pl-6 shrink-0">
-          <button
-            type="button"
-            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors whitespace-nowrap"
-            onClick={openReviewWrite}
-          >
-            Write a Review
-          </button>
+          {!alreadyReviewed && (
+            <button
+              type="button"
+              className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-full transition-colors whitespace-nowrap"
+              onClick={openReviewWrite}
+            >
+              Write a Review
+            </button>
+          )}
         </div>
       </div>
 
@@ -204,7 +148,11 @@ const ProductReview = ({ productId }) => {
       ) : (
         <div className="flex flex-col gap-3">
           {visibleReviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard
+              key={review.id}
+              review={review}
+              setReviewWrite={setReviewWrite}
+            />
           ))}
         </div>
       )}
@@ -224,7 +172,7 @@ const ProductReview = ({ productId }) => {
         onClose={closeReviewWrite}
         title="Write a Review"
       >
-        <ProductReviewWrite productId={productId} />
+        <ProductReviewWrite productId={productId} onClose={closeReviewWrite} />
       </Modal>
     </div>
   );

@@ -1,23 +1,27 @@
 import PageWapper from "./PageWapper";
 import { useSelector, useDispatch } from "react-redux";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { setCategory } from "../../features/category/categotySlice";
 import { fetchCategories } from "../../features/category/categoryThunk";
 
-const CategoryButton = memo(function CategoryButton({ name, image, onSelect }) {
+const CategoryButton = memo(function CategoryButton({
+  name,
+  image,
+  onSelect,
+  isActive,
+  btnRef,
+}) {
   return (
     <button
+      ref={btnRef}
       type="button"
       onClick={(e) => onSelect(e, name)}
       className={[
         "cursor-pointer text-black relative font-medium px-4 py-2 flex justify-center items-center gap-1 rounded",
+        isActive ? "text-blue-600" : "",
       ].join(" ")}
     >
-      <img
-        src={`../../../public/image/category_img/${image}`}
-        alt=""
-        className="w-7"
-      />
+      <img src={`/image/category_img/${image}`} alt="" className="w-7" />
       <span>{name}</span>
     </button>
   );
@@ -27,29 +31,42 @@ const Navbar = memo(function Navbar() {
   const category = useSelector((state) => state.userCategory.category);
   const dispatch = useDispatch();
 
-  const [categoryPos, setCategoryPos] = useState("8px");
-  const [categoryWidth, setCategoryWidth] = useState("83.11");
+  const btnRefs = useRef({});
 
-  // console.log(categoryPos);
-  // console.log(categoryWidth);
+  const active = useSelector((state) => state.userCategory.active);
+  const [categoryPos, setCategoryPos] = useState(0);
+  const [categoryWidth, setCategoryWidth] = useState(0);
+
+  console.log(active);
+
 
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
+  const measureUnderline = useCallback((btnEl) => {
+    if (!btnEl) return;
+    const buttonRect = btnEl.getBoundingClientRect();
+    const parentRect = btnEl.parentElement.getBoundingClientRect();
+    setCategoryPos(buttonRect.left - parentRect.left);
+    setCategoryWidth(buttonRect.width);
+  }, []);
+
+  useEffect(() => {
+    if (!active) return;
+    const activeBtn = btnRefs.current[active];
+    if (activeBtn) {
+      const id = requestAnimationFrame(() => measureUnderline(activeBtn));
+      return () => cancelAnimationFrame(id);
+    }
+  }, [active, category, measureUnderline]);
+
   const handleCategory = useCallback(
     (e, name) => {
       dispatch(setCategory(name));
-
-      const buttonRect = e.currentTarget.getBoundingClientRect();
-      const parentRect = e.currentTarget.parentElement.getBoundingClientRect();
-      // console.log(buttonRect);
-      // console.log(parentRect);
-
-      setCategoryPos(buttonRect.left - parentRect.left);
-      setCategoryWidth(buttonRect.width);
+      measureUnderline(e.currentTarget);
     },
-    [dispatch],
+    [dispatch, measureUnderline],
   );
 
   return (
@@ -63,6 +80,10 @@ const Navbar = memo(function Navbar() {
                 name={item?.name}
                 image={item?.image}
                 onSelect={handleCategory}
+                isActive-={item?.name === active}
+                btnRef={(el) => {
+                  if (el) btnRefs.current[item.name] = el;
+                }}
               />
             ) : null,
           )}

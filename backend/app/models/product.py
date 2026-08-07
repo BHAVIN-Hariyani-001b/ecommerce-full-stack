@@ -4,6 +4,7 @@ from sqlalchemy import Enum as saEnum
 from sqlalchemy import Numeric
 from enum import Enum as pyEnum
 from collections import defaultdict
+from app.models.ProductReview import ProductReview
 
 
 def get_grouped_attributes(self):
@@ -101,6 +102,8 @@ class Products(db.Model):
             "PPrice": float(self.Product_price),
             "discount": self.discount,
             "category": str(self.category.name) if self.category else None,
+            "review": ProductReview.count_rating(self.id),
+            "brand": str(self.brand.name) if self.brand else None,
             "SubCategory": str(self.subcategory.name) if self.subcategory else None,
             "image": next(
                 (img.to_dict() for img in self.images if img.is_primary), None

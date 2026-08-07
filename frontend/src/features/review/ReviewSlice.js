@@ -10,26 +10,41 @@ const initialState = {
   reviews: [],
   loading: false,
   error: null,
+  review_summary: [],
+  isUpdate: false,
 };
 
 const reviewSlice = createSlice({
   name: "reviews",
   initialState,
-  reducers: {},
+  reducers: {
+    setUserReviewUpdate: (state, action) => {
+      state.isUpdate = action.payload ?? true;
+    },
+    clearReview: (state) => {
+      state.reviews = [];
+      state.review_summary = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       // fetch review
       .addCase(fetchReviewsAPI.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.reviews = [];
+        state.review_summary = [];
       })
       .addCase(fetchReviewsAPI.fulfilled, (state, action) => {
         state.loading = false;
         state.reviews = action.payload?.data;
+        state.review_summary = action.payload?.review;
       })
       .addCase(fetchReviewsAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.reviews = [];
+        state.review_summary = [];
       })
 
       //   add review
@@ -40,6 +55,7 @@ const reviewSlice = createSlice({
       .addCase(addReviewAPI.fulfilled, (state, action) => {
         state.loading = false;
         state.reviews.push(action.payload?.data);
+        state.review_summary = action.payload?.review;
       })
       .addCase(addReviewAPI.rejected, (state, action) => {
         state.loading = false;
@@ -54,14 +70,17 @@ const reviewSlice = createSlice({
       })
       .addCase(updateReviewAPI.fulfilled, (state, action) => {
         state.loading = false;
-        const UpdataReview = action.payload?.data;
+        const UpdataUserReview = action.payload?.data;
+        console.log(UpdataUserReview);
         const index = state.reviews.findIndex(
-          (reviewItem) => reviewItem.id == UpdataReview?.id,
+          (reviewItem) => reviewItem.id == UpdataUserReview?.id,
         );
 
         if (index !== -1) {
-          state.brand[index] = UpdataReview;
+          console.log(UpdataUserReview, index);
+          state.reviews[index] = UpdataUserReview;
         }
+        state.review_summary = action.payload?.review;
       })
       .addCase(updateReviewAPI.rejected, (state, action) => {
         state.loading = false;
@@ -76,9 +95,11 @@ const reviewSlice = createSlice({
       })
       .addCase(deleteReviewAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.reviews = state.brand.filter(
-          (r) => r.id !== action.payload?.data,
+        console.log(action.payload);
+        state.reviews = state.reviews.filter(
+          (item) => item.id !== action.payload?.data,
         );
+        state.review_summary = action.payload?.review;
       })
       .addCase(deleteReviewAPI.rejected, (state, action) => {
         state.loading = false;
@@ -87,5 +108,5 @@ const reviewSlice = createSlice({
   },
 });
 
-export const { setReviews, setLoading, setError } = reviewSlice.actions;
+export const { setUserReviewUpdate, clearReview } = reviewSlice.actions;
 export default reviewSlice.reducer;
