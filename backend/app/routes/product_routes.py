@@ -519,7 +519,7 @@ def get_products():
         if role == "admin":
             return jsonify({"products": [i.to_dict() for i in products]})
 
-        return jsonify({"products": [i.to_dictt() for i in products]})
+        return jsonify({"products": [i.to_dict() for i in products]})
     except Exception as e:
         return (
             jsonify(

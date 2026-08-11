@@ -1,9 +1,97 @@
 import { FaStar } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addToCart,
+  decrementCartItem,
+  incrementCartItem,
+} from "../../features/card/cardThunk";
+import {
+  addGuestCartItem,
+  decrementQty,
+  incrementQty,
+} from "../../features/card/cardSlice";
+
+import { IoMdAdd, IoMdRemove } from "react-icons/io";
+import { BiLoaderCircle } from "react-icons/bi";
+import { useLocation } from "react-router-dom";
+
+const findCartLine = (cartItems, productId) =>
+  cartItems.find(
+    (line) =>
+      line.id === productId ||
+      line.product_id === productId ||
+      line.product?.id === productId,
+  );
 
 const ProductDetails = ({ productAttributes }) => {
   const product = useSelector((state) => state.product.product);
-  const rating = useSelector((state) => state.review?.review_summary?.average_rating);
+  const rating = useSelector(
+    (state) => state.review?.review_summary?.average_rating,
+  );
+
+  const { state } = useLocation();
+  const item = state?.item;
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.auth.user);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const cartItems = useSelector((state) => state.cart?.items) ?? [];
+  const { loading, error } = useSelector((state) => state.cart);
+
+  const cartLine = findCartLine(cartItems, item?.id);
+  const isInCart = Boolean(cartLine);
+  const currentQty = cartLine?.qty ?? 0;
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isLoggedIn && user?.id) {
+      dispatch(
+        addToCart({
+          user_id: user.id,
+          product_id: item.id,
+        }),
+      );
+      return;
+    }
+
+    dispatch(addGuestCartItem(item));
+  };
+
+  const handleIncrement = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isLoggedIn && user?.id && cartLine?.cart_id) {
+      dispatch(
+        incrementCartItem({
+          cart_id: cartLine.cart_id,
+          user,
+        }),
+      );
+      return;
+    }
+    console.log(item);
+    dispatch(incrementQty(item.id));
+  };
+
+  const handleDecrement = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isLoggedIn && user?.id && cartLine?.cart_id) {
+      dispatch(
+        decrementCartItem({
+          cart_id: cartLine.cart_id,
+          user,
+        }),
+      );
+      return;
+    }
+
+    dispatch(decrementQty(item.id));
+  };
 
   return (
     <>
@@ -90,16 +178,55 @@ const ProductDetails = ({ productAttributes }) => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                className="bg-blue-600 text-white  py-3 rounded-xl cursor-pointer"
+                className=" text-black border border-gray-300 py-3 rounded-lg cursor-pointer hover:scale-102 duration-200"
               >
                 Buy Product
               </button>
-              <button
-                type="button"
-                className="border border-gray-300 text-black  py-3 rounded-xl cursor-pointer"
-              >
-                Add To Cart
-              </button>
+              {isInCart ? (
+                <div className="bg-green-600 relative grid grid-cols-3 place-items-center text-white rounded-lg transition-all duration-200">
+                  <button
+                    type="button"
+                    className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
+                    onClick={handleDecrement}
+                    disabled={loading}
+                  >
+                    <IoMdRemove />
+                  </button>
+
+                  <span>{currentQty}</span>
+
+                  <button
+                    type="button"
+                    className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
+                    onClick={handleIncrement}
+                    disabled={loading}
+                  >
+                    <IoMdAdd />
+                  </button>
+
+                  {loading && (
+                    <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
+                      <BiLoaderCircle className="animate-spin" size={22} />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="relative flex text-white bg-blue-700 border rounded-lg hover:scale-102 duration-200  justify-center items-center">
+                  <button
+                    type="button"
+                    className="w-full h-full cursor-pointer"
+                    onClick={handleAdd}
+                    disabled={loading}
+                  >
+                    Add To Cart
+                  </button>
+                  {loading && (
+                    <div className="absolute bg-gray-100/40 text-gray-600 border border-gray-100/40 rounded-lg w-full h-full flex justify-center items-center">
+                      <BiLoaderCircle className="animate-spin" size={22} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

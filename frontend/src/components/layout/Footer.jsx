@@ -73,21 +73,24 @@ const Footer = memo(function Footer() {
               <NavLink to="/search" className="hover:text-[#2b2f3a]">
                 Search
               </NavLink>
+              <NavLink to="/about" className="hover:text-[#2b2f3a]">
+                AboutUs
+              </NavLink>
             </div>
           </div>
 
           <div className="col-span-6 md:col-span-2 max-w-fit">
             <p className="font-semibold text-[#2b2f3a]">Help</p>
             <div className="mt-3 flex flex-col gap-2 text-sm text-[#586274]">
-              <a href="#" className="hover:text-[#2b2f3a]">
+               <NavLink to="#" className="hover:text-[#2b2f3a]">
                 Shipping
-              </a>
-              <a href="#" className="hover:text-[#2b2f3a]">
+              </NavLink>
+               <NavLink to="/#" className="hover:text-[#2b2f3a]">
                 Returns
-              </a>
-              <a href="#" className="hover:text-[#2b2f3a]">
+              </NavLink>
+               <NavLink to="/contact" className="hover:text-[#2b2f3a]">
                 Support
-              </a>
+              </NavLink>
             </div>
           </div>
         </div>

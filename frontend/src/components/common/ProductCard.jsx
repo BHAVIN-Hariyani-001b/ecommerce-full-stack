@@ -121,35 +121,33 @@ const ProductCard = ({ item }) => {
           <div className="absolute left-2 bottom-2 opacity-0 translate-y-10 group-hover:flex group-hover:opacity-100 group-hover:translate-y-0 duration-700">
             <div className="relative">
               {isInCart ? (
-                <>
-                  <div className="bg-green-600 grid grid-cols-3 place-items-center text-white h-10 w-20 rounded-lg transition-all duration-200">
-                    <button
-                      type="button"
-                      className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
-                      onClick={handleDecrement}
-                      disabled={loading}
-                    >
-                      <IoMdRemove />
-                    </button>
+                <div className="bg-green-600 grid grid-cols-3 place-items-center text-white h-10 w-20 rounded-lg transition-all duration-200">
+                  <button
+                    type="button"
+                    className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
+                    onClick={handleDecrement}
+                    disabled={loading}
+                  >
+                    <IoMdRemove />
+                  </button>
 
-                    <span>{currentQty}</span>
+                  <span>{currentQty}</span>
 
-                    <button
-                      type="button"
-                      className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
-                      onClick={handleIncrement}
-                      disabled={loading}
-                    >
-                      <IoMdAdd />
-                    </button>
+                  <button
+                    type="button"
+                    className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
+                    onClick={handleIncrement}
+                    disabled={loading}
+                  >
+                    <IoMdAdd />
+                  </button>
 
-                    {loading && (
-                      <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
-                        <BiLoaderCircle className="animate-spin" size={22} />
-                      </div>
-                    )}
-                  </div>
-                </>
+                  {loading && (
+                    <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
+                      <BiLoaderCircle className="animate-spin" size={22} />
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="relative flex w-20 h-10 text-green-600 border border-green-600 rounded-lg hover:scale-105 duration-200  bg-white/80 justify-center items-center">
                   <button
@@ -161,7 +159,7 @@ const ProductCard = ({ item }) => {
                     Add
                   </button>
                   {loading && (
-                    <div className="absolute bg-gray-100/40 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
+                    <div className="absolute bg-gray-100/40 text-gray-600 border border-gray-100/40 rounded-lg w-full h-full flex justify-center items-center">
                       <BiLoaderCircle className="animate-spin" size={22} />
                     </div>
                   )}

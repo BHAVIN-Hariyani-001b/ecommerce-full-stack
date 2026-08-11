@@ -16,7 +16,6 @@ const ProductPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const product = useSelector((state) => state.product.product);
-  console.log(product);
 
   const navigate = useNavigate();
 
@@ -50,7 +49,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     dispatch(fetchReviewsAPI(id)).unwrap();
-  }, [id,dispatch]);
+  }, [id, dispatch]);
 
   useEffect(() => {
     (async () => {

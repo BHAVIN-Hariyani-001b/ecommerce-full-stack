@@ -10,7 +10,6 @@ import ProductReviewWrite from "./ProductReviewWrite";
 import { useDispatch, useSelector } from "react-redux";
 import ReviewCard from "./ReviewCard";
 import {
-  clearAuthError,
   setAuthOpen,
   setAuthView,
 } from "../../features/auth/authSlice";

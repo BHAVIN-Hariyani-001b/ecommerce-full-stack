@@ -7,8 +7,10 @@ from app.models.users import User
 class ProductReview(db.Model):
     __tablename__ = "product_review"
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("User", backref="reviews")
+    user_id = db.Column(
+        db.String(36), db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    user = db.relationship("User", backref=db.backref("reviews", passive_deletes=True))
     product_id = db.Column(db.String(36), db.ForeignKey("products.id"), nullable=False)
     product = db.relationship("Products", backref="reviews")
     product_rating = db.Column(db.Numeric(3, 2), nullable=False)
@@ -57,7 +59,7 @@ class ProductReview(db.Model):
             for star in range(5, 0, -1)
         ]
 
-        return {    
+        return {
             "total_review": total_review,
             "average_rating": average_rating,
             "breakdown": breakdown,

@@ -2,8 +2,11 @@ from flask import Blueprint, jsonify, request
 from app.models.users import User
 from app.util.admin import admin_required
 from app.db import db
+from app.models.cart import Cart
+from app.models.ProductReview import ProductReview
 
 user_bp = Blueprint("user", __name__)
+
 
 @user_bp.route("/user", methods=["GET"])
 def user_get():
@@ -60,7 +63,7 @@ def user_create():
         user.set_password(data.get("password").strip())
 
         db.session.add(user)
-        db.session.commit()
+        db.session.commit() 
 
         return jsonify(
             {
@@ -141,6 +144,11 @@ def delete_user(id):
     """User Delete Use By Id"""
     try:
         existing = db.session.get(User, str(id))
+        """delele for user all table connection"""
+
+        Cart.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
+        ProductReview.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
+
         print("---------- delete ---------")
         print(existing)
 
@@ -153,4 +161,4 @@ def delete_user(id):
             {"success": True, "message": "User Delete Successfully", "data": id}
         )
     except Exception as e:
-        return jsonify({"success": False, "message": "User Not Delete"})
+        return jsonify({"success": False, "message": "User Not Delete"}), 500

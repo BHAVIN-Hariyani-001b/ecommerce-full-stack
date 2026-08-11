@@ -16,6 +16,8 @@ const App = memo(function App() {
 
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isSearch = location.pathname.startsWith("/search");
+  const contact = location.pathname.startsWith("/contact");
+  const about = location.pathname.startsWith("/about");
 
   const { isAdmin, isLoading } = useAdminVerify();
 
@@ -27,7 +29,7 @@ const App = memo(function App() {
 
   return (
     <div>
-      {!isAdminRoute && (
+      {!isAdminRoute && !about && !contact && (
         <Header
           setQuery={setSearchQuery}
           setSideBar={setSideBar}
@@ -52,7 +54,7 @@ const App = memo(function App() {
 
       <Outlet context={{ searchQuery, setSearchQuery, sideBar, setSideBar }} />
 
-      {!isAdminRoute && !isSearch && (
+      {!isAdminRoute && !isSearch && !about && !contact && (
         <>
           <Cart setSideBar={setSideBar} sideBarOpen={sideBar} />
           <Footer />

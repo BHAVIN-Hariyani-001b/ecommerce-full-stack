@@ -9,24 +9,24 @@ import { deleteReviewAPI } from "../../features/review/ReviewThunk.js";
 import { setUserReviewUpdate } from "../../features/review/ReviewSlice.js";
 
 const ReviewCard = ({ review, setReviewWrite }) => {
-  const [helpfulCount, setHelpfulCount] = useState(review.helpful);
-  const [marked, setMarked] = useState(false);
+  // const [helpfulCount, setHelpfulCount] = useState(review.helpful);
+  // const [marked, setMarked] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth?.user);
 
   const initials =
-    review.user_name &&
-    review.user_name
+    review?.user_name &&
+    review?.user_name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
 
-  const handleHelpful = () => {
-    if (marked) return;
-    setHelpfulCount((prev) => prev + 1);
-    setMarked(true);
-  };
+  // const handleHelpful = () => {
+  //   if (marked) return;
+  //   setHelpfulCount((prev) => prev + 1);
+  //   setMarked(true);
+  // };
 
   const handleOnDelete = (id) => {
     dispatch(deleteReviewAPI(id)).unwrap();
@@ -79,7 +79,7 @@ const ReviewCard = ({ review, setReviewWrite }) => {
         </p>
 
         <div className="flex justify-between items-center">
-          <button
+          {/* <button
             type="button"
             onClick={handleHelpful}
             className={`w-fit flex items-center gap-1.5 text-xs mt-1 px-3 py-1.5 rounded-full border transition-colors cursor-pointer ${
@@ -90,7 +90,7 @@ const ReviewCard = ({ review, setReviewWrite }) => {
           >
             <IoMdThumbsUp size={14} />
             Helpful ({helpfulCount})
-          </button>
+          </button> */}
 
           {user && user?.id === review?.user_id ? (
             <div className="space-x-2 hidden group-hover:flex">

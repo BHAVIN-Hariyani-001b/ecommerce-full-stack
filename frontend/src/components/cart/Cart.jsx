@@ -5,6 +5,7 @@ import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { RiFileList2Fill, RiEBikeFill } from "react-icons/ri";
 import { IoBagHandle, IoArrowForward } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
+import { BiLoaderCircle } from "react-icons/bi";
 import {
   decrementCartItem,
   incrementCartItem,
@@ -51,13 +52,12 @@ const Cart = ({ sideBarOpen, setSideBar }) => {
         <div className="bg-gray-50/50 space-y-2 px-2 py-4 mx-2 max-[600px]:rounded-xl h-screen shadow-inner pb-60 overflow-scroll scrollbar-none">
           <div className="space-y-2">
             {items.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">Your cart is empty</p>
+              <p className="text-center text-gray-500 py-8">
+                Your cart is empty
+              </p>
             ) : (
               items.map((item) => (
-                <CartProduct
-                  key={item?.cart_id || item?.id}
-                  item={item}
-                />
+                <CartProduct key={item?.cart_id || item?.id} item={item} />
               ))
             )}
           </div>
@@ -134,6 +134,7 @@ const Cart = ({ sideBarOpen, setSideBar }) => {
 const CartProduct = ({ item }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const { loading, error } = useSelector((state) => state.cart);
   const product = item?.product || item;
   const name = product?.name;
   const pPrice = product?.PPrice;
@@ -191,6 +192,11 @@ const CartProduct = ({ item }) => {
           >
             <IoMdAdd />
           </button>
+          {loading && (
+            <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
+              <BiLoaderCircle className="animate-spin" size={22} />
+            </div>
+          )}
         </div>
       </div>
     </div>

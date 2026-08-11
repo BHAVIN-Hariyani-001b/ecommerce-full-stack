@@ -4,6 +4,7 @@ import { logout } from "../../features/auth/authSlice";
 import Modal from "../common/Modal";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { logoutUser } from "../../features/auth/authThunk";
+import Profile from "../profile/Profile";
 
 const Logout = memo(function Logout() {
   const dispatch = useDispatch();
@@ -32,27 +33,17 @@ const Logout = memo(function Logout() {
         aria-label="Open profile menu"
       >
         <FaRegCircleUser className="w-9 h-6 max-[600px]:w-8 max-[600px]:h-5 max-[600px]:text-[#5c647a]" />
-        <p className="max-w-24 truncate max-[600px]:text-[#5c647a]" title={displayName}>
+        <p
+          className="max-w-24 truncate max-[600px]:text-[#5c647a]"
+          title={displayName}
+        >
           {displayName}
         </p>
       </button>
 
-      <Modal open={logoutOpen} onClose={closeModal} title="Account">
+      <Modal open={logoutOpen} onClose={closeModal} title="Account" widthClassName="max-w-6xl">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#8685ef]/15 flex items-center justify-center">
-              <FaRegCircleUser className="text-[#8685ef] text-xl" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm text-[#586274]">Signed in as</p>
-              <p
-                className="font-semibold text-[#2b2f3a] truncate"
-                title={displayName}
-              >
-                {displayName}
-              </p>
-            </div>
-          </div>
+          <Profile />
 
           <div className="flex gap-3 justify-end">
             <button
