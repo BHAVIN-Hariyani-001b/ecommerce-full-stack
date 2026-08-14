@@ -40,8 +40,8 @@ const Profile = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-3 w-full border border-gray-300 rounded-2xl h-120 max-[900px]:flex max-[600px]:flex-wrap overflow-auto">
-        <div>
+      <div className="grid grid-cols-3 w-full border border-gray-300 rounded-2xl h-120 max-[900px]:flex max-[600px]:flex-wrap overflow-auto scrollbar-none">
+        <div className="w-full flex items-center justify-center">
           <ProfileSettingShow openPage={openPage} setOpenPage={setOpenPage} />
         </div>
         <div className=" w-full h-full col-span-2 p-5 overflow-scroll scrollbar-none">

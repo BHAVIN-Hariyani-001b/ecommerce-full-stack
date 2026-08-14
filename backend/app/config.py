@@ -5,6 +5,9 @@ from datetime import timedelta
 load_dotenv()
 
 class Config:
+
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    
     # Secret key for session management
     SECRET_KEY = os.getenv('SECRET_KEY')
 

@@ -24,13 +24,17 @@ export const checkAdmin = async () => {
   return response?.data;
 };
 
-
 export const refreshTokenApi = async () => {
   const response = await api.post("/auth/refresh"); // cookie auto-sent
   return response?.data;
 };
 
 export const logoutApi = async () => {
-  const response = await api.post("/auth/logout");  // clears cookie on server
+  const response = await api.post("/auth/logout"); // clears cookie on server
+  return response?.data;
+};
+
+export const profileEdit = async ({ id, username, phone }) => {
+  const response = await api.put(`/user/profile/${id}`, { username, phone });
   return response?.data;
 };

@@ -107,7 +107,7 @@ const SearchProduct = memo(function SearchProduct() {
             )}
 
             {!loading && (
-              <div className="grid grid-cols-6 max-[1000px]:grid-cols-4 max-[700px]:flex max-[700px]:flex-wrap place-content-center place-items-center overflow-auto">
+              <div className="grid grid-cols-5 max-[1150px]:grid-cols-4 max-[930px]:grid-cols-3 max-[700px]:flex max-[700px]:flex-wrap gap-3 place-content-center place-items-center overflow-hidden py-10">
                 {searchProduct &&
                   searchProduct?.map((item) => (
                     <NavLink key={item?.id} to={`/product/${item?.id}`}>

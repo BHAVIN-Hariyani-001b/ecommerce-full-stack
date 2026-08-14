@@ -5,6 +5,7 @@ from app.models.productImage import ProductImage
 from app.models.AttributeValue import AttributeValue
 from app.models.Attribute import Attribute
 from app.models.brand import Brand
+from app.models.ProductReview import ProductReview
 from app.db import db
 from app.util.imageUpload import save_image as save_uploaded_file
 import json
@@ -485,6 +486,8 @@ def delete_product(id):
     try:
         print(id)
         existing = db.session.get(Products, str(id))
+
+        ProductReview.query.filter_by(product_id=str(id)).delete(synchronize_session=False)
 
         if not existing:
             return jsonify({"error": "Product not found"}), 404

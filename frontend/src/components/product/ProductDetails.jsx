@@ -13,7 +13,6 @@ import {
 
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { BiLoaderCircle } from "react-icons/bi";
-import { useLocation } from "react-router-dom";
 
 const findCartLine = (cartItems, productId) =>
   cartItems.find(
@@ -29,8 +28,7 @@ const ProductDetails = ({ productAttributes }) => {
     (state) => state.review?.review_summary?.average_rating,
   );
 
-  const { state } = useLocation();
-  const item = state?.item;
+  console.log(product)
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.auth.user);
@@ -38,7 +36,7 @@ const ProductDetails = ({ productAttributes }) => {
   const cartItems = useSelector((state) => state.cart?.items) ?? [];
   const { loading, error } = useSelector((state) => state.cart);
 
-  const cartLine = findCartLine(cartItems, item?.id);
+  const cartLine = findCartLine(cartItems, product?.id);
   const isInCart = Boolean(cartLine);
   const currentQty = cartLine?.qty ?? 0;
 
@@ -50,13 +48,13 @@ const ProductDetails = ({ productAttributes }) => {
       dispatch(
         addToCart({
           user_id: user.id,
-          product_id: item.id,
+          product_id: product.id,
         }),
       );
       return;
     }
 
-    dispatch(addGuestCartItem(item));
+    dispatch(addGuestCartItem(product));
   };
 
   const handleIncrement = (e) => {
@@ -72,8 +70,8 @@ const ProductDetails = ({ productAttributes }) => {
       );
       return;
     }
-    console.log(item);
-    dispatch(incrementQty(item.id));
+    console.log(product);
+    dispatch(incrementQty(product.id));
   };
 
   const handleDecrement = (e) => {
@@ -90,7 +88,7 @@ const ProductDetails = ({ productAttributes }) => {
       return;
     }
 
-    dispatch(decrementQty(item.id));
+    dispatch(decrementQty(product.id));
   };
 
   return (

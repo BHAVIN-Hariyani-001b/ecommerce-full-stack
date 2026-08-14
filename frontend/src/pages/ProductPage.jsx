@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PageWapper from "../components/layout/PageWapper";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Container from "../admin/components/common/Container";
 import { useDispatch, useSelector } from "react-redux";
 import { productPageAPI } from "../features/productPage/ProductPageThunk";

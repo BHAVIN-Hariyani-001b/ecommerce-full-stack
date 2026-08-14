@@ -56,8 +56,8 @@ const Cart = ({ sideBarOpen, setSideBar }) => {
                 Your cart is empty
               </p>
             ) : (
-              items.map((item) => (
-                <CartProduct key={item?.cart_id || item?.id} item={item} />
+              items.map((item,index) => (
+                <CartProduct key={index} item={item} />
               ))
             )}
           </div>
@@ -139,7 +139,8 @@ const CartProduct = ({ item }) => {
   const name = product?.name;
   const pPrice = product?.PPrice;
   const bPrice = product?.BPrice;
-  const imageName = product?.image?.image_name;
+  const imageName = product?.images[0]?.image_name;
+
   const handleIncrement = () => {
     if (user && item?.cart_id) {
       dispatch(incrementCartItem({ cart_id: item.cart_id, user }));
@@ -164,7 +165,7 @@ const CartProduct = ({ item }) => {
             src={`../../../public/image/product_img/${imageName}`}
             alt={name}
             loading="lazy"
-            className="w-full h-full p-1 border border-gray-200 object-cover rounded-sm"
+            className="w-full h-full p-1 border border-gray-200 object-contain rounded-sm"
           />
         </div>
         <div className="flex flex-col items-center">

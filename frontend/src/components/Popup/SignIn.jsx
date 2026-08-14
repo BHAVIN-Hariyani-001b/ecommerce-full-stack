@@ -22,7 +22,7 @@ const SignIn = memo(function SignIn({
       try {
         await dispatch(loginUser({ email, password })).unwrap();
         setPassword("");
-        toast.success("Loging Successfully")
+        toast.success("Loging Successfully");
         onClose?.();
       } catch {
         toast.error("please try again");
@@ -96,10 +96,17 @@ const SignIn = memo(function SignIn({
               Sign up
             </button>
           </p>
+
+          <div className="flex justify-center items-center text-[14px] font-semibold text-[#454d5c] hover:underline">
+            <button
+              type="button"
+              className="cursor-pointer"
+              onClick={onForgotPassword}
+            >
+              Forgot Password?
+            </button>
+          </div>
         </form>
-        <div className="flex justify-center items-center text-[14px] font-semibold text-[#454d5c] hover:underline">
-          <button type="button" className="cursor-pointer" onClick={onForgotPassword}>Forgot Password?</button>
-        </div>
       </div>
     </Modal>
   );

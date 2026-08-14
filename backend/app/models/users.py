@@ -42,10 +42,17 @@ class User(db.Model):
 
         phone = re.sub(r"[\s\-\(\)]", "", phone)
 
+        if not phone.startswith("+91"):
+            raise ValueError("Phone number must start with +91")
+
+        number = phone[3:]
+        if len(number) != 10:
+            raise ValueError("Enter 10 digit after +91")
+
         # India-friendly + generic
         if not re.match(r"^\+[1-9]\d{7,14}$", phone):
-            raise ValueError("Invalid phone number")
-
+            raise ValueError("Invalid phone number")        
+        print(phone)
         return phone
 
     @validates("email")

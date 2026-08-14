@@ -5,6 +5,7 @@ import Modal from "../common/Modal";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { logoutUser } from "../../features/auth/authThunk";
 import Profile from "../profile/Profile";
+import AdminProfile from "../profile/AdminProfile";
 
 const Logout = memo(function Logout() {
   const dispatch = useDispatch();
@@ -17,6 +18,8 @@ const Logout = memo(function Logout() {
 
   const openModal = useCallback(() => setLogoutOpen(true), []);
   const closeModal = useCallback(() => setLogoutOpen(false), []);
+  const role = useSelector((state) => state.auth?.user?.role);
+  console.log(role);
 
   const handleLogout = useCallback(() => {
     dispatch(logout());
@@ -41,9 +44,18 @@ const Logout = memo(function Logout() {
         </p>
       </button>
 
-      <Modal open={logoutOpen} onClose={closeModal} title="Account" widthClassName="max-w-6xl">
+      <Modal
+        open={logoutOpen}
+        onClose={closeModal}
+        title="Account"
+        widthClassName={role === "admin" ? "max-w-xl" : "max-w-6xl"}
+      >
         <div className="flex flex-col gap-4">
-          <Profile />
+          {role === "user" ? (
+            <Profile />
+          ) : (
+            <AdminProfile displayName={displayName} />
+          )}
 
           <div className="flex gap-3 justify-end">
             <button

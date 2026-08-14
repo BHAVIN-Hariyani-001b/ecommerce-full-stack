@@ -12,9 +12,11 @@ from flask_jwt_extended import (
 from app.models.users import User
 from app.db import db
 from sqlalchemy.exc import IntegrityError
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from flask import current_app
 
 auth_bp = Blueprint("auth", __name__)
-
 
 
 # login route
@@ -32,9 +34,7 @@ def login():
         if missing:
             return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
-        
         user = User.query.filter_by(email=data["email"]).first()
-   
 
         if not user:
             return jsonify({"error": "Invalid email or password"}), 401
@@ -173,3 +173,51 @@ def verify():
         return jsonify({"error": "User Not Found"}), 404
 
     return jsonify({"valid": True, "role": claims.get("role"), "id": user_id}), 200
+
+
+@auth_bp.route("/user/profile/<uuid:id>", methods=["PUT"])
+def update_user_profile(id):
+    """update product using by id and change admin user data update"""
+    try:
+        existing = db.session.get(User, str(id))
+
+        if not existing:
+            return jsonify({"message": "User Not Found"}), 400
+
+        data = request.get_json()
+
+        userName = data.get("username").strip()
+
+        if not userName:
+            return jsonify({"message": "UserName Are require"}), 400
+
+        existing.username = userName
+        existing.phone = data.get("phone").strip()
+
+        db.session.commit()
+
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": "User updated successfully",
+                    "user": {
+                        "id": str(existing.id),
+                        "username": existing.username,
+                        "email": existing.email,
+                        "role": existing.role.value,
+                    },
+                }
+            ),
+            200,
+        )
+
+    except ValueError as e:
+        db.session.rollback()
+        print(e)
+        return jsonify({"success": False, "message": str(e)}), 500
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return jsonify({"success": False, "message": "User Not Update"}), 500

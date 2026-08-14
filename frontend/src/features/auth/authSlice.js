@@ -4,6 +4,7 @@ import {
   registerUser,
   getUserProfile,
   fetchAdminStatus,
+  editProfile,
 } from "./authThunk";
 
 const initialState = {
@@ -125,6 +126,21 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAdmin = false;
         state.error = action.payload || "Failed to verify admin";
+      })
+
+      // update profile
+      .addCase(editProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(editProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload?.user;
+        state.error = null;
+      })
+      .addCase(editProfile.rejected, (state, action) => {
+        state.error = action.payload;
+        state.isLoading = false;
       });
   },
 });

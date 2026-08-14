@@ -63,7 +63,7 @@ def user_create():
         user.set_password(data.get("password").strip())
 
         db.session.add(user)
-        db.session.commit() 
+        db.session.commit()
 
         return jsonify(
             {
@@ -137,7 +137,6 @@ def update_user(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"success": False, "message": "User Not Update"}), 500
-
 
 @user_bp.route("/user/<uuid:id>", methods=["DELETE"])
 def delete_user(id):

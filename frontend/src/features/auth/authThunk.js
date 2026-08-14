@@ -5,10 +5,10 @@ import {
   getProfileApi,
   checkAdmin,
   logoutApi,
+  profileEdit,
 } from "../../middleware/authApi";
 import { addToCart, fetchCartItem } from "../card/cardThunk";
 import { clearCart } from "../card/cardSlice";
-
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -69,18 +69,33 @@ export const fetchAdminStatus = createAsyncThunk(
       const data = await checkAdmin();
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || "failed to fetch admin status");
+      return rejectWithValue(
+        error.response?.data?.error || "failed to fetch admin status",
+      );
     }
   },
 );
 
 export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
-  async (_, { rejectWithValue,dispatch }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      dispatch(logoutApi())
+      dispatch(logoutApi());
     } catch (err) {
       return rejectWithValue(err.response?.data?.error || "Logout failed");
     }
-  }
+  },
+);
+
+export const editProfile = createAsyncThunk(
+  "auth/editProfile",
+  async ({ id, username, phone }, { rejectWithValue }) => {
+    try {
+      const response = await profileEdit({ id, username, phone });
+      return response;
+    } catch (error) {
+      console.log(error)
+      return rejectWithValue(error.response?.data?.message);
+    }
+  },
 );

@@ -201,7 +201,7 @@ const UserOrderHistory = () => {
     filter === "all" ? ORDERS : ORDERS.filter((o) => o.status === filter);
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="font-serif text-[26px] font-semibold text-gray-900">
           Order History
