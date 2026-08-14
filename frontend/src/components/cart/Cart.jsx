@@ -56,7 +56,7 @@ const Cart = ({ sideBarOpen, setSideBar }) => {
                 Your cart is empty
               </p>
             ) : (
-              items.map((item,index) => (
+              items.map((item, index) => (
                 <CartProduct key={index} item={item} />
               ))
             )}
@@ -134,12 +134,13 @@ const Cart = ({ sideBarOpen, setSideBar }) => {
 const CartProduct = ({ item }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const { loading, error } = useSelector((state) => state.cart);
+  const { loadingCartId, error } = useSelector((state) => state.cart);
   const product = item?.product || item;
   const name = product?.name;
   const pPrice = product?.PPrice;
   const bPrice = product?.BPrice;
-  const imageName = product?.images[0]?.image_name;
+  const imageName = product?.image?.image_name;
+  console.log(product?.image);
 
   const handleIncrement = () => {
     if (user && item?.cart_id) {
@@ -179,7 +180,7 @@ const CartProduct = ({ item }) => {
         </div>
       </div>
       <div className="flex justify-center p-2 items-center">
-        <div className="bg-green-600 grid grid-cols-3 place-items-center text-white h-9 w-20 max-[400px]:w-15 rounded-lg">
+        <div className="bg-green-600 grid grid-cols-3 place-items-center text-white h-9 w-20 max-[400px]:w-15 rounded-lg relative">
           <button
             className="h-full cursor-pointer hover:scale-90"
             onClick={handleDecrement}
@@ -193,7 +194,7 @@ const CartProduct = ({ item }) => {
           >
             <IoMdAdd />
           </button>
-          {loading && (
+          {loadingCartId === item?.cart_id && (
             <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
               <BiLoaderCircle className="animate-spin" size={22} />
             </div>

@@ -28,11 +28,17 @@ const ProductCard = ({ item }) => {
   const user = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const cartItems = useSelector((state) => state.cart?.items) ?? [];
-  const { loading, error } = useSelector((state) => state.cart);
+  const { loadingProductId, loadingCartId, error } = useSelector(
+    (state) => state.cart,
+  );
 
   const cartLine = findCartLine(cartItems, item?.id);
   const isInCart = Boolean(cartLine);
   const currentQty = cartLine?.qty ?? 0;
+
+  const isAddLoading = loadingProductId === item?.id;
+  console.log("hello bhavin",item.id,isAddLoading)
+  const isQtyLoading = isInCart && loadingCartId === cartLine?.cart_id;
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -117,7 +123,7 @@ const ProductCard = ({ item }) => {
             <FaStar className="rotate-12" size={10} />
           </div>
 
-          {/* Cart Button */}
+          {/* Cart Button */} 
           <div className="absolute left-2 bottom-2 opacity-0 translate-y-10 group-hover:flex group-hover:opacity-100 group-hover:translate-y-0 duration-700">
             <div className="relative">
               {isInCart ? (
@@ -126,7 +132,7 @@ const ProductCard = ({ item }) => {
                     type="button"
                     className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
                     onClick={handleDecrement}
-                    disabled={loading}
+                    disabled={isQtyLoading}
                   >
                     <IoMdRemove />
                   </button>
@@ -137,12 +143,12 @@ const ProductCard = ({ item }) => {
                     type="button"
                     className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
                     onClick={handleIncrement}
-                    disabled={loading}
+                    disabled={isQtyLoading}
                   >
                     <IoMdAdd />
                   </button>
 
-                  {loading && (
+                  {isQtyLoading && (
                     <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
                       <BiLoaderCircle className="animate-spin" size={22} />
                     </div>
@@ -154,11 +160,11 @@ const ProductCard = ({ item }) => {
                     type="button"
                     className="w-full h-full cursor-pointer"
                     onClick={handleAdd}
-                    disabled={loading}
+                    disabled={isAddLoading}
                   >
                     Add
                   </button>
-                  {loading && (
+                  {isAddLoading && (
                     <div className="absolute bg-gray-100/40 text-gray-600 border border-gray-100/40 rounded-lg w-full h-full flex justify-center items-center">
                       <BiLoaderCircle className="animate-spin" size={22} />
                     </div>

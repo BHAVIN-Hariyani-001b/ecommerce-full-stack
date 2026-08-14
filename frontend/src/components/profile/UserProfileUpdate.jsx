@@ -8,7 +8,7 @@ const UserProfileUpdate = () => {
   const { error, isLoading } = useSelector((state) => state.auth);
 
   const [userName, setUserName] = useState(user?.username);
-  const [userPhone, setUserPhone] = useState("");
+  const [userPhone, setUserPhone] = useState(user?.phone ?? "");
   const dispatch = useDispatch();
 
   const handleUpdateProfile = useCallback(async () => {

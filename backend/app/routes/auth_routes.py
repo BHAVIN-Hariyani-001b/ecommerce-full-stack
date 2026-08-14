@@ -59,6 +59,7 @@ def login():
                     "username": user.username,
                     "email": user.email,
                     "role": user.role.value,
+                    "phone": user.phone,
                 },
             }
         )
@@ -206,6 +207,7 @@ def update_user_profile(id):
                         "username": existing.username,
                         "email": existing.email,
                         "role": existing.role.value,
+                        "phone": existing.phone,
                     },
                 }
             ),

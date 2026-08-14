@@ -16,6 +16,8 @@ const initialState = {
   handlingCharge: 0,
   finalPrice: 0,
   count: 0,
+  loadingCartId: null,
+  loadingProductId: null,
 };
 
 const mapCartItem = (cartItem) => ({
@@ -115,12 +117,12 @@ const cartSlice = createSlice({
         state.loading = false;
       })
 
-      .addCase(addToCart.pending, (state) => {
-        state.loading = true;
+      .addCase(addToCart.pending, (state, action) => {
+        state.loadingProductId = action.meta.arg.product_id;
         state.error = null;
       })
       .addCase(addToCart.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingProductId = null;
         const cart = action.payload.cart;
         const existing = state.items.find(
           (item) => item.id === cart.id || item.product_id === cart.id,
@@ -138,16 +140,16 @@ const cartSlice = createSlice({
         recalculate(state);
       })
       .addCase(addToCart.rejected, (state, action) => {
+        state.loadingProductId = null;
         state.error = action.payload;
-        state.loading = false;
       })
 
-      .addCase(incrementCartItem.pending, (state) => {
-        state.loading = true;
+      .addCase(incrementCartItem.pending, (state, action) => {
+        state.loadingCartId = action.meta.arg.cart_id;
         state.error = null;
       })
       .addCase(incrementCartItem.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingCartId = null;
         const updatedCart = action.payload?.cart;
         if (!updatedCart) return;
 
@@ -164,16 +166,16 @@ const cartSlice = createSlice({
         recalculate(state);
       })
       .addCase(incrementCartItem.rejected, (state, action) => {
+        state.loadingCartId = null;
         state.error = action.payload;
-        state.loading = false;
       })
 
-      .addCase(decrementCartItem.pending, (state) => {
-        state.loading = true;
+      .addCase(decrementCartItem.pending, (state, action) => {
+        state.loadingCartId = action.meta.arg.cart_id;
         state.error = null;
       })
       .addCase(decrementCartItem.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingCartId = null;
         const { cart, cart_id } = action.payload;
 
         if (!cart) {
@@ -191,8 +193,8 @@ const cartSlice = createSlice({
         recalculate(state);
       })
       .addCase(decrementCartItem.rejected, (state, action) => {
+        state.loadingCartId = null;
         state.error = action.payload;
-        state.loading = false;
       });
   },
 });

@@ -139,5 +139,8 @@ class Products(db.Model):
             "SubCategory": str(self.subcategory.name) if self.subcategory else None,
             "discount": self.discount,
             "attributes": [attr.to_dict() for attr in self.attributes],
+            "image": next(
+                (img.to_dict() for img in self.images if img.is_primary), None
+            ),
             "images": images,
         }

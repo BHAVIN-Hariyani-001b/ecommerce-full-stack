@@ -28,13 +28,15 @@ const ProductDetails = ({ productAttributes }) => {
     (state) => state.review?.review_summary?.average_rating,
   );
 
-  console.log(product)
+  console.log(product);
   const dispatch = useDispatch();
 
   const user = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const cartItems = useSelector((state) => state.cart?.items) ?? [];
-  const { loading, error } = useSelector((state) => state.cart);
+  const { loadingProductId, loadingCartId, error } = useSelector(
+    (state) => state.cart,
+  );
 
   const cartLine = findCartLine(cartItems, product?.id);
   const isInCart = Boolean(cartLine);
@@ -186,7 +188,7 @@ const ProductDetails = ({ productAttributes }) => {
                     type="button"
                     className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
                     onClick={handleDecrement}
-                    disabled={loading}
+                    disabled={loadingCartId}
                   >
                     <IoMdRemove />
                   </button>
@@ -197,12 +199,12 @@ const ProductDetails = ({ productAttributes }) => {
                     type="button"
                     className="h-full w-full flex items-center justify-center hover:scale-90 cursor-pointer"
                     onClick={handleIncrement}
-                    disabled={loading}
+                    disabled={loadingCartId}
                   >
                     <IoMdAdd />
                   </button>
 
-                  {loading && (
+                  {loadingCartId && (
                     <div className="absolute bg-white/30 text-gray-600 rounded-lg w-full h-full flex justify-center items-center">
                       <BiLoaderCircle className="animate-spin" size={22} />
                     </div>
@@ -214,11 +216,11 @@ const ProductDetails = ({ productAttributes }) => {
                     type="button"
                     className="w-full h-full cursor-pointer"
                     onClick={handleAdd}
-                    disabled={loading}
+                    disabled={loadingProductId}
                   >
                     Add To Cart
                   </button>
-                  {loading && (
+                  {loadingProductId && (
                     <div className="absolute bg-gray-100/40 text-gray-600 border border-gray-100/40 rounded-lg w-full h-full flex justify-center items-center">
                       <BiLoaderCircle className="animate-spin" size={22} />
                     </div>
