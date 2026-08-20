@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { TbEdit } from "react-icons/tb";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { IoMdThumbsUp } from "react-icons/io";
@@ -39,7 +38,7 @@ const ReviewCard = ({ review, setReviewWrite }) => {
 
   return (
     <div className="relative">
-      <div className="border border-gray-200 rounded-2xl p-4 flex flex-col gap-2 group">
+      <div className="border border-gray-200 rounded-2xl p-4 flex flex-col gap-2 group duration-900 ease-in-out transition-all overflow-hidden">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-gray-300 text-white flex items-center justify-center text-sm font-semibold shrink-0">
@@ -78,7 +77,7 @@ const ReviewCard = ({ review, setReviewWrite }) => {
           {review.comment}
         </p>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-end items-center">
           {/* <button
             type="button"
             onClick={handleHelpful}
@@ -92,8 +91,8 @@ const ReviewCard = ({ review, setReviewWrite }) => {
             Helpful ({helpfulCount})
           </button> */}
 
-          {user && user?.id === review?.user_id ? (
-            <div className="space-x-2 hidden group-hover:flex">
+          {user && (user?.id === review?.user_id || user?.role === "admin") ? (
+            <div className="space-x-2 group-hover:opacity-100 group-hover:translate-x-0  opacity-0 transition-all duration-700 translate-x-20">
               <button
                 onClick={() => handleOnUpdate(review)}
                 className="cursor-pointer hover:bg-gray-300 p-1 rounded-full"

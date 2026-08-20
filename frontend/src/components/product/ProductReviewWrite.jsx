@@ -52,7 +52,7 @@ const ProductReviewWrite = ({ productId, onClose }) => {
       setRating(isUpdate.product_rating);
       setReview(isUpdate.comment);
     } else {
-      setRating(0);
+      setRating(5);
       setReview("");
     }
   }, [isUpdate]);
@@ -74,11 +74,10 @@ const ProductReviewWrite = ({ productId, onClose }) => {
             <Stack spacing={1}>
               <Rating
                 name="half-rating"
-                value={rating}
-                defaultValue={5}
+                value={rating ?? 5}
                 precision={1}
                 size="large"
-                onChange={(event, newValue) => setRating(newValue ?? 0.1)}
+                onChange={(event, newValue) => setRating(newValue ?? 5)}
               />
             </Stack>
             <span className="text-sm text-gray-500">({rating})</span>

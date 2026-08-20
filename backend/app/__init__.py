@@ -72,6 +72,7 @@ def create_app():
     from app.routes.attributes_routes import attributes_bp
     from app.routes.user_route import user_bp
     from app.routes.product_review_route import product_review_bp
+    from app.routes.user_address_routes import user_address_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -84,6 +85,7 @@ def create_app():
     app.register_blueprint(attributes_bp,url_prefix="/api")
     app.register_blueprint(user_bp,url_prefix="/api")
     app.register_blueprint(product_review_bp,url_prefix="/api")
+    app.register_blueprint(user_address_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)

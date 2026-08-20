@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { IoMdThumbsUp } from "react-icons/io";
 import { MdVerified } from "react-icons/md";
@@ -9,10 +9,7 @@ import Modal from "../common/Modal";
 import ProductReviewWrite from "./ProductReviewWrite";
 import { useDispatch, useSelector } from "react-redux";
 import ReviewCard from "./ReviewCard";
-import {
-  setAuthOpen,
-  setAuthView,
-} from "../../features/auth/authSlice";
+import { setAuthOpen, setAuthView } from "../../features/auth/authSlice";
 
 // import { fetchReviewsAPI } from "../../features/review/ReviewThunk";
 
@@ -62,8 +59,10 @@ const ProductReview = ({ productId }) => {
 
   const visibleReviews = filteredReviews.slice(0, visibleCount);
 
-  const alreadyReviewed = mockReviews.some((item) => item?.user_id === user?.id);
-  console.log("is good"+alreadyReviewed);
+  const alreadyReviewed = mockReviews.some(
+    (item) => item?.user_id === user?.id,
+  );
+  // console.log("is good" + alreadyReviewed);
 
   return (
     <div className="flex flex-col gap-6">
@@ -145,7 +144,7 @@ const ProductReview = ({ productId }) => {
           No reviews for this rating yet.
         </p>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 h-80 scrollbar-none overflow-y-scroll">
           {visibleReviews.map((review) => (
             <ReviewCard
               key={review.id}

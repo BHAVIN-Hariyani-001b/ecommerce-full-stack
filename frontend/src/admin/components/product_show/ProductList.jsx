@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -8,6 +8,7 @@ import {
 import { TbEdit } from "react-icons/tb";
 import { MdOutlineDelete } from "react-icons/md";
 import { setIsUpdatedProduct } from "../../features/productAdd/productAddSlice";
+import { MdOutlineRateReview } from "react-icons/md";
 import { toast } from "react-toastify";
 import ProductSearch from "./ProductSearch";
 import DeletePopup from "../common/DeletePopup";
@@ -15,6 +16,9 @@ import DataTable from "../common/DataTable";
 
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
+import Modal from "../../../components/common/Modal";
+import ProductReview from "../../../components/product/ProductReview";
+import { fetchReviewsAPI } from "../../../features/review/ReviewThunk";
 
 const ProductList = ({ setActivePage }) => {
   const Product = useSelector((state) => state.productAdd?.products) ?? [];
@@ -24,6 +28,9 @@ const ProductList = ({ setActivePage }) => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState(null); // for popup
+
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [productId, setProductwId] = useState(null);
 
   const handleFilterProduct = useMemo(() => {
     return Product.filter((item) => {
@@ -69,6 +76,19 @@ const ProductList = ({ setActivePage }) => {
   useEffect(() => {
     dispatch(ProductGet());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (productId) {
+      dispatch(fetchReviewsAPI(productId)).unwrap();
+    }
+  }, [productId, dispatch]);
+
+  const handleOpenReview = useCallback((id) => {
+    setReviewOpen(true);
+    setProductwId(id);
+  }, []);
+
+  const handleCloseReview = useCallback(() => setReviewOpen(false), []);
 
   const columns = [
     {
@@ -150,6 +170,22 @@ const ProductList = ({ setActivePage }) => {
         </div>
       ),
     },
+    {
+      field: "review",
+      headerName: "Review",
+      width: 100,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <IconButton
+          size="small"
+          onClick={() => handleOpenReview(params.row?._id || params.row?.id)}
+          title="Review"
+        >
+          <MdOutlineRateReview className="text-blue-400 text-xl hover:scale-105 duration-100" />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
@@ -180,6 +216,15 @@ const ProductList = ({ setActivePage }) => {
           handleDelete={() => handleDeleteProduct(deleteId)}
         />
       )}
+
+      <Modal
+        open={reviewOpen}
+        onClose={handleCloseReview}
+        title="Manage Review"
+        widthClassName="max-w-7xl"
+      >
+        <ProductReview productId={productId} />
+      </Modal>
     </div>
   );
 };

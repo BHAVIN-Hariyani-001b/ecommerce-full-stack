@@ -15,6 +15,7 @@ import brandReducer from "../admin/features/Brand/brandSlice.js";
 import attributeReducer from "../admin/features/attributes/attributesSlice";
 import userReducer from "../admin/features/user/userSlice";
 import reviewReducer from "../features/review/ReviewSlice";
+import userAddressReducer from "./userAddress/userAddressSlice.js"
 
 const storage = storageDefault.default || storageDefault;
 
@@ -51,6 +52,7 @@ const rootReducer = combineReducers({
   attribute: attributeReducer,
   user: userReducer,
   review: reviewReducer,
+  address : userAddressReducer,
 });
 
 export default rootReducer;

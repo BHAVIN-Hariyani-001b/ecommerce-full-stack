@@ -9,7 +9,6 @@ const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
     "Sales Report",
     "View Orders",
     "Category",
-    "HeroSection",
     "Brand",
     "User",
     "Attribute"

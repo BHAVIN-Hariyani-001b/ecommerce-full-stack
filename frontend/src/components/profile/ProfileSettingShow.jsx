@@ -16,7 +16,7 @@ const ProfileSettingShow = ({ openPage, setOpenPage }) => {
       icon: <HiOutlineShoppingBag size={20} />,
     },
     {
-      FiledName: "Saved Location",
+      FiledName: "Saved Address",
       icon: <PiMapPinArea size={20} />,
     },
   ];
@@ -58,7 +58,7 @@ const ProfileSettingShow = ({ openPage, setOpenPage }) => {
           {ProfileList.map((item, index) => (
             <div
               key={index}
-              className={`flex items-center justify-start cursor-pointer hover:bg-gray-300/30 w-full gap-3 text-[17px] text-black p-3 rounded-lg hover:scale-105 duration-500 ${openPage == item.FiledName && "bg-blue-400/30"}`}
+              className={`flex items-center justify-start cursor-pointer hover:bg-gray-300/30 w-full gap-3 text-[17px] text-black p-3 rounded-lg hover:scale-102 duration-500 ${openPage == item.FiledName && "bg-blue-400/30"}`}
               onClick={() => handleOnClickProfile(item.FiledName)}
             >
               {item.icon}

@@ -1,0 +1,32 @@
+from app.db import db
+import uuid
+from app.models.users import User
+
+
+class UserAddress(db.Model):
+    __tablename__ = "user_address"
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(
+        db.String(36),
+        db.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    streetArea = db.Column(db.String(256), nullable=True)
+    city = db.Column(db.String(36), nullable=True)
+    state = db.Column(db.String(50), nullable=True)
+    pin_code = db.Column(db.String(6), nullable=True)
+
+    user = db.relationship(
+        "User", backref=db.backref("user_address", passive_deletes=True)
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user.id,
+            "streetArea": self.streetArea,
+            "city": self.city,
+            "state": self.state,
+            "pin_code": self.pin_code,
+        }

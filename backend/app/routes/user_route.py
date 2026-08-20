@@ -4,6 +4,7 @@ from app.util.admin import admin_required
 from app.db import db
 from app.models.cart import Cart
 from app.models.ProductReview import ProductReview
+# from app.models.UserAddress import UserAddress
 
 user_bp = Blueprint("user", __name__)
 
@@ -147,6 +148,7 @@ def delete_user(id):
 
         Cart.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
         ProductReview.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
+        # UserAddress.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
 
         print("---------- delete ---------")
         print(existing)
@@ -160,4 +162,5 @@ def delete_user(id):
             {"success": True, "message": "User Delete Successfully", "data": id}
         )
     except Exception as e:
+        db.session.rollback()
         return jsonify({"success": False, "message": "User Not Delete"}), 500

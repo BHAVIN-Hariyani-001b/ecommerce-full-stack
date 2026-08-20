@@ -1,7 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { logoutUser } from "../../features/auth/authThunk";
-
 import { FaRegCircleUser } from "react-icons/fa6";
+import { MdDeleteOutline } from "react-icons/md";
 import { PiUserCircle } from "react-icons/pi";
 import ProfileSettingShow from "./ProfileSettingShow";
 import UserProfileUpdate from "./UserProfileUpdate";
@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { deleteUserAPI } from "../../admin/features/user/userThunk";
 import DeletePopup from "../../admin/components/common/DeletePopup";
 import { logout } from "../../features/auth/authSlice";
+import { GetUserAddress } from "../../features/userAddress/userAddressThunk";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.user);
@@ -22,7 +23,7 @@ const Profile = () => {
   const pages = {
     Profile: <UserProfileUpdate />,
     "Order History": <UserOrderHistory />,
-    "Saved Location": <UserLocation />,
+    "Saved Address": <UserLocation />,
   };
 
   const PageRender = () => {
@@ -38,9 +39,13 @@ const Profile = () => {
     setDeleteId(null);
   }, [dispatch, delteId]);
 
+  useEffect(() => {
+    dispatch(GetUserAddress(user?.id)).unwrap();
+  }, [dispatch, user]);
+
   return (
     <div>
-      <div className="grid grid-cols-3 w-full border border-gray-300 rounded-2xl h-120 max-[900px]:flex max-[600px]:flex-wrap overflow-auto scrollbar-none">
+      <div className="grid grid-cols-3 w-full border border-gray-300 rounded-2xl h-120 max-[1000px]:flex max-[1000px]:flex-wrap overflow-auto scrollbar-none">
         <div className="w-full flex items-center justify-center">
           <ProfileSettingShow openPage={openPage} setOpenPage={setOpenPage} />
         </div>
@@ -48,17 +53,20 @@ const Profile = () => {
           <div className="space-y-3">
             <PageRender />
             {openPage === "Profile" && (
-              <div className="pl-1">
-                <button
-                  className="text-blue-500 cursor-pointer"
-                  onClick={() => setDeleteId(user?.id)}
-                >
-                  Delete Account
-                </button>
-                <p>
-                  Deleting your account will remove all your orders,any active
-                  referral
-                </p>
+              <div className="flex items-center gap-3 border border-gray-300 rounded-xl p-2">
+                <MdDeleteOutline size={25} />
+                <div className="pl-1">
+                  <button
+                    className="text-blue-500 cursor-pointer"
+                    onClick={() => setDeleteId(user?.id)}
+                  >
+                    Delete Account
+                  </button>
+                  <p>
+                    Deleting your account will remove all your orders,any active
+                    referral
+                  </p>
+                </div>
               </div>
             )}
           </div>

@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.models.ProductReview import ProductReview
+from app.models.users import User
 from app.db import db
 
 product_review_bp = Blueprint("poduct_review", __name__)
@@ -169,15 +170,34 @@ def product_review_update(id):
 @product_review_bp.route("/product_review/<uuid:id>", methods=["DELETE"])
 def product_review_delete(id):
     try:
+        data = request.get_json()
+        user_id = data.get("user_id")
+        print(data)
+
+        if not user_id:
+            return jsonify({"message": "User Id Not Found"}), 404
+
+        user = User.query.filter_by(id=user_id).first()
+        # print(user)
+
+        if not user:
+            return jsonify({"message" : "User Not Found"})
+
         existing = db.session.get(ProductReview, str(id))
-        print(existing)
-        p_id = existing.product_id
 
         if not existing:
-            return jsonify({"message": "User Not Found"}), 404
+            return jsonify({"message": "Product Review Not Found"}), 404
+        
+        print(existing.user_id)
+        print(user.id)
 
-        db.session.delete(existing)
-        db.session.commit()
+        p_id = existing.product_id
+
+        if existing.user_id == user.id or (user.role and user.role.value == "admin"):
+            db.session.delete(existing)
+            db.session.commit()
+        else:
+            return jsonify({"success": False, "message": "Not authorized to delete this review"}), 403
 
         rating_summary = ProductReview.count_rating(str(p_id))
 
@@ -193,4 +213,6 @@ def product_review_delete(id):
             200,
         )
     except Exception as e:
+        print(e)
         return jsonify({"success": False, "message": "Product review Not Delete"}), 500
+
