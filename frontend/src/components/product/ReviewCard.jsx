@@ -1,6 +1,5 @@
 import { TbEdit } from "react-icons/tb";
 import { MdOutlineDeleteOutline } from "react-icons/md";
-import { IoMdThumbsUp } from "react-icons/io";
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import { useDispatch, useSelector } from "react-redux";

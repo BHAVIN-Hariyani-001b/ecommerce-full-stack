@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useCallback, useState } from "react";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { FaStar, FaRegHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,6 +13,8 @@ import {
   decrementCartItem,
   incrementCartItem,
 } from "../../features/card/cardThunk";
+import Modal from "../common/Modal";
+import { useOutletContext } from "react-router-dom";
 
 const findCartLine = (cartItems, productId) =>
   cartItems.find(
@@ -32,12 +34,14 @@ const ProductCard = ({ item }) => {
     (state) => state.cart,
   );
 
+  const { AddToCartOpen } = useOutletContext();
+
   const cartLine = findCartLine(cartItems, item?.id);
   const isInCart = Boolean(cartLine);
   const currentQty = cartLine?.qty ?? 0;
 
   const isAddLoading = loadingProductId === item?.id;
-  console.log("hello bhavin",item.id,isAddLoading)
+  console.log("hello bhavin", item.id, isAddLoading);
   const isQtyLoading = isInCart && loadingCartId === cartLine?.cart_id;
 
   const handleAdd = (e) => {
@@ -123,7 +127,7 @@ const ProductCard = ({ item }) => {
             <FaStar className="rotate-12" size={10} />
           </div>
 
-          {/* Cart Button */} 
+          {/* Cart Button */}
           <div className="absolute left-2 bottom-2 opacity-0 translate-y-10 group-hover:flex group-hover:opacity-100 group-hover:translate-y-0 duration-700">
             <div className="relative">
               {isInCart ? (
@@ -159,7 +163,7 @@ const ProductCard = ({ item }) => {
                   <button
                     type="button"
                     className="w-full h-full cursor-pointer"
-                    onClick={handleAdd}
+                    onClick={(e) => AddToCartOpen(e, item.id)}
                     disabled={isAddLoading}
                   >
                     Add

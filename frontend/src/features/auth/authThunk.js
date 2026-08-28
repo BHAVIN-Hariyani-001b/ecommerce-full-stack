@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, ReducerType } from "@reduxjs/toolkit";
 import {
   loginApi,
   registerApi,
@@ -78,9 +78,10 @@ export const fetchAdminStatus = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      dispatch(logoutApi());
+      const response = await logoutApi();
+      return response;
     } catch (err) {
       return rejectWithValue(err.response?.data?.error || "Logout failed");
     }
@@ -94,7 +95,7 @@ export const editProfile = createAsyncThunk(
       const response = await profileEdit({ id, username, phone });
       return response;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return rejectWithValue(error.response?.data?.message);
     }
   },

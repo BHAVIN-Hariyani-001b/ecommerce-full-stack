@@ -23,9 +23,17 @@ export const fetchCartItem = createAsyncThunk(
 
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ user_id, product_id, qty = 1 }, { rejectWithValue }) => {
+  async (
+    { user_id, product_id, attributes_value_ids, qty = 1 },
+    { rejectWithValue },
+  ) => {
     try {
-      const response = await addCart({ user_id, product_id, qty });
+      const response = await addCart({
+        user_id,
+        product_id,
+        attributes_value_ids,
+        qty,
+      });
       return response;
     } catch {
       return rejectWithValue("faild to add cart item");

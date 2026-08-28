@@ -19,6 +19,7 @@ const ProductPage = lazy(() => import("./pages/ProductPage"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 
+
 // Setup axios interceptors after store is created
 setupInterceptors(store);
 

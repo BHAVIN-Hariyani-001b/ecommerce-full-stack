@@ -1,7 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import { IoAddOutline } from "react-icons/io5";
 import { IoIosArrowForward } from "react-icons/io";
-import { BiHome } from "react-icons/bi";
 import { MdOutlineDelete } from "react-icons/md";
 import { TbEditCircle } from "react-icons/tb";
 import Modal from "../common/Modal";
@@ -10,6 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsUpdateAddress } from "../../features/userAddress/userAddressSlice";
 import { DeleteUserAddress } from "../../features/userAddress/userAddressThunk";
 import DeletePopup from "../../admin/components/common/DeletePopup";
+
+import { BiHome } from "react-icons/bi";
+import { MdOutlineWorkOutline } from "react-icons/md";
+import { IoLocationOutline } from "react-icons/io5";
 
 const UserLocation = () => {
   const [addressDetail, setAddressDetail] = useState(false);
@@ -57,14 +60,21 @@ const UserLocation = () => {
         open={addressDetail}
         onClose={handeleCloseAddressDetails}
         title="Address"
+        width={'max-[900px]:h-160 overflow-y-auto max-h-190 scrollbar-none'}
       >
-        <AddressDetails />
+        <AddressDetails handeleCloseAddressDetails={handeleCloseAddressDetails} />
       </Modal>
     </div>
   );
 };
 
 const AddressCart = ({ item, setAddressDetail }) => {
+  const Work = [
+    { name: "home", icon: <BiHome size={15} /> },
+    { name: "office", icon: <MdOutlineWorkOutline size={15} /> },
+    { name: "other", icon: <IoLocationOutline size={15} /> },
+  ];
+
   const dispatch = useDispatch();
   const [delteId, setDeleteId] = useState(null);
 
@@ -82,20 +92,29 @@ const AddressCart = ({ item, setAddressDetail }) => {
     }
   }, [dispatch, delteId]);
 
+  const locationType = item?.location_type?.trim() ?? "";
+
+  const locationItem =
+    Work.find(
+      (workItem) => workItem.name.toLowerCase() === locationType.toLowerCase(),
+    ) ?? Work[2];
+
+  const displayLocationName =
+    locationItem.name === "other" ? locationType || "other" : locationItem.name;
+
   return (
     <div className="bg-white p-3 border border-gray-300 rounded-2xl flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <BiHome size={30} />
+        {locationItem.icon}
         <div className="flex flex-col">
-          <span className="font-semibold">Home</span>
-          <span className="text-[14px] max-[600px]:w-30 max-[600px]:truncate">
-            {/* 10, ab, 311, Shahpore, Bhagal, Surat, Gujarat 395003, India */}
-            {item?.streetArea}, {item?.city}, {item?.pin_code}, {item?.state},
+          <span className="font-semibold">{displayLocationName.toUpperCase()}</span>
+          <span className="text-[14px] max-[600px]:w-30 max-[600px]:truncate max-[400px]:w-10">
+            {item?.street_area}, {item?.city}, {item?.pin_code}, {item?.state},
             India
           </span>
         </div>
       </div>
-      <div className="flex  items-center gap-4 text-2xl">
+      <div className="flex items-center gap-4 text-2xl">
         <TbEditCircle
           className="cursor-pointer"
           onClick={() => handleOnClick(item)}

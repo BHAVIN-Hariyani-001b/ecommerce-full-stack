@@ -19,11 +19,11 @@ const Logout = memo(function Logout() {
   const openModal = useCallback(() => setLogoutOpen(true), []);
   const closeModal = useCallback(() => setLogoutOpen(false), []);
   const role = useSelector((state) => state.auth?.user?.role);
-  console.log(role);
+  // console.log(user.id);
 
   const handleLogout = useCallback(() => {
-    dispatch(logout());
     dispatch(logoutUser());
+    dispatch(logout());
     setLogoutOpen(false);
   }, [dispatch]);
 

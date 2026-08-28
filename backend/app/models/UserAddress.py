@@ -1,7 +1,7 @@
 from app.db import db
 import uuid
 from app.models.users import User
-
+from enum import Enum as pyEnum
 
 class UserAddress(db.Model):
     __tablename__ = "user_address"
@@ -12,7 +12,13 @@ class UserAddress(db.Model):
         nullable=True,
         index=True,
     )
-    streetArea = db.Column(db.String(256), nullable=True)
+    userfullname = db.Column(db.String(100), nullable=True)
+    location_type = db.Column(
+        db.String(30),
+        nullable=False,
+        default="home",
+    )
+    street_area = db.Column(db.String(256), nullable=True)
     city = db.Column(db.String(36), nullable=True)
     state = db.Column(db.String(50), nullable=True)
     pin_code = db.Column(db.String(6), nullable=True)
@@ -24,8 +30,10 @@ class UserAddress(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "user_id": self.user.id,
-            "streetArea": self.streetArea,
+            "user_id": self.user_id,
+            "userfullname": self.userfullname,
+            "location_type": self.location_type,
+            "street_area": self.street_area,
             "city": self.city,
             "state": self.state,
             "pin_code": self.pin_code,

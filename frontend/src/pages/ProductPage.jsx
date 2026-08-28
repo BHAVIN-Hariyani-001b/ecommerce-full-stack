@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import PageWapper from "../components/layout/PageWapper";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Container from "../admin/components/common/Container";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, } from "react-redux";
 import { productPageAPI } from "../features/productPage/ProductPageThunk";
 import { IoIosArrowBack } from "react-icons/io";
 import ProductReview from "../components/product/ProductReview";
@@ -15,37 +15,11 @@ import { fetchReviewsAPI } from "../features/review/ReviewThunk";
 const ProductPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const product = useSelector((state) => state.product.product);
 
   const navigate = useNavigate();
 
   const [option, setOption] = useState(true);
-  const [productAttributes, setProductAttributes] = useState({
-    Color: [],
-    Size: [],
-    Text: [],
-    Number: [],
-  });
 
-  const filterData = () => {
-    const grouped = { Color: [], Size: [], Text: [], Number: [] };
-
-    (product?.attributes ?? []).forEach((item) => {
-      if (grouped[item?.name]) {
-        grouped[item.name].push(item);
-      } else {
-        grouped.Text.push(item); // fallback bucket for unknown types
-      }
-    });
-
-    setProductAttributes(grouped);
-  };
-
-  // console.log(productAttributes);
-
-  useEffect(() => {
-    filterData();
-  }, [product]);
 
   useEffect(() => {
     dispatch(fetchReviewsAPI(id)).unwrap();
@@ -73,7 +47,7 @@ const ProductPage = () => {
         <div className="grid grid-cols-2 max-[700px]:flex max-[700px]:justify-center max-[700px]:items-center max-[700px]:flex-wrap h-full my-5 w-full gap-5 p-2">
           <ProductPageImage />
 
-          <ProductDetails productAttributes={productAttributes} />
+          <ProductDetails />
         </div>
 
         <ProductService />

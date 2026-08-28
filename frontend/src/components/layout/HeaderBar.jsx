@@ -1,15 +1,20 @@
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { GrCart } from "react-icons/gr";
 import { MdOutlineSearch } from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaLocationDot } from "react-icons/fa6";
 import { NavLink, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Search from "../common/Search";
 import Logout from "../Popup/Logout";
 import logo from "../../assets/images/logo/logo.jpeg";
 import SearchAnimation from "../animation/SearchAnimation";
+
+import { MdOutlineAddLocationAlt } from "react-icons/md";
+import Modal from "../common/Modal";
+import AddressDetails from "../profile/AddressDetails";
+import { setIsUpdateAddress } from "../../features/userAddress/userAddressSlice";
 
 const HeaderBar = memo(function HeaderBar({
   onLoginClick,
@@ -20,6 +25,24 @@ const HeaderBar = memo(function HeaderBar({
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.auth?.user);
   const isSearchPage = location.pathname === "/search";
+
+  const [addressDetail, setAddressDetail] = useState(false);
+  // const [openMouseHover, setOpenMouseHover] = useState(false);
+  const dispatch = useDispatch();
+
+  const handeleOpenAddressDetails = useCallback(
+    () => setAddressDetail(true),
+    [],
+  );
+
+  const handeleCloseAddressDetails = useCallback(
+    () => {
+      dispatch(setIsUpdateAddress(false));
+      setAddressDetail(false);
+    },
+    [dispatch],
+    [],
+  );
 
   // console.log(useSelector((state) => state.auth));
 
@@ -37,13 +60,25 @@ const HeaderBar = memo(function HeaderBar({
               />
             </NavLink>
           </div>
-          <div className="mr-10 max-[700px]:hidden">
+
+          <div className="mr-10 max-[700px]:hidden relative group">
             <p className="flex gap-1 items-center justify-center cursor-pointer max-[600px]:hidden group text-[#474554] font-medium text-nowrap">
               <FaLocationDot />
               <span>Select Location</span>
               <IoIosArrowDown className="group-hover:rotate-180 transition-transform duration-200 text-[15px]" />
             </p>
+
+            <div className="absolute w-37 opacity-0 p-2 rounded top-7 z-30 bg-white/99 shadow-md invisible duration-500 group-hover:opacity-100 group-hover:visible cursor-pointer transition-all">
+              <div
+                className="flex items-center justify-center gap-1"
+                onClick={handeleOpenAddressDetails}
+              >
+                <MdOutlineAddLocationAlt />
+                <span>Add Location</span>
+              </div>
+            </div>
           </div>
+
           <div className="w-full max-w-svw flex items-center justify-center cursor-pointer pr-4 max-[600px]:absolute max-[600px]:left-0 max-[600px]:right-0 max-[600px]:mx-auto max-[600px]:top-3 max-[600px]:px-2">
             {isSearchPage ? (
               <Search onSearch={onSearch} />
@@ -88,6 +123,17 @@ const HeaderBar = memo(function HeaderBar({
             </div>
           </div>
         </div>
+
+        <Modal
+          open={addressDetail}
+          onClose={handeleCloseAddressDetails}
+          title="Address"
+          width={"max-[900px]:h-160 overflow-y-auto max-h-190 scrollbar-none"}
+        >
+          <AddressDetails
+            handeleCloseAddressDetails={handeleCloseAddressDetails}
+          />
+        </Modal>
       </header>
     </div>
   );

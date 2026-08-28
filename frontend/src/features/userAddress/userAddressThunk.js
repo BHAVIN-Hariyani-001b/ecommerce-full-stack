@@ -20,10 +20,14 @@ export const GetUserAddress = createAsyncThunk(
 
 export const AddUserAddress = createAsyncThunk(
   "Address/AddUserAddress",
-  async ({ AddressData }, { rejectWithValue, getState }) => {
+  async ({ location_type, AddressData }, { rejectWithValue, getState }) => {
     try {
       const user_id = getState().auth.user?.id;
-      const response = await AddAddress({ user_id, AddressData });
+      const response = await AddAddress({
+        location_type,
+        user_id,
+        AddressData,
+      });
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error);
@@ -33,9 +37,9 @@ export const AddUserAddress = createAsyncThunk(
 
 export const UpdateUserAddress = createAsyncThunk(
   "Address/UpdateUserAddress",
-  async ({ id, AddressData }, { rejectWithValue }) => {
+  async ({ id, AddressData,location_type }, { rejectWithValue }) => {
     try {
-      const response = await UpdateAddress({ id, AddressData });
+      const response = await UpdateAddress({ id, AddressData,location_type });
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error);

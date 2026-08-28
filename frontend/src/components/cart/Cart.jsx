@@ -1,8 +1,8 @@
-import React, { memo } from "react";
+import { memo, useCallback } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { MdOutlineShoppingCart, MdDeliveryDining } from "react-icons/md";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
-import { RiFileList2Fill, RiEBikeFill } from "react-icons/ri";
+import { RiFileList2Fill } from "react-icons/ri";
 import { IoBagHandle, IoArrowForward } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -11,12 +11,25 @@ import {
   incrementCartItem,
 } from "../../features/card/cardThunk";
 import { decrementQty, incrementQty } from "../../features/card/cardSlice";
+import { setAuthOpen, setAuthView } from "../../features/auth/authSlice";
 
-const Cart = ({ sideBarOpen, setSideBar }) => {
+const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
   const items = useSelector((state) => state.cart.items) ?? [];
   // console.log(items);
   const { basePrice, totalPrice, finalPrice, deliveryCharge, handlingCharge } =
     useSelector((state) => state.cart);
+  const user = useSelector((state) => state.auth?.user);
+  const dispatch = useDispatch();
+
+  const handleOpenCheckOut = useCallback(() => {
+    if (!user) {
+      dispatch(setAuthView("signin"));
+      dispatch(setAuthOpen(true));
+      return;
+    }
+    setCheckOut(true);
+  }, [setCheckOut, user, dispatch]);
+
   return (
     <>
       <div
@@ -117,7 +130,10 @@ const Cart = ({ sideBarOpen, setSideBar }) => {
             </div>
           </div>
         </div>
-        <div className="flex items-center w-[90%] justify-center group text-white cursor-pointer bg-green-600 py-5 rounded-r-full mr-5 absolute bottom-2">
+        <div
+          className="flex items-center w-[90%] justify-center group text-white cursor-pointer bg-green-600 py-5 rounded-r-full mr-5 absolute bottom-2"
+          onClick={handleOpenCheckOut}
+        >
           <div className="flex items-center gap-3 justify-center">
             <h2 className="text-[18px]">Continue To Process</h2>
             <IoArrowForward

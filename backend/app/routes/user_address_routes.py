@@ -47,14 +47,62 @@ def user_address_post():
         user_city = data.get("city")
         user_state = data.get("state")
         user_pin_code = data.get("pin_code")
+        user_name = data.get("username")
+        user_location_type = data.get("location_type")
+        user_phone = data.get("phone")
+
+        required_fields = {
+            "username": user_name,
+            "city": user_city,
+            "state": user_state,
+            "pin_code": user_pin_code,
+            "location_type": user_location_type,
+            "phone": user_phone,
+        }
+
+        missing_fields = [
+            field
+            for field, value in required_fields.items()
+            if value is None or str(value).strip() == ""
+        ]
+
+        if missing_fields:
+            return (
+                jsonify(
+                    {   
+                        "message": "Required fields are missing",
+                        "missing_fields": missing_fields,
+                    }
+                ),
+                400,
+            )
+
+        if not user_location_type:
+            return (
+                jsonify(
+                    {
+                        "message": "Invalid location_type",
+                    }
+                ),
+                400,
+            )   
 
         user_address = UserAddress(
             user_id=user_id,
-            streetArea=user_area,
+            street_area=user_area,
             city=user_city,
             state=user_state,
             pin_code=user_pin_code,
+            userfullname=user_name,
+            location_type=user_location_type,
         )
+
+        try:
+            existing.phone = user_phone
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+            return jsonify({"message": str(e)}), 500
 
         db.session.add(user_address)
         db.session.commit()
@@ -80,15 +128,35 @@ def user_address_update(id):
     try:
         data = request.get_json()
 
-        existing = db.session.get(UserAddress,id)
-        # print(existing)
+        existing = db.session.get(UserAddress, id)
+
         if not existing:
             return jsonify({"message": "User Address Not Found is Not Found"}), 404
 
+        required = [
+            "city",
+            "streetArea",
+            "state",
+            "pin_code",
+            "location_type",
+            "username",
+            "phone",
+        ]
+
+        missing = [f for f in required if not data.get(f)]
+
+        if missing:
+            return jsonify({"message": f"Missing fileds : {', '.join(missing)}"}), 400
+
         existing.city = data.get("city")
-        existing.streetArea = data.get("streetArea")
+        existing.street_area = data.get("streetArea")
         existing.state = data.get("state")
         existing.pin_code = data.get("pin_code")
+        existing.location_type = data.get("location_type")
+        existing.userfullname = data.get("username")
+
+        existing = db.session.get(User, existing.user_id)
+        existing.phone = data.get("phone")
 
         db.session.commit()
 

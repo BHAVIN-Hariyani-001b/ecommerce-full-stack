@@ -29,7 +29,7 @@ export const refreshTokenApi = async () => {
   return response?.data;
 };
 
-export const logoutApi = async () => {
+export const logoutApi = async () => {  
   const response = await api.post("/auth/logout"); // clears cookie on server
   return response?.data;
 };

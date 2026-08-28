@@ -5,7 +5,7 @@ export const AddressGet = async (id) => {
   return response.data;
 };
 
-export const AddAddress = async ({ user_id, AddressData }) => {
+export const AddAddress = async ({ location_type, user_id, AddressData }) => {
   const { name, address, city, state, pin, phone } = AddressData;
   const response = await api.post("/address/", {
     user_id,
@@ -15,12 +15,13 @@ export const AddAddress = async ({ user_id, AddressData }) => {
     state,
     pin_code: pin,
     phone: phone,
+    location_type,
   });
 
   return response.data;
 };
 
-export const UpdateAddress = async ({ id, AddressData }) => {
+export const UpdateAddress = async ({ id, AddressData, location_type }) => {
   const { name, address, city, state, pin, phone } = AddressData;
   const response = await api.put(`/address/${id}`, {
     username: name,
@@ -29,6 +30,7 @@ export const UpdateAddress = async ({ id, AddressData }) => {
     state,
     pin_code: pin,
     phone: phone,
+    location_type,
   });
 
   return response.data;

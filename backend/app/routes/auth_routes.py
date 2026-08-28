@@ -10,11 +10,9 @@ from flask_jwt_extended import (
     unset_jwt_cookies,
 )
 from app.models.users import User
+from app.models.cart import Cart
 from app.db import db
 from sqlalchemy.exc import IntegrityError
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
-from flask import current_app
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -121,12 +119,25 @@ def register():
 
 
 @auth_bp.route("/auth/logout", methods=["POST"])
+@jwt_required()
 def logout():
-    response = jsonify({"message": "Logged out successfully"})
+    try:
+        user_id = get_jwt_identity()
 
-    unset_jwt_cookies(response)
+        print("Logging out user:", user_id)
 
-    return response, 200
+        Cart.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+
+        db.session.commit()
+
+        response = jsonify({"message": "Logged out successfully"})
+
+        unset_jwt_cookies(response)
+
+        return response, 200
+    except Exception as e:
+        print(e)
+        return response, 500
 
 
 @auth_bp.route("/auth/refresh", methods=["POST"])

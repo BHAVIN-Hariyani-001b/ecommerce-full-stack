@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import All from "../components/cards/All";
 import ProductSection from "../components/cards/ProductSection";
@@ -14,6 +14,7 @@ import BottomMenu from "../admin/components/common/BottomMenu";
 import { setAuthOpen, setAuthView } from "../features/auth/authSlice";
 
 import { useOutletContext } from "react-router-dom";
+import { GetUserAddress } from "../features/userAddress/userAddressThunk";
 
 const BOTTOM_MENU_ITEMS = [
   {
@@ -57,6 +58,13 @@ const Home = memo(function Home() {
   const dispatch = useDispatch();
 
   const { sideBar, setSideBar } = useOutletContext();
+
+  const user = useSelector((state) => state.auth.user);
+  useEffect(() => {
+    if (user) {
+      dispatch(GetUserAddress(user?.id)).unwrap();
+    }
+  }, [dispatch, user]);
 
   const handleOnChange = (item) => {
     switch (item) {

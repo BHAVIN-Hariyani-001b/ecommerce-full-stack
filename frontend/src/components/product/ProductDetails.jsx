@@ -13,6 +13,7 @@ import {
 
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { BiLoaderCircle } from "react-icons/bi";
+import { useCallback, useEffect, useState } from "react";
 
 const findCartLine = (cartItems, productId) =>
   cartItems.find(
@@ -22,7 +23,7 @@ const findCartLine = (cartItems, productId) =>
       line.product?.id === productId,
   );
 
-const ProductDetails = ({ productAttributes }) => {
+const ProductDetails = () => {
   const product = useSelector((state) => state.product.product);
   const rating = useSelector(
     (state) => state.review?.review_summary?.average_rating,
@@ -42,21 +43,76 @@ const ProductDetails = ({ productAttributes }) => {
   const isInCart = Boolean(cartLine);
   const currentQty = cartLine?.qty ?? 0;
 
+
+  const [productAttributes, setProductAttributes] = useState({
+    Color: [],
+    Size: [],
+    Text: [],
+    Number: [],
+  });
+
+  const filterData = () => {
+    const grouped = { Color: [], Size: [], Text: [], Number: [] };
+
+    (product?.attributes ?? []).forEach((item) => {
+      if (grouped[item?.name]) {
+        grouped[item.name].push(item);
+      } else {
+        grouped.Text.push(item); // fallback bucket for unknown types
+      }
+    });
+
+    setProductAttributes(grouped);
+  };
+
+
+  useEffect(() => {
+    filterData();
+  }, [product]);
+
+  const [selectedAttributes, setSelectedAttributes] = useState({});
+  const selectedAttributesValueIds = Object.values(selectedAttributes);
+
+  useEffect(() => {
+    if (!product?.attributes?.length) return;
+    console.log(selectedAttributes);
+    const defaults = {};
+
+    product?.attributes?.forEach((item) => {
+      if (!(item.a_id in defaults)) {
+        defaults[item.a_id] = item.id;
+      }
+    });
+
+    setSelectedAttributes(defaults);
+  }, [product?.id]);
+
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log("Hello bhavin");
+    console.log("hi" + selectedAttributesValueIds);
+    console.log(selectedAttributes);
 
     if (isLoggedIn && user?.id) {
       dispatch(
         addToCart({
           user_id: user.id,
           product_id: product.id,
+          attributes_value_ids: selectedAttributesValueIds,
         }),
       );
       return;
     }
 
-    dispatch(addGuestCartItem(product));
+    dispatch(addGuestCartItem({ ...product, selectedAttributesValueIds }));
+  };
+
+  const handleSelectAttribute = (a_id, attribute_value_id) => {
+    setSelectedAttributes((prev) => ({
+      ...prev,
+      [a_id]: attribute_value_id,
+    }));
   };
 
   const handleIncrement = (e) => {
@@ -95,7 +151,7 @@ const ProductDetails = ({ productAttributes }) => {
 
   return (
     <>
-      <div className="border border-gray-200 h-full w-full rounded-2xl p-5">
+      <div className="border border-gray-200 h-150 max-h-full w-full rounded-2xl p-5">
         {/* this is the product all info */}
         <div className="space-y-5">
           <div>
@@ -146,22 +202,31 @@ const ProductDetails = ({ productAttributes }) => {
                     <div key={name} className="flex flex-col gap-2">
                       <span className="text-sm font-medium">{name}</span>
                       <div className="flex gap-2">
-                        {items.map((item) => (
-                          <span
-                            key={item.product_id + item.value}
-                            className="w-10 h-10 flex shadow-2xl rounded-md border border-gray-200 justify-center items-center cursor-pointer"
-                            style={
-                              name === "Color"
-                                ? {
-                                    backgroundColor: item?.value,
-                                    borderRadius: "50%",
-                                  }
-                                : undefined
-                            }
-                          >
-                            {name !== "Color" && item?.value}
-                          </span>
-                        ))}
+                        {items.map((item) => {
+                          const isSelected =
+                            selectedAttributes[item.a_id] === item.id;
+
+                          return (
+                            <span
+                              key={item.id}
+                              onClick={() =>
+                                handleSelectAttribute(item.a_id, item.id)
+                              }
+                              className={`w-10 h-10 flex shadow-2xl rounded-md border justify-center items-center cursor-pointer
+                          ${isSelected ? "border-blue-600 border-2" : "border-gray-200"}`}
+                              style={
+                                name === "Color"
+                                  ? {
+                                      backgroundColor: item?.value,
+                                      borderRadius: "50%",
+                                    }
+                                  : undefined
+                              }
+                            >
+                              {name !== "Color" && item?.value}
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
                   ),
