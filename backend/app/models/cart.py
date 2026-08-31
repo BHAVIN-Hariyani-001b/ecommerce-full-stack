@@ -1,6 +1,7 @@
 from app.db import db
 import uuid
 
+
 class Cart(db.Model):
     __tablename__ = "cart"
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -13,7 +14,9 @@ class Cart(db.Model):
 
     user = db.relationship("User", backref=db.backref("cart", passive_deletes=True))
     product = db.relationship("Products", backref="cart")
-    values = db.relationship("CartValue",back_populates="cart", cascade="all, delete-orphan")
+    values = db.relationship(
+        "CartValue", back_populates="cart", cascade="all, delete-orphan"
+    )
 
     def to_dict(self):
         return {
@@ -25,4 +28,5 @@ class Cart(db.Model):
                 self.qty * self.product.Product_price if self.product else 0
             ),
             "product": self.product.to_dictt() if self.product else None,
+            "cart_value": [i.to_dict() for i in self.values],
         }

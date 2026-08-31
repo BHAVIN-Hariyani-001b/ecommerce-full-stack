@@ -10,6 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   attributes: [],
+  attributesName: {},
   isUpdate: false,
 };
 
@@ -19,6 +20,10 @@ const attributesSlice = createSlice({
   reducers: {
     setIsUpdateAttribute: (state, action) => {
       state.isUpdate = action.payload ?? true;
+    },
+
+    setAttributeName: (state, action) => {
+      state.attributesName = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -98,5 +103,6 @@ const attributesSlice = createSlice({
   },
 });
 
-export const { setIsUpdateAttribute } = attributesSlice.actions;
+export const { setIsUpdateAttribute, setAttributeName } =
+  attributesSlice.actions;
 export default attributesSlice.reducer;

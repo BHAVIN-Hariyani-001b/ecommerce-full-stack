@@ -5,6 +5,8 @@ from sqlalchemy.orm import validates
 import re
 import uuid
 from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHash
+
 
 ph = PasswordHasher()  ## use password hash
 
@@ -91,7 +93,10 @@ class User(db.Model):
         self.password = ph.hash(raw_password)
 
     def check_password(self, raw_password):
-        return ph.verify(self.password, raw_password)
+        try:
+            return ph.verify(self.password, raw_password)
+        except (VerifyMismatchError, VerificationError, InvalidHash):
+            return False
 
     def to_dict(self):
         return {

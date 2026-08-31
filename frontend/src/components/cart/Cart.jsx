@@ -158,6 +158,8 @@ const CartProduct = ({ item }) => {
   const imageName = product?.image?.image_name;
   console.log(product?.image);
 
+  console.log(item);
+
   const handleIncrement = () => {
     if (user && item?.cart_id) {
       dispatch(incrementCartItem({ cart_id: item.cart_id, user }));
@@ -186,7 +188,29 @@ const CartProduct = ({ item }) => {
           />
         </div>
         <div className="flex flex-col items-center">
-          <p className="w-30 wrap-break-word line-clamp-1 font-light">{name}</p>
+          <div className="w-30 min-w-full wrap-break-word line-clamp-1 font-light">
+            {name}
+          </div>
+
+          <div className="text-[12px] flex flex-col justify-start w-full">
+            {(item.cart_value ?? []).map(
+              (values, index) =>
+                values?.value?.charAt(0) === "#" ? (
+                  <span className="flex items-center" key={index}>
+                    {values.name} :
+                    <span
+                      style={{ backgroundColor: values.value }}
+                      className="inline-block w-5 mx-2 h-5 rounded-full border border-gray-300"
+                    />
+                    {values.value}
+                  </span>
+                ) : (
+                  <span key={index}>
+                    {values?.name} : {values?.value}
+                  </span>
+                ),
+            )}
+          </div>
           <div className="space-x-2 items-start w-full">
             <span className="text-[14px] font-semibold">&#8377;{pPrice}</span>
             <span className="text-[12px] line-through text-gray-400">

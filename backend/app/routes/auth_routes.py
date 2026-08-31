@@ -32,12 +32,16 @@ def login():
         if missing:
             return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
+        print("after")
         user = User.query.filter_by(email=data["email"]).first()
+        print("before1")
 
         if not user:
+            print("How")
             return jsonify({"error": "Invalid email or password"}), 401
         elif not user.check_password(data["password"]):
             return jsonify({"error": "Invalid password"}), 401
+
 
         claims = {"role": user.role.value}
 

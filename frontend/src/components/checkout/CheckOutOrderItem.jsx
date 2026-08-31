@@ -12,7 +12,7 @@ const CheckOutOrderItem = ({ item }) => {
         />
       </div>
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 space-y-2">
         <div className="flex items-start justify-between gap-2">
           <p className="min-w-0 flex-1 truncate text-sm font-medium text-gray-800">
             {item?.name}
@@ -51,6 +51,25 @@ const CheckOutOrderItem = ({ item }) => {
           <span className="text-sm font-semibold text-gray-800">
             &#8377;{item?.PPrice}
           </span>
+        </div>
+
+        <div className="text-[12px] flex flex-col justify-start w-full">
+          {(item.cart_value ?? []).map((values) =>
+            values.value.charAt(0) === "#" ? (
+              <span className="flex items-center">
+                {values.name} :
+                <span
+                  style={{ backgroundColor: values.value }}
+                  className="inline-block w-5 mx-2 h-5 rounded-full border border-gray-300"
+                />
+                {values.value}
+              </span>
+            ) : (
+              <span>
+                {values.name} : {values.value}
+              </span>
+            ),
+          )}
         </div>
       </div>
     </div>

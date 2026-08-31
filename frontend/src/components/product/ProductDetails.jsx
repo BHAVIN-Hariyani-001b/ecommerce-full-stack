@@ -13,7 +13,8 @@ import {
 
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { BiLoaderCircle } from "react-icons/bi";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
 const findCartLine = (cartItems, productId) =>
   cartItems.find(
@@ -34,6 +35,7 @@ const ProductDetails = () => {
 
   const user = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const cartItems = useSelector((state) => state.cart?.items) ?? [];
   const { loadingProductId, loadingCartId, error } = useSelector(
     (state) => state.cart,
@@ -43,56 +45,60 @@ const ProductDetails = () => {
   const isInCart = Boolean(cartLine);
   const currentQty = cartLine?.qty ?? 0;
 
+  // const { ProductAtr } = useOutletContext();
+  const attributesName = useSelector(
+    (state) => state.attribute?.attributesName,
+  );
 
-  const [productAttributes, setProductAttributes] = useState({
-    Color: [],
-    Size: [],
-    Text: [],
-    Number: [],
-  });
+  const [productAttributes, setProductAttributes] = useState({});
 
   const filterData = () => {
-    const grouped = { Color: [], Size: [], Text: [], Number: [] };
+    const grouped = Object.keys(attributesName ?? {}).reduce((acc, key) => {
+      acc[key] = [];
+      return acc;
+    }, {});
 
     (product?.attributes ?? []).forEach((item) => {
-      if (grouped[item?.name]) {
-        grouped[item.name].push(item);
-      } else {
-        grouped.Text.push(item); // fallback bucket for unknown types
+      const key = item?.name;
+
+      if (key && grouped[key]) {
+        grouped[key].push(item);
+      } else if (grouped.Text) {
+        grouped.Text.push(item); // fallback bucket
       }
     });
 
     setProductAttributes(grouped);
   };
 
+  console.log(productAttributes);
 
   useEffect(() => {
     filterData();
   }, [product]);
 
   const [selectedAttributes, setSelectedAttributes] = useState({});
+  const [selectedDataAttributes, setSelectedDataAttributes] = useState({});
   const selectedAttributesValueIds = Object.values(selectedAttributes);
-
+  console.log(selectedAttributes);
   useEffect(() => {
     if (!product?.attributes?.length) return;
-    console.log(selectedAttributes);
     const defaults = {};
+    const defaultsData = {};
 
     product?.attributes?.forEach((item) => {
       if (!(item.a_id in defaults)) {
         defaults[item.a_id] = item.id;
+        defaultsData[item.a_id] = item;
       }
     });
-
     setSelectedAttributes(defaults);
+    setSelectedDataAttributes(defaultsData);
   }, [product?.id]);
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Hello bhavin");
-    console.log("hi" + selectedAttributesValueIds);
-    console.log(selectedAttributes);
 
     if (isLoggedIn && user?.id) {
       dispatch(
@@ -105,15 +111,24 @@ const ProductDetails = () => {
       return;
     }
 
-    dispatch(addGuestCartItem({ ...product, selectedAttributesValueIds }));
+    dispatch(
+      addGuestCartItem({
+        ...product,
+        selectedAttributesValueIds,
+        cart_value: Object.values(selectedDataAttributes),
+      }),
+    );
   };
 
-  const handleSelectAttribute = (a_id, attribute_value_id) => {
+  const handleSelectAttribute = (a_id, item) => {
     setSelectedAttributes((prev) => ({
       ...prev,
-      [a_id]: attribute_value_id,
+      [a_id]: item.id,
     }));
+    setSelectedDataAttributes((prev) => ({ ...prev, [a_id]: item }));
   };
+
+  console.log(selectedDataAttributes);
 
   const handleIncrement = (e) => {
     e.preventDefault();
@@ -151,7 +166,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <div className="border border-gray-200 h-150 max-h-full w-full rounded-2xl p-5">
+      <div className="border border-gray-200 max-h-full w-full rounded-2xl p-5">
         {/* this is the product all info */}
         <div className="space-y-5">
           <div>
@@ -210,12 +225,12 @@ const ProductDetails = () => {
                             <span
                               key={item.id}
                               onClick={() =>
-                                handleSelectAttribute(item.a_id, item.id)
+                                handleSelectAttribute(item.a_id, item)
                               }
                               className={`w-10 h-10 flex shadow-2xl rounded-md border justify-center items-center cursor-pointer
                           ${isSelected ? "border-blue-600 border-2" : "border-gray-200"}`}
                               style={
-                                name === "Color"
+                                name.toLocaleLowerCase() === "color"
                                   ? {
                                       backgroundColor: item?.value,
                                       borderRadius: "50%",
@@ -223,7 +238,8 @@ const ProductDetails = () => {
                                   : undefined
                               }
                             >
-                              {name !== "Color" && item?.value}
+                              {name.toLocaleLowerCase() !== "color" &&
+                                item?.value}
                             </span>
                           );
                         })}

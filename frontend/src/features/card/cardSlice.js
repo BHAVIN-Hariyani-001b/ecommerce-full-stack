@@ -25,6 +25,7 @@ const mapCartItem = (cartItem) => ({
   id: cartItem.id,
   product_id: cartItem.id,
   qty: cartItem.qty,
+  cart_value: cartItem.cart_value,
   BTotalAmount: cartItem.BTotalAmount,
   PTotalAmount: cartItem.PTotalAmount,
   product: cartItem.product,
@@ -109,6 +110,7 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCartItem.fulfilled, (state, action) => {
         state.loading = false;
+        console.log(action.payload);
         state.items = (action.payload?.cart ?? []).map(mapCartItem);
         recalculate(state);
       })

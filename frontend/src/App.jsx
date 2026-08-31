@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, Slide } from "react-toastify";
 import Header from "./components/layout/Header";
@@ -9,7 +9,9 @@ import ViewCheckOut from "./components/checkout/ViewCheckout";
 import Modal from "./components/common/Modal";
 import ProductAdd from "./components/product/ProductAdd";
 import { productPageAPI } from "./features/productPage/ProductPageThunk";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAttributesAPI } from "./admin/features/attributes/attributesThunk";
+import { setAttributeName } from "./admin/features/attributes/attributesSlice";
 
 const App = memo(function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,6 +55,25 @@ const App = memo(function App() {
   );
 
   const AddToCartClose = useCallback(() => setAddToItem(false), []);
+
+  const attributes = useSelector((state) => state.attribute?.attributes);
+
+  useEffect(() => {
+    dispatch(fetchAttributesAPI());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!attributes) return;
+
+    const grouped = attributes.reduce((acc, attr) => {
+      const key = attr.attribute_name;
+      const valueIds = (attr.values ?? attr.options ?? []).map((v) => v.id);
+      acc[key] = valueIds;
+      return acc;
+    }, {});
+
+    dispatch(setAttributeName(grouped));
+  }, [attributes, dispatch]);
 
   return (
     <div>
