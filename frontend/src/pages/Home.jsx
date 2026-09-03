@@ -61,7 +61,7 @@ const Home = memo(function Home() {
 
   const user = useSelector((state) => state.auth.user);
   useEffect(() => {
-    if (user) {
+    if (user && user?.role !== "admin") {
       dispatch(GetUserAddress(user?.id)).unwrap();
     }
   }, [dispatch, user]);

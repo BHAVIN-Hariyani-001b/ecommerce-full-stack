@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { fetchCategories } from "../../../features/category/categoryThunk";
 import { IoIosArrowDown } from "react-icons/io";
 import {

@@ -50,6 +50,7 @@ def add_cart():
     """add to cart product"""
     try:
         data = request.get_json()
+        print(data)
 
         user_id = data.get("user_id")
         product_id = data.get("product_id")

@@ -16,13 +16,15 @@ export const loginUser = createAsyncThunk(
     try {
       const data = await loginApi({ email, password });
       const guestItems = getState().cart.items;
-      // console.log(data);
+      // console.log("Guest Items:", guestItems);
+
       if (guestItems.length > 0 && data.role !== "admin") {
         for (const item of guestItems) {
           await dispatch(
             addToCart({
               user_id: data.user?.id,
               product_id: item?.id || item?.product_id,
+              attributes_value_ids: item?.attributes_value_ids || [],
               qty: item?.qty || 1,
             }),
           );

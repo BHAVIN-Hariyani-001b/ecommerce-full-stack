@@ -9,7 +9,7 @@ import { TbEdit } from "react-icons/tb";
 import { MdOutlineDelete } from "react-icons/md";
 import { setIsUpdatedProduct } from "../../features/productAdd/productAddSlice";
 import { MdOutlineRateReview } from "react-icons/md";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import ProductSearch from "./ProductSearch";
 import DeletePopup from "../common/DeletePopup";
 import DataTable from "../common/DataTable";

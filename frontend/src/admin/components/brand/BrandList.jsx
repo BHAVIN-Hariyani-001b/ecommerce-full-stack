@@ -5,7 +5,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBrand, fetchBrand } from "../../features/Brand/brandThunk";
 import { setIsUpdateBrand } from "../../features/Brand/brandSlice";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import DeletePopup from "../common/DeletePopup";
 
 const BrandList = () => {

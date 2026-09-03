@@ -3,7 +3,7 @@ import { IoIosArrowDown } from "react-icons/io";
 
 import { FaRegEye } from "react-icons/fa6";
 import { FaRegEyeSlash } from "react-icons/fa6";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { createUserAPI, updateUserAPI } from "../../features/user/userThunk";
 

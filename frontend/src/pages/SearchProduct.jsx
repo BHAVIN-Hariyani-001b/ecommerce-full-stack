@@ -7,7 +7,7 @@ import { NavLink, useOutletContext } from "react-router-dom";
 import PageWapper from "../components/layout/PageWapper";
 import { clearSearch } from "../features/search/searchSlice";
 import ProductLoading from "../components/ProductLoading/ProductLoading";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
 
 const SearchProduct = memo(function SearchProduct() {

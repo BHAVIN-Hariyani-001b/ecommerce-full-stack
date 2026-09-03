@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { logout } from "../features/auth/authSlice";
 
 const api = axios.create({

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   AddUserAddress,
   GetUserAddress,
@@ -20,6 +20,7 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
     state: "",
     pin: "",
     phone: user?.phone ?? "",
+    isPrimary: false,
   };
 
   const isUpdate = useSelector((state) => state.address?.isUpdate);
@@ -40,12 +41,13 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
   const dispatch = useDispatch();
 
   const [adressInfo, setAddressInfo] = useState(initialAddress);
+  console.log(adressInfo);
 
   const handleOnChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setAddressInfo((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -55,7 +57,24 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
       : locationType;
   };
 
+  const ChekcLocation = () => {
+    return Boolean(
+      adressInfo.name && adressInfo.address && adressInfo.city && adressInfo.state && adressInfo.pin && adressInfo.phone,
+    );
+  }
+
   const handleOnClick = async () => {
+
+    if(user === null){
+      toast.error("Please login first");
+      return;
+    }
+
+    if (!ChekcLocation()) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
     try {
       if (isUpdate?.id) {
         await dispatch(
@@ -93,6 +112,7 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
         location_type: isUpdate?.location_type,
         pin: isUpdate?.pin_code,
         phone: user?.phone,
+        isPrimary: isUpdate?.isPrimary,
       });
     } else {
       setAddressInfo(initialAddress);
@@ -133,7 +153,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
           <div>
             {locationType.toLocaleLowerCase() === "other" && (
               <div className="flex flex-col gap-1 pb-3">
-                <label htmlFor="UserName">Enter Type Of Location <span className="text-red-600">*</span></label>
+                <label htmlFor="UserName">
+                  Enter Type Of Location <span className="text-red-600">*</span>
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -153,7 +175,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
         </div>
         <form onSubmit={(e) => e.preventDefault()} className="space-y-3">
           <div className="flex flex-col gap-1">
-            <label htmlFor="UserName">Enter Full Name <span className="text-red-600">*</span> </label>
+            <label htmlFor="UserName">
+              Enter Full Name <span className="text-red-600">*</span>{" "}
+            </label>
             <input
               type="text"
               name="name"
@@ -165,7 +189,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="UserAddress">Street address <span className="text-red-600">*</span></label>
+            <label htmlFor="UserAddress">
+              Street address <span className="text-red-600">*</span>
+            </label>
             <textarea
               type="text"
               name="address"
@@ -177,7 +203,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="UserCity">City <span className="text-red-600">*</span></label>
+            <label htmlFor="UserCity">
+              City <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
               name="city"
@@ -189,7 +217,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="UserState">State <span className="text-red-600">*</span></label>
+            <label htmlFor="UserState">
+              State <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
               name="state"
@@ -201,7 +231,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="UserPin">Pin Code <span className="text-red-600">*</span></label>
+            <label htmlFor="UserPin">
+              Pin Code <span className="text-red-600">*</span>
+            </label>
             <input
               type="number"
               name="pin"
@@ -215,7 +247,9 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="UserPhone">Phone number <span className="text-red-600">*</span></label>
+            <label htmlFor="UserPhone">
+              Phone number <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
               name="phone"
@@ -225,6 +259,17 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
               onChange={handleOnChange}
               placeholder="+91897698XXXX"
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="isPrimary"
+              id="UserPrimary"
+              checked={adressInfo.isPrimary}
+              onChange={handleOnChange}
+              className="w-4 h-4 accent-blue-500 cursor-pointer transition-transform duration-300 hover:scale-110"
+            />
+            <label htmlFor="UserPrimary">Set as Primary Address</label>
           </div>
           <button
             className="w-full bg-blue-500 py-2 text-white rounded-md cursor-pointer"

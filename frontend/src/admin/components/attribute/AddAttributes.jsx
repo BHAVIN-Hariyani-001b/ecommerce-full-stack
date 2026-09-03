@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import PageWapper from "../../../components/layout/PageWapper";
 import AttributesList from "./AttributesList";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
+
 import {
   createAttributeAPI,
   fetchAttributesAPI,

@@ -4,7 +4,7 @@ import { fetchCategoryProduct } from "../../features/categoryProduct/categoryPro
 import ProductCard from "../common/ProductCard";
 import PageWapper from "../layout/PageWapper";
 import ProductLoading from "../ProductLoading/ProductLoading";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import HeroBanner from "../product/HeroBanner";
 import { NavLink } from "react-router-dom";
 

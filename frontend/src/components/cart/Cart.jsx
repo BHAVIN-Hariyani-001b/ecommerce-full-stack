@@ -1,17 +1,21 @@
 import { memo, useCallback } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
-import { MdOutlineShoppingCart, MdDeliveryDining } from "react-icons/md";
+import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { RiFileList2Fill } from "react-icons/ri";
 import { IoBagHandle, IoArrowForward } from "react-icons/io5";
+import { IoIosWarning } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { BiLoaderCircle } from "react-icons/bi";
+import { TbTruckDelivery } from "react-icons/tb";
 import {
   decrementCartItem,
   incrementCartItem,
 } from "../../features/card/cardThunk";
 import { decrementQty, incrementQty } from "../../features/card/cardSlice";
 import { setAuthOpen, setAuthView } from "../../features/auth/authSlice";
+import toast from "react-hot-toast";
+import BillDetails from "./BillDetails";
 
 const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
   const items = useSelector((state) => state.cart.items) ?? [];
@@ -22,13 +26,22 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
   const dispatch = useDispatch();
 
   const handleOpenCheckOut = useCallback(() => {
+    if (items.length === 0) {
+      toast("Your cart is empty. Please add items !", {
+        icon: <IoIosWarning className="text-yellow-500" size={40} />,
+        style: { background: "#fef3c7", color: "#92400e" },
+      });
+
+      return;
+    }
+
     if (!user) {
       dispatch(setAuthView("signin"));
       dispatch(setAuthOpen(true));
       return;
     }
     setCheckOut(true);
-  }, [setCheckOut, user, dispatch]);
+  }, [setCheckOut, user, dispatch, items.length]);
 
   return (
     <>
@@ -36,7 +49,7 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
         onClick={() => setSideBar(false)}
         className={`fixed inset-0 z-20 bg-black/40 backdrop-blur-sm
           transition-all duration-300 ease-in-out
-          ${sideBarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+          ${sideBarOpen ? "opacity-100 pointer-events-  auto" : "opacity-0 pointer-events-none"}`}
       />
 
       <aside
@@ -74,61 +87,7 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
               ))
             )}
           </div>
-          <div className="bg-white mx-2 p-3 rounded-xl">
-            <div>
-              <h3 className="font-semibold text-[18px] py-2">Bill Details</h3>
-            </div>
-            <div className="space-y-1">
-              <div className="flex justify-between items-center">
-                <div className="flex justify-center gap-2 items-center text-[14px]">
-                  <RiFileList2Fill size={14} />
-                  <div className="flex justify-center items-center space-x-2">
-                    <span>items total</span>
-                    <span className="text-[10px] bg-blue-100 p-0.5 rounded text-blue-800">
-                      saved $54
-                    </span>
-                  </div>
-                </div>
-                <div className="space-x-2">
-                  <span>&#8377;{totalPrice}</span>
-                  <span className="line-through text-gray-400">
-                    &#8377;{basePrice}
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex justify-center gap-2 items-center text-[14px]">
-                  <MdDeliveryDining size={14} />
-                  <div className="flex justify-center items-center space-x-2">
-                    <span>Delivery charge</span>
-                  </div>
-                </div>
-                <div className="space-x-2">
-                  <span className="text-blue-600">FREE</span>
-                  <span className="line-through text-gray-400">
-                    &#8377;{deliveryCharge}
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex justify-center gap-2 items-center text-[14px]">
-                  <IoBagHandle size={14} />
-                  <div className="flex justify-center items-center space-x-2">
-                    <span>Handling charge</span>
-                  </div>
-                </div>
-                <div className="space-x-2">
-                  <span>&#8377;{handlingCharge}</span>
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-dashed border-gray-200 mt-2">
-              <div className="flex justify-between">
-                <span>Total</span>
-                <span>&#8377;{finalPrice}</span>
-              </div>
-            </div>
-          </div>
+          <BillDetails />
         </div>
         <div
           className="flex items-center w-[90%] justify-center group text-white cursor-pointer bg-green-600 py-5 rounded-r-full mr-5 absolute bottom-2"
@@ -193,22 +152,21 @@ const CartProduct = ({ item }) => {
           </div>
 
           <div className="text-[12px] flex flex-col justify-start w-full">
-            {(item.cart_value ?? []).map(
-              (values, index) =>
-                values?.value?.charAt(0) === "#" ? (
-                  <span className="flex items-center" key={index}>
-                    {values.name} :
-                    <span
-                      style={{ backgroundColor: values.value }}
-                      className="inline-block w-5 mx-2 h-5 rounded-full border border-gray-300"
-                    />
-                    {values.value}
-                  </span>
-                ) : (
-                  <span key={index}>
-                    {values?.name} : {values?.value}
-                  </span>
-                ),
+            {(item.cart_value ?? []).map((values, index) =>
+              values?.value?.charAt(0) === "#" ? (
+                <span className="flex items-center" key={index}>
+                  {values.name} :
+                  <span
+                    style={{ backgroundColor: values.value }}
+                    className="inline-block w-5 mx-2 h-5 rounded-full border border-gray-300"
+                  />
+                  {values.value}
+                </span>
+              ) : (
+                <span key={index}>
+                  {values?.name} : {values?.value}
+                </span>
+              ),
             )}
           </div>
           <div className="space-x-2 items-start w-full">

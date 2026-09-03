@@ -32,12 +32,12 @@ def login():
         if missing:
             return jsonify({"error": f"Missing fields: {', '.join(missing)}"}), 400
 
-        print("after")
+        # print("after")
         user = User.query.filter_by(email=data["email"]).first()
-        print("before1")
+        # print("before1")
 
         if not user:
-            print("How")
+            # print("How")
             return jsonify({"error": "Invalid email or password"}), 401
         elif not user.check_password(data["password"]):
             return jsonify({"error": "Invalid password"}), 401
@@ -162,7 +162,8 @@ def refresh():
         return response, 200
 
     except Exception as e:
-        return jsonify({"error": "Token refresh failed"}), 401
+        print(e)
+        return jsonify({"error": f"Token refresh failed: {str(e)}"}), 401
 
 
 @auth_bp.route("/auth/profile", methods=["GET"])

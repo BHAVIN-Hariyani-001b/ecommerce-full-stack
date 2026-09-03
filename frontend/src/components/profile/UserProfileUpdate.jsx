@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { editProfile } from "../../features/auth/authThunk";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const UserProfileUpdate = () => {
   const user = useSelector((state) => state.auth.user);

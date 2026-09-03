@@ -4,7 +4,7 @@ import AddCategory from "./AddCategory";
 import CategoryList from "./CategoryList";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteCategory } from "../../features/category/categoryThunk";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useState } from "react";
 import DeletePopup from "../common/DeletePopup";
 

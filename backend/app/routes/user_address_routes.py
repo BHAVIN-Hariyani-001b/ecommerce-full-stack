@@ -95,6 +95,7 @@ def user_address_post():
             pin_code=user_pin_code,
             userfullname=user_name,
             location_type=user_location_type,
+            isPrimary=data.get("isPrimary", False)
         )
 
         try:
@@ -105,6 +106,11 @@ def user_address_post():
             return jsonify({"message": str(e)}), 500
 
         db.session.add(user_address)
+        db.session.commit()
+
+        UserAddress.query.filter_by(user_id=user_id).update({"isPrimary": False})
+        user_address.isPrimary = True
+
         db.session.commit()
 
         return (
@@ -127,6 +133,7 @@ def user_address_update(id):
     """user address Add"""
     try:
         data = request.get_json()
+        print(data)
 
         existing = db.session.get(UserAddress, id)
 
@@ -154,10 +161,14 @@ def user_address_update(id):
         existing.pin_code = data.get("pin_code")
         existing.location_type = data.get("location_type")
         existing.userfullname = data.get("username")
+        existing.isPrimary = data.get("isPrimary", existing.isPrimary)
 
-        existing = db.session.get(User, existing.user_id)
-        existing.phone = data.get("phone")
+        existingUser = db.session.get(User, existing.user_id)
+        existingUser.phone = data.get("phone")
 
+
+        UserAddress.query.filter_by(user_id=existingUser.id).update({"isPrimary": False})
+        existing.isPrimary = True
         db.session.commit()
 
         return (

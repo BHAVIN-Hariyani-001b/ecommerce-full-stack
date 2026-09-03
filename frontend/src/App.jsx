@@ -1,6 +1,6 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer, Slide } from "react-toastify";
+import { Toaster } from "react-hot-toast";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Cart from "./components/cart/Cart";
@@ -85,19 +85,25 @@ const App = memo(function App() {
         />
       )}
 
-      <ToastContainer
-        position="top-right"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        transition={Slide}
-        pauseOnHover
-        theme="colored"
-        className="custom-toast-container"
+      <Toaster
+        position="top-center"
+        reverseOrder={false} // equivalent to newestOnTop={false}
+        gutter={8}
+        toastOptions={{
+          duration: 1500, // equivalent to autoClose={1500}
+          className: "custom-toast-container",
+          style: {
+            // "theme=colored" isn't built-in — you style it manually
+            background: "#363636",
+            color: "#fff",
+          },
+          success: {
+            style: { background: "#22c55e", color: "#fff" },
+          },
+          error: {
+            style: { background: "#ef4444", color: "#fff" },
+          },
+        }}
       />
 
       <Outlet

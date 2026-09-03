@@ -24,6 +24,7 @@ const HeaderBar = memo(function HeaderBar({
 }) {
   const location = useLocation();
   const isLoggedIn = useSelector((state) => state.auth?.user);
+  const UserAddress = useSelector((state) => state.address?.Address);
   const isSearchPage = location.pathname === "/search";
 
   const [addressDetail, setAddressDetail] = useState(false);
@@ -62,11 +63,20 @@ const HeaderBar = memo(function HeaderBar({
           </div>
 
           <div className="mr-10 max-[700px]:hidden relative group">
-            <p className="flex gap-1 items-center justify-center cursor-pointer max-[600px]:hidden group text-[#474554] font-medium text-nowrap">
-              <FaLocationDot />
-              <span>Select Location</span>
-              <IoIosArrowDown className="group-hover:rotate-180 transition-transform duration-200 text-[15px]" />
-            </p>
+            {UserAddress.length === 0 ? (
+              <p className="flex gap-1 items-center justify-center cursor-pointer max-[600px]:hidden group text-[#474554] font-medium text-nowrap">
+                <FaLocationDot />
+                <span>Select Location</span>
+                <IoIosArrowDown className="group-hover:rotate-180 transition-transform duration-200 text-[15px]" />
+              </p>
+            ) : (
+              <p className="flex gap-1 items-center justify-center cursor-pointer max-[600px]:hidden group text-[#474554] font-medium text-nowrap">
+                <FaLocationDot />
+                <span>{UserAddress[0]?.location_type.charAt(0).toUpperCase() + UserAddress[0]?.location_type.slice(1)} - </span>
+                <span className="max-w-12 truncate">{`${UserAddress[0]?.city}, ${UserAddress[0]?.state}, ${UserAddress[0]?.street_area}`}</span>
+                <IoIosArrowDown className="group-hover:rotate-180 transition-transform duration-200 text-[15px]" />
+              </p>
+            )}
 
             <div className="absolute w-37 opacity-0 p-2 rounded top-7 z-30 bg-white/99 shadow-md invisible duration-500 group-hover:opacity-100 group-hover:visible cursor-pointer transition-all">
               <div

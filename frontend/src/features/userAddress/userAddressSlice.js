@@ -10,6 +10,7 @@ const initialState = {
   loading: false,
   error: null,
   Address: [],
+  PrimaryAddress: null,
   isUpdate: false,
 };
 
@@ -19,6 +20,11 @@ const AddressSlice = createSlice({
   reducers: {
     setIsUpdateAddress: (state, action) => {
       state.isUpdate = action.payload ?? true;
+    },
+
+    setPrimaryAddress: (state) => {
+      state.PrimaryAddress =
+        state.Address.find((address) => address.isPrimary) || null;
     },
   },
   extraReducers: (builder) => {
@@ -91,5 +97,5 @@ const AddressSlice = createSlice({
   },
 });
 
-export const { setIsUpdateAddress } = AddressSlice.actions;
+export const { setIsUpdateAddress,setPrimaryAddress } = AddressSlice.actions;
 export default AddressSlice.reducer;

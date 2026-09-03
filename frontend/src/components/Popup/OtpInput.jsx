@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtpRequest } from "../../features/forgotPassword/forgotPasswordThunk";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { setStep } from "../../features/forgotPassword/forgotPasswordSlice";
 
 const LENGTH = 4;

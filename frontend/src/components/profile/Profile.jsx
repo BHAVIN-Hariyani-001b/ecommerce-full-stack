@@ -8,7 +8,7 @@ import UserProfileUpdate from "./UserProfileUpdate";
 import UserOrderHistory from "./UserOrderHistory";
 import UserLocation from "./UserLocation";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { deleteUserAPI } from "../../admin/features/user/userThunk";
 import DeletePopup from "../../admin/components/common/DeletePopup";
 import { logout } from "../../features/auth/authSlice";

@@ -47,11 +47,14 @@ const recalculate = (state) => {
     return acc + (i.qty || 0) * price;
   }, 0);
 
-  state.deliveryCharge = parseFloat((state.totalPrice * 5) / 100).toFixed(2);
-  state.handlingCharge = parseFloat((state.totalPrice * 2) / 100).toFixed(2);
-  state.finalPrice = parseFloat(
-    state.totalPrice + Number(state.handlingCharge),
-  ).toFixed(2);
+  const delivery = (state.totalPrice * 5) / 100;
+  const handling = (state.totalPrice * 2) / 100;
+
+  state.deliveryCharge = Number(delivery.toFixed(2));
+  state.handlingCharge = Number(handling.toFixed(2));
+  state.finalPrice = Number(
+    (state.totalPrice + delivery + handling).toFixed(2),
+  );
 };
 
 const cartSlice = createSlice({
@@ -100,6 +103,7 @@ const cartSlice = createSlice({
       state.finalPrice = 0;
       state.deliveryCharge = 0;
       state.handlingCharge = 0;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {

@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import { TbEdit } from "react-icons/tb";
 import { MdOutlineDelete } from "react-icons/md";
 import { setIsUpdatedUser } from "../../features/user/userSlice";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import DeletePopup from "../common/DeletePopup";
 
 const UserList = ({ searchQuery, openAddUser, userRole }) => {

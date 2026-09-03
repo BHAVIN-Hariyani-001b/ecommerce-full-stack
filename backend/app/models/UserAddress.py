@@ -22,6 +22,7 @@ class UserAddress(db.Model):
     city = db.Column(db.String(36), nullable=True)
     state = db.Column(db.String(50), nullable=True)
     pin_code = db.Column(db.String(6), nullable=True)
+    isPrimary = db.Column(db.Boolean, default=False, nullable=False)
 
     user = db.relationship(
         "User", backref=db.backref("user_address", passive_deletes=True)
@@ -37,4 +38,5 @@ class UserAddress(db.Model):
             "city": self.city,
             "state": self.state,
             "pin_code": self.pin_code,
+            "isPrimary": self.isPrimary,
         }

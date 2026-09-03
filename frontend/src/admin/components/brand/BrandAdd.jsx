@@ -4,7 +4,7 @@ import PageWapper from "../../../components/layout/PageWapper";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import BrandList from "./BrandList";
 import { CgCloseO } from "react-icons/cg";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addNewBrand,

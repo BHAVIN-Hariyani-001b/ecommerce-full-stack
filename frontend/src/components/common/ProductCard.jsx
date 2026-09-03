@@ -44,22 +44,22 @@ const ProductCard = ({ item }) => {
   console.log("hello bhavin", item.id, isAddLoading);
   const isQtyLoading = isInCart && loadingCartId === cartLine?.cart_id;
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // const handleAdd = (e) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
 
-    if (isLoggedIn && user?.id) {
-      dispatch(
-        addToCart({
-          user_id: user.id,
-          product_id: item.id,
-        }),
-      );
-      return;
-    }
+  //   if (isLoggedIn && user?.id) {
+  //     dispatch(
+  //       addToCart({
+  //         user_id: user.id,
+  //         product_id: item.id,
+  //       }),
+  //     );
+  //     return;
+  //   }
 
-    dispatch(addGuestCartItem(item));
-  };
+  //   dispatch(addGuestCartItem(item));
+  // };
 
   const handleIncrement = (e) => {
     e.preventDefault();

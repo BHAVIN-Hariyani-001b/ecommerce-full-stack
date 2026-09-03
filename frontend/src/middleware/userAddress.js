@@ -22,7 +22,7 @@ export const AddAddress = async ({ location_type, user_id, AddressData }) => {
 };
 
 export const UpdateAddress = async ({ id, AddressData, location_type }) => {
-  const { name, address, city, state, pin, phone } = AddressData;
+  const { name, address, city, state, pin, phone, isPrimary } = AddressData;
   const response = await api.put(`/address/${id}`, {
     username: name,
     streetArea: address,
@@ -31,6 +31,7 @@ export const UpdateAddress = async ({ id, AddressData, location_type }) => {
     pin_code: pin,
     phone: phone,
     location_type,
+    isPrimary,
   });
 
   return response.data;

@@ -4,7 +4,7 @@ import { fetchHomePageProduct } from "../../features/producthome/productHomeThun
 import ProductCardList from "../common/ProductCardList";
 import PageWapper from "../layout/PageWapper";
 import HomePageLoading from "../ProductLoading/HomePageLoading";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import Loding from "../common/Loding";
 import { getErrorMessage } from "../../util/getErrorMessage";
 import ProductCardOther from "../common/ProductCardOther";

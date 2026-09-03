@@ -5,7 +5,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAttributeAPI, fetchAttributesAPI } from "../../features/attributes/attributesThunk";
 import DeletePopup from "../common/DeletePopup";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { setIsUpdateAttribute } from "../../features/attributes/attributesSlice";
 
 const AttributesList = () => {

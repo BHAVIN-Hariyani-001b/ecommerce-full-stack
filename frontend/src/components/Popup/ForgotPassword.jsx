@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
-import { toast, ToastContainer } from "react-toastify";
+import toast from "react-hot-toast";
 import {
   forgotPasswordRequest,
   resetPasswordRequest,
@@ -11,7 +11,6 @@ import {
   setStep,
 } from "../../features/forgotPassword/forgotPasswordSlice";
 import OtpInput from "./OtpInput";
-import { FaArrowLeftLong } from "react-icons/fa6";
 import NewPassword from "./NewPassword";
 
 const OTP_VALIDITY_SECONDS = 2 * 60;

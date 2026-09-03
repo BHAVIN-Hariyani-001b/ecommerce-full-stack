@@ -15,7 +15,7 @@ import {
 } from "../../features/productAdd/productAddThunk";
 import SkeletonAddProduct from "../common/SkeletonAddProduct";
 import AddAtribute from "./AddAtribute";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { setIsUpdatedProduct } from "../../features/productAdd/productAddSlice";
 
 const ProductInfo = lazy(() => import("./ProductInfo"));

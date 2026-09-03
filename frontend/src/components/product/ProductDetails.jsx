@@ -114,7 +114,7 @@ const ProductDetails = () => {
     dispatch(
       addGuestCartItem({
         ...product,
-        selectedAttributesValueIds,
+        attributes_value_ids: selectedAttributesValueIds,
         cart_value: Object.values(selectedDataAttributes),
       }),
     );

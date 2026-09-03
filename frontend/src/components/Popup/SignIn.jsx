@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Modal from "../common/Modal";
 import { loginUser } from "../../features/auth/authThunk";
 import Passwordshow from "../common/Passwordshow";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 const SignIn = memo(function SignIn({
   open,
