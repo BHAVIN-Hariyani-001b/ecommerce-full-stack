@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../features/auth/authSlice";
+import { logout, setLogOut } from "../../features/auth/authSlice";
 import Modal from "../common/Modal";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { logoutUser } from "../../features/auth/authThunk";
@@ -10,21 +10,21 @@ import AdminProfile from "../profile/AdminProfile";
 const Logout = memo(function Logout() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const logoutOpenClose = useSelector((state) => state.auth.logout);
   const displayName = useMemo(
     () => user?.username || "Profile",
     [user?.username],
   );
-  const [logoutOpen, setLogoutOpen] = useState(false);
 
-  const openModal = useCallback(() => setLogoutOpen(true), []);
-  const closeModal = useCallback(() => setLogoutOpen(false), []);
+  const openModal = useCallback(() => dispatch(setLogOut(true)), [dispatch]);
+  const closeModal = useCallback(() => dispatch(setLogOut(false)), [dispatch]);
   const role = useSelector((state) => state.auth?.user?.role);
   // console.log(user.id);
 
   const handleLogout = useCallback(() => {
     dispatch(logoutUser());
     dispatch(logout());
-    setLogoutOpen(false);
+    dispatch(setLogOut(false));
   }, [dispatch]);
 
   return (
@@ -45,12 +45,12 @@ const Logout = memo(function Logout() {
       </button>
 
       <Modal
-        open={logoutOpen}
+        open={logoutOpenClose}
         onClose={closeModal}
         title="Account"
-        widthClassName={role === "admin" ? "max-w-xl" : "max-w-6xl"}
+        widthClassName={role === "admin" ? "max-w-xl" : "max-w-7xl"}
       >
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 z-20">
           {role === "user" ? (
             <Profile />
           ) : (

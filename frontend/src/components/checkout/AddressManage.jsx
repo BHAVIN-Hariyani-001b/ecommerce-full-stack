@@ -99,8 +99,8 @@ const AddressManage = ({ handeleOpenAddressDetails }) => {
               {address?.location_type.toUpperCase()}
             </span>
           </div>
-          <p>{`${address?.street_area}, ${address?.city}, ${address?.state}, ${address?.pin_code}`}</p>
-          <p>{user?.phone}</p>
+          <p>{`${address?.street_area}, ${address?.city}, ${address?.state}, ${address?.pin_code.slice(0, 3)} ${address?.pin_code.slice(3, 6)}`}</p>
+          <p>{`${user?.phone.slice(0, 3)} ${user?.phone.slice(3, 8)} ${user?.phone.slice(8, 13)}`}</p>
         </div>
       )}
 
@@ -140,9 +140,9 @@ const AddressManage = ({ handeleOpenAddressDetails }) => {
                   Primary
                 </span>
               </div>
-              <p>{`${item?.street_area}, ${item?.city}, ${item?.state}, ${item?.pin_code}`}</p>
+              <p>{`${item?.street_area}, ${item?.city}, ${item?.state}, ${item?.pin_code.slice(0, 3)} ${item?.pin_code.slice(3, 6)}`}</p>
               <div className="flex items-center justify-between">
-                <p>{user?.phone}</p>
+                <p>{`${user?.phone.slice(0, 3)} ${user?.phone.slice(3, 8)} ${user?.phone.slice(8, 13)}`}</p>
                 {!item?.isPrimary && (
                   <input
                     type="checkbox"

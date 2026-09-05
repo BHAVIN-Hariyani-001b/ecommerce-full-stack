@@ -61,12 +61,13 @@ class Products(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     images = db.relationship(
-        "ProductImage", backref="product", cascade="all, delete-orphan"
+        "ProductImage", backref="products", cascade="all, delete-orphan"
     )
 
     attributes = db.relationship(
-        "AttributeValue", backref="product", cascade="all, delete-orphan"
+        "AttributeValue", backref="products", cascade="all, delete-orphan"
     )
+    wishlists = db.relationship("Wishlist", back_populates="product")
 
     def to_dict(self):
         return {
@@ -105,6 +106,17 @@ class Products(db.Model):
             "review": ProductReview.count_rating(self.id),
             "brand": str(self.brand.name) if self.brand else None,
             "SubCategory": str(self.subcategory.name) if self.subcategory else None,
+            "image": next(
+                (img.to_dict() for img in self.images if img.is_primary), None
+            ),
+        }
+
+    def to_dict_wish(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "BPrice": float(self.Base_price),
+            "PPrice": float(self.Product_price),
             "image": next(
                 (img.to_dict() for img in self.images if img.is_primary), None
             ),

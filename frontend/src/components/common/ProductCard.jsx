@@ -1,8 +1,9 @@
-import React, { memo, useCallback, useState } from "react";
+import { memo, useState } from "react";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { FaStar, FaRegHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { BiLoaderCircle } from "react-icons/bi";
+import { FaHeart } from "react-icons/fa";
 import {
   addGuestCartItem,
   decrementQty,
@@ -13,8 +14,15 @@ import {
   decrementCartItem,
   incrementCartItem,
 } from "../../features/card/cardThunk";
-import Modal from "../common/Modal";
 import { useOutletContext } from "react-router-dom";
+import {
+  wishListAddAPI,
+  wishListFetchAPI,
+  wishListRemoveAPI,
+} from "../../features/wishlist/wishlistThunk";
+import toast from "react-hot-toast";
+import { setAuthOpen, setAuthView } from "../../features/auth/authSlice";
+import { setProductList } from "../../features/wishlist/wishlistSlice";
 
 const findCartLine = (cartItems, productId) =>
   cartItems.find(
@@ -30,6 +38,12 @@ const ProductCard = ({ item }) => {
   const user = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const cartItems = useSelector((state) => state.cart?.items) ?? [];
+  const wishListItem = useSelector(
+    (state) => state.wishlist.wishListProductList,
+  );
+  const wishListProduct = useSelector(
+    (state) => state.wishlist.wishListProduct,
+  );
   const { loadingProductId, loadingCartId, error } = useSelector(
     (state) => state.cart,
   );
@@ -43,6 +57,50 @@ const ProductCard = ({ item }) => {
   const isAddLoading = loadingProductId === item?.id;
   console.log("hello bhavin", item.id, isAddLoading);
   const isQtyLoading = isInCart && loadingCartId === cartLine?.cart_id;
+
+  const handleOnWishList = async (e, item) => {
+    e.preventDefault();
+    if (!user) {
+      dispatch(setAuthView("signin"));
+      dispatch(setAuthOpen(true));
+      return;
+    }
+
+    try {
+      await dispatch(wishListAddAPI({ user_id: user.id, product_id: item.id }));
+      await dispatch(wishListFetchAPI(user?.id)).unwrap();
+      dispatch(setProductList());
+      toast.success("wishList Add Successfully");
+    } catch {
+      toast.error("Pleace Try Again");
+    }
+  };
+
+  const handleOnClickDelete = (e, id) => {
+    e.preventDefault();
+    if (!user) {
+      dispatch(setAuthView("signin"));
+      dispatch(setAuthOpen(true));
+      return;
+    }
+
+    const wishlistEntry = wishListProduct.find(
+      (wi) => wi.product.id === id && wi.user_id === user.id,
+    );
+
+    const wishlistId = wishlistEntry?.id;
+
+    // console.log("Wishlist id:", wishlistId);
+    // console.log("Product find : " + user.id);
+
+    try {
+      dispatch(wishListRemoveAPI(wishlistId));
+      dispatch(setProductList());
+      toast.success("Remove successfully");
+    } catch {
+      toast.error("Pleace Try Again");
+    }
+  };
 
   // const handleAdd = (e) => {
   //   e.preventDefault();
@@ -100,14 +158,31 @@ const ProductCard = ({ item }) => {
       ? Math.round(((item.BPrice - item.PPrice) / item.BPrice) * 100)
       : 0;
 
+  // console.log(item.id, wishListItem);
+  // console.log("include");
+  // console.log(wishListItem.includes(item.id));
+
   return (
     <div className="shrink-0 hover:scale-102 shadow-lg duration-500 group border border-gray-300 rounded-2xl w-fit">
       <div className="w-55 max-[600px]:w-42 flex flex-col items-center p-2">
         <div className="w-55 max-[600px]:w-40 relative rounded-2xl overflow-hidden">
           {/* Wishlist */}
-          <button className="absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer">
-            <FaRegHeart />
-          </button>
+
+          {wishListItem.includes(item.id) ? (
+            <button
+              className={`absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer hover:scale-112`}
+              onClick={(e) => handleOnClickDelete(e, item.id)}
+            >
+              <FaHeart className="text-red-500" />
+            </button>
+          ) : (
+            <button
+              className={`absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer hover:scale-112`}
+              onClick={(e) => handleOnWishList(e, item)}
+            >
+              <FaRegHeart />
+            </button>
+          )}
 
           {/* Product Image */}
           <div className="h-67 max-[600px]:h-45 overflow-hidden rounded-2xl bg-gray-50 flex items-center justify-center">

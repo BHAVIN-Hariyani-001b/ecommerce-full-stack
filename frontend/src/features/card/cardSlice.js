@@ -32,7 +32,7 @@ const mapCartItem = (cartItem) => ({
   ...(cartItem.product || {}),
 });
 
-const recalculate = (state) => {
+export const recalculate = (state) => {
   const items = state.items ?? [];
 
   state.count = items.reduce((acc, i) => acc + (i.qty || 0), 0);
@@ -105,6 +105,10 @@ const cartSlice = createSlice({
       state.handlingCharge = 0;
       state.error = null;
     },
+
+    RecalculateCart: (state) => {
+      recalculate(state);
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -206,5 +210,5 @@ const cartSlice = createSlice({
 });
 
 export default cartSlice.reducer;
-export const { addGuestCartItem, decrementQty, incrementQty, clearCart } =
+export const { addGuestCartItem, decrementQty, incrementQty, clearCart, RecalculateCart } =
   cartSlice.actions;

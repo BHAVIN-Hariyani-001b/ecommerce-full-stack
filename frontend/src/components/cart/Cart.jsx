@@ -1,18 +1,20 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
-import { RiFileList2Fill } from "react-icons/ri";
-import { IoBagHandle, IoArrowForward } from "react-icons/io5";
+import { IoArrowForward } from "react-icons/io5";
 import { IoIosWarning } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { BiLoaderCircle } from "react-icons/bi";
-import { TbTruckDelivery } from "react-icons/tb";
 import {
   decrementCartItem,
   incrementCartItem,
 } from "../../features/card/cardThunk";
-import { decrementQty, incrementQty } from "../../features/card/cardSlice";
+import {
+  decrementQty,
+  incrementQty,
+  RecalculateCart
+} from "../../features/card/cardSlice";
 import { setAuthOpen, setAuthView } from "../../features/auth/authSlice";
 import toast from "react-hot-toast";
 import BillDetails from "./BillDetails";
@@ -20,10 +22,13 @@ import BillDetails from "./BillDetails";
 const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
   const items = useSelector((state) => state.cart.items) ?? [];
   // console.log(items);
-  const { basePrice, totalPrice, finalPrice, deliveryCharge, handlingCharge } =
-    useSelector((state) => state.cart);
   const user = useSelector((state) => state.auth?.user);
   const dispatch = useDispatch();
+
+  
+  useEffect(() => {
+    dispatch(RecalculateCart());
+  }, [dispatch]);
 
   const handleOpenCheckOut = useCallback(() => {
     if (items.length === 0) {

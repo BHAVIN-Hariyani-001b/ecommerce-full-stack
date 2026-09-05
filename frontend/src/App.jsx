@@ -12,6 +12,8 @@ import { productPageAPI } from "./features/productPage/ProductPageThunk";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAttributesAPI } from "./admin/features/attributes/attributesThunk";
 import { setAttributeName } from "./admin/features/attributes/attributesSlice";
+import { wishListFetchAPI } from "./features/wishlist/wishlistThunk";
+import { setProductList } from "./features/wishlist/wishlistSlice";
 
 const App = memo(function App() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,6 +28,7 @@ const App = memo(function App() {
   const isSearch = location.pathname.startsWith("/search");
   const contact = location.pathname.startsWith("/contact");
   const about = location.pathname.startsWith("/about");
+  const user = useSelector((state) => state.auth.user);
 
   const { isAdmin, isLoading } = useAdminVerify();
 
@@ -61,6 +64,11 @@ const App = memo(function App() {
   useEffect(() => {
     dispatch(fetchAttributesAPI());
   }, [dispatch]);
+
+  useEffect(() => {
+    (async () => await dispatch(wishListFetchAPI(user?.id)).unwrap())();
+    dispatch(setProductList());
+  }, [dispatch, user]);
 
   useEffect(() => {
     if (!attributes) return;

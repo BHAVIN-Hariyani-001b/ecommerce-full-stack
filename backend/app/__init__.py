@@ -10,6 +10,7 @@ from app.models.ForgotPassword import ForgotPassword
 from app.models.ProductReview import ProductReview
 from app.models.UserAddress import UserAddress
 from app.models.cartValue import CartValue
+from app.models.wishlist import Wishlist
 from app.config import Config
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
@@ -75,6 +76,7 @@ def create_app():
     from app.routes.user_route import user_bp
     from app.routes.product_review_route import product_review_bp
     from app.routes.user_address_routes import user_address_bp
+    from app.routes.wishlist_route import wishlist_bp
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -88,6 +90,7 @@ def create_app():
     app.register_blueprint(user_bp,url_prefix="/api")
     app.register_blueprint(product_review_bp,url_prefix="/api")
     app.register_blueprint(user_address_bp,url_prefix="/api")
+    app.register_blueprint(wishlist_bp,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)

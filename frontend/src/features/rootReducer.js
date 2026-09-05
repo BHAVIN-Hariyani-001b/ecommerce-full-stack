@@ -15,7 +15,8 @@ import brandReducer from "../admin/features/Brand/brandSlice.js";
 import attributeReducer from "../admin/features/attributes/attributesSlice";
 import userReducer from "../admin/features/user/userSlice";
 import reviewReducer from "../features/review/ReviewSlice";
-import userAddressReducer from "./userAddress/userAddressSlice.js"
+import userAddressReducer from "./userAddress/userAddressSlice";
+import wishlistReducer from "./wishlist/wishlistSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -37,6 +38,12 @@ const persistConfigCart = {
   whitelist: ["items", "count", "totalPrice"],
 };
 
+const persistConfigWishList = {
+  key: "wishlist",
+  storage,
+  whitelist: ["wishListProduct", "wishListProductList"],
+};
+
 const rootReducer = combineReducers({
   userCategory: persistReducer(persistConfigCategory, userCategoryReducer),
   auth: persistReducer(persistConfigAuth, authReducer),
@@ -52,7 +59,8 @@ const rootReducer = combineReducers({
   attribute: attributeReducer,
   user: userReducer,
   review: reviewReducer,
-  address : userAddressReducer,
+  address: userAddressReducer,
+  wishlist: persistReducer(persistConfigWishList, wishlistReducer),
 });
 
 export default rootReducer;

@@ -13,6 +13,7 @@ import { deleteUserAPI } from "../../admin/features/user/userThunk";
 import DeletePopup from "../../admin/components/common/DeletePopup";
 import { logout } from "../../features/auth/authSlice";
 import { GetUserAddress } from "../../features/userAddress/userAddressThunk";
+import WishList from "./WishList";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.user);
@@ -24,6 +25,7 @@ const Profile = () => {
     Profile: <UserProfileUpdate />,
     "Order History": <UserOrderHistory />,
     "Saved Address": <UserLocation />,
+    "WishList" : <WishList />
   };
 
   const PageRender = () => {
@@ -45,7 +47,7 @@ const Profile = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-3 w-full border border-gray-300 rounded-2xl h-120 max-[1000px]:flex max-[1000px]:flex-wrap overflow-auto scrollbar-none">
+      <div className="grid grid-cols-3 w-full border border-gray-300 rounded-2xl h-120 max-[1000px]:flex max-[1000px]:flex-wrap overflow-auto scrollbar-none z-20">
         <div className="w-full flex items-center justify-center">
           <ProfileSettingShow openPage={openPage} setOpenPage={setOpenPage} />
         </div>

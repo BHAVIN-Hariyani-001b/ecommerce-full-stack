@@ -4,6 +4,8 @@ import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { PiMapPinArea } from "react-icons/pi";
 import { useSelector } from "react-redux";
 import { LuMails } from "react-icons/lu";
+import { FaRegHeart } from "react-icons/fa";
+
 
 const ProfileSettingShow = ({ openPage, setOpenPage }) => {
   const ProfileList = [
@@ -18,6 +20,10 @@ const ProfileSettingShow = ({ openPage, setOpenPage }) => {
     {
       FiledName: "Saved Address",
       icon: <PiMapPinArea size={20} />,
+    },
+    {
+      FiledName: "WishList",
+      icon: <FaRegHeart size={17} />,
     },
   ];
 

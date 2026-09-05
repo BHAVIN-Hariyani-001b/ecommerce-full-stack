@@ -19,6 +19,8 @@ const initialState = {
   authView: "signin",
   authOpen: false,
   forgotPassword: false,
+
+  logout: false,
 };
 
 const pickUser = (data) => data?.user;
@@ -56,6 +58,10 @@ const authSlice = createSlice({
 
     setAuthOpen: (state, action) => {
       state.authOpen = action.payload;
+    },
+
+    setLogOut: (state, action) => {
+      state.logout = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -155,4 +161,5 @@ export const {
   setAuthOpen,
   setForgotPassword,
   setAuthView,
+  setLogOut,
 } = authSlice.actions;
