@@ -68,6 +68,8 @@ class Products(db.Model):
         "AttributeValue", backref="products", cascade="all, delete-orphan"
     )
     wishlists = db.relationship("Wishlist", back_populates="product")
+    orders_item = db.relationship("OrderItem", back_populates="product")
+
 
     def to_dict(self):
         return {

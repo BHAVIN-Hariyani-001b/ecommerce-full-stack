@@ -21,6 +21,10 @@ const WishList = () => {
   const closeModal = useCallback(() => dispatch(setLogOut(false)), [dispatch]);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     (async () => await dispatch(wishListFetchAPI(user?.id)).unwrap())();
     dispatch(setProductList());
   }, [dispatch, user]);

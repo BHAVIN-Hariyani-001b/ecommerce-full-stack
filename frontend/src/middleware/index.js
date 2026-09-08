@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import { logout } from "../features/auth/authSlice";
+import { clearAddress } from "../features/userAddress/userAddressSlice";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api/",
@@ -40,6 +41,7 @@ api.interceptors.response.use(
         toast.error("Session expired. Please login again.");
         if (store) {
           store.dispatch(logout());
+          store.dispatch(clearAddress());
         }
         setTimeout(() => {
           window.location.href = "/";

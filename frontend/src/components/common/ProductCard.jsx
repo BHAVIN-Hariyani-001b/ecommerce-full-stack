@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo } from "react";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { FaStar, FaRegHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -170,14 +170,14 @@ const ProductCard = ({ item }) => {
 
           {wishListItem.includes(item.id) ? (
             <button
-              className={`absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer hover:scale-112`}
+              className={`absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer hover:scale-112 transition-transform duration-300`}
               onClick={(e) => handleOnClickDelete(e, item.id)}
             >
               <FaHeart className="text-red-500" />
             </button>
           ) : (
             <button
-              className={`absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer hover:scale-112`}
+              className={`absolute right-2 top-2 z-1 rounded-full bg-white/50 border border-gray-200 p-3 cursor-pointer hover:scale-112 transition-transform duration-300`}
               onClick={(e) => handleOnWishList(e, item)}
             >
               <FaRegHeart />

@@ -16,7 +16,7 @@ class AttributeValue(db.Model):
     value = db.Column(db.String(255), nullable=False)
 
     attribute = db.relationship('Attribute', back_populates='values')
-
+   
     def to_dict(self):
         return {
             'id': self.id,

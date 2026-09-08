@@ -27,6 +27,7 @@ class UserAddress(db.Model):
     user = db.relationship(
         "User", backref=db.backref("user_address", passive_deletes=True)
     )
+    orders = db.relationship('Orders', back_populates='address') 
 
     def to_dict(self):
         return {

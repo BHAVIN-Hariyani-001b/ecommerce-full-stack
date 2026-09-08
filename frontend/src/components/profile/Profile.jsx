@@ -14,6 +14,7 @@ import DeletePopup from "../../admin/components/common/DeletePopup";
 import { logout } from "../../features/auth/authSlice";
 import { GetUserAddress } from "../../features/userAddress/userAddressThunk";
 import WishList from "./WishList";
+import { clearAddress } from "../../features/userAddress/userAddressSlice";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.user);
@@ -25,7 +26,7 @@ const Profile = () => {
     Profile: <UserProfileUpdate />,
     "Order History": <UserOrderHistory />,
     "Saved Address": <UserLocation />,
-    "WishList" : <WishList />
+    WishList: <WishList />,
   };
 
   const PageRender = () => {
@@ -35,6 +36,7 @@ const Profile = () => {
   const handleOnDeleteAccount = useCallback(() => {
     dispatch(logoutUser());
     dispatch(logout());
+    dispatch(clearAddress());
     toast.success("logout successfully");
     dispatch(deleteUserAPI(delteId));
     toast.success("Delete Account successfully");

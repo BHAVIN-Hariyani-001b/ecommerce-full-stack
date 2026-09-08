@@ -12,7 +12,7 @@ export const wishListFetchAPI = createAsyncThunk(
       const response = await wishProductFetch(id);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data.messagee);
+      return rejectWithValue(error.response?.data.message);
     }
   },
 );
@@ -24,7 +24,7 @@ export const wishListAddAPI = createAsyncThunk(
       const response = await wishListAdd({ user_id, product_id });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data.messagee);
+      return rejectWithValue(error.response?.data.message);
     }
   },
 );
@@ -37,7 +37,7 @@ export const wishListRemoveAPI = createAsyncThunk(
       return response;
     } catch (error) {
       console.log(error);
-      return rejectWithValue(error.response?.data?.messagee);
+      return rejectWithValue(error.response?.data?.message);
     }
   },
 );

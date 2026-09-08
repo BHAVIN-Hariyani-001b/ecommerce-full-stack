@@ -6,6 +6,7 @@ import { FaRegCircleUser } from "react-icons/fa6";
 import { logoutUser } from "../../features/auth/authThunk";
 import Profile from "../profile/Profile";
 import AdminProfile from "../profile/AdminProfile";
+import { clearAddress } from "../../features/userAddress/userAddressSlice";
 
 const Logout = memo(function Logout() {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ const Logout = memo(function Logout() {
   const handleLogout = useCallback(() => {
     dispatch(logoutUser());
     dispatch(logout());
+    dispatch(clearAddress())
     dispatch(setLogOut(false));
   }, [dispatch]);
 

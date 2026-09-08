@@ -66,6 +66,10 @@ const App = memo(function App() {
   }, [dispatch]);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     (async () => await dispatch(wishListFetchAPI(user?.id)).unwrap())();
     dispatch(setProductList());
   }, [dispatch, user]);

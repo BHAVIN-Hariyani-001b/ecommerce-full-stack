@@ -26,8 +26,11 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(saEnum(userRole), default=userRole.USER, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-    wishlists = db.relationship("Wishlist", back_populates="user")
 
+    wishlists = db.relationship("Wishlist", back_populates="user")
+    orders = db.relationship("Orders", back_populates="user")    
+    payments = db.relationship("Payment", back_populates="user")
+    
     @validates("username")
     def validate_username(self, key, username):
         username = username.strip()

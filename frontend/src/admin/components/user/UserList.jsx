@@ -65,7 +65,7 @@ const UserList = ({ searchQuery, openAddUser, userRole }) => {
       headerName: "Phone Number",
       type: "number",
       width: 200,
-      renderCell: (params) => (params.value ? `₹${params.value}` : "—"),
+      renderCell: (params) => (params.value ? `${params.value.slice(0,3)} ${params.value.slice(3,8)} ${params.value.slice(8)}` : "—"),
     },
 
     {
