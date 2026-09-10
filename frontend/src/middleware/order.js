@@ -1,22 +1,9 @@
 import api from "./index";
 
-export const createOrder = async ({
-  user_id,
-  product_id,
-  attribute_id,
-  address_id,
-  qty,
-  total_amount,
-  PPrice,
-}) => {
+export const createOrder = async ({ user_id, address_id }) => {
   const response = await api.post("/order/create", {
     user_id,
-    product_id,
-    attribute_id,
     address_id,
-    qty,
-    total_amount,
-    PPrice,
   });
   return response.data;
 };

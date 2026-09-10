@@ -53,7 +53,7 @@ export const recalculate = (state) => {
   state.deliveryCharge = Number(delivery.toFixed(2));
   state.handlingCharge = Number(handling.toFixed(2));
   state.finalPrice = Number(
-    (state.totalPrice + delivery + handling).toFixed(2),
+    (state.totalPrice + handling).toFixed(2),
   );
 };
 

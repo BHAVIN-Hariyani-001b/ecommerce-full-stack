@@ -3,6 +3,7 @@ from app.models.orders import Orders
 from app.models.orderItem import OrderItem
 from app.models.users import User
 from app.models.product import Products
+from app.models.cart import Cart
 from app.db import db
 from sqlalchemy import select
 
@@ -16,11 +17,7 @@ def create_order():
 
         required_fields = [
             "user_id",
-            "product_id",
-            "attribute_id",
             "address_id",
-            "qty",
-            "total_amount",
         ]
         missing = [f for f in required_fields if f not in data]
         if missing:
@@ -35,62 +32,83 @@ def create_order():
             )
 
         user_id = data.get("user_id")
-        product_id = data.get("product_id")
-        attribute_id = data.get("attribute_id")
         address_id = data.get("address_id")
-        qty = data.get("qty")
-        total_amount = data.get("total_amount")
-        PPrice = data.get("PPrice")
 
-        try:
-            qty = int(data.get("qty"))
-            if qty < 1:
-                raise ValueError
-        except (TypeError, ValueError):
+        cart_items = db.session.scalars(
+            select(Cart).where(Cart.user_id == user_id)
+        ).all()
+
+        print(cart_items)
+
+        if not cart_items:
             return (
                 jsonify(
-                    {"message": "qty must be a positive integer", "success": False}
+                    {
+                        "message": "Cart is empty",
+                        "success": False,
+                    }
                 ),
                 400,
             )
 
-        total_amount = float(data.get("total_amount"))
-        if total_amount <= 0:
-            return (
-                jsonify(
-                    {"message": "total_amount must be greater than 0", "success": False}
-                ),
-                400,
-            )
+        total_amount = 0
+        products = []
 
-        product = db.session.get(Products, product_id)
-        # print(product)
-        if not product:
-            return jsonify({"message": "Invalid product_id", "success": False}), 400
+        for cart_item in cart_items:
+            product = db.session.get(Products, cart_item.product.id)
 
-        if product.qty < qty:
-            return jsonify({"message": "Insufficient stock", "success": False}), 400
+            if not product:
+                return jsonify({"message": "Invalid product_id", "success": False}), 400
+
+            if product.qty < cart_item.qty:
+                return (
+                    jsonify(
+                        {
+                            "message": f"Insufficient stock for {product.name}",
+                            "success": False,
+                        }
+                    ),
+                    400,
+                )
+
+            total_amount += product.Product_price * cart_item.qty
+
+            products.append({"cart_item": cart_item, "product": product})
+
+
+        
+        def total_count(total):
+            return total + (total * 2 / 100)
 
         order = Orders(
             user_id=user_id,
             address_id=address_id,
-            total_amount=total_amount,
+            total_amount=total_count(total_amount),
         )
-
-        product.qty -= qty
 
         db.session.add(order)
         db.session.commit()
 
-        order_item = OrderItem(
-            order_id=order.id,
-            product_id=product_id,
-            attribute_id=attribute_id,
-            qty=qty,
-            price_at_purchase=PPrice,
-        )
+        for item in products:
+            cart_item = item.get("cart_item")
+            product = item.get("product")
 
-        db.session.add(order_item)
+            order_item = OrderItem(
+                order_id=order.id,
+                product_id=product.id,
+                attribute_id=f"{[str(j.attribute_value_id) for j in cart_item.values]}",
+                qty=cart_item.qty,
+                price_at_purchase=product.Product_price,
+            )
+
+            product.qty -= cart_item.qty
+
+            db.session.add(order_item)
+            db.session.commit()
+
+        for cart_item in cart_items:
+            db.session.delete(cart_item)
+
         db.session.commit()
 
         return (
@@ -113,7 +131,7 @@ def create_order():
 @order_bp.route("/order/<uuid:id>", methods=["GET"])
 def get_order(id):
     try:
-        existing = db.session.get(Orders,id)
+        existing = db.session.get(Orders, id)
 
         if not existing:
             return jsonify({"message": "Order Not Found", "success": False}), 404

@@ -32,27 +32,11 @@ export const getOrderAPI = createAsyncThunk(
 
 export const createOrderAPI = createAsyncThunk(
   "orders/createOrderAPI",
-  async (
-    {
-      user_id,
-      product_id,
-      attribute_id,
-      address_id,
-      qty,
-      total_amount,
-      PPrice,
-    },
-    { rejectWithValue },
-  ) => {
+  async ({ user_id, address_id }, { rejectWithValue }) => {
     try {
       const response = await createOrder({
         user_id,
-        product_id,
-        attribute_id,
         address_id,
-        qty,
-        total_amount,
-        PPrice,
       });
       return response;
     } catch (error) {
