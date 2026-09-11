@@ -32,15 +32,21 @@ export const getOrderAPI = createAsyncThunk(
 
 export const createOrderAPI = createAsyncThunk(
   "orders/createOrderAPI",
-  async ({ user_id, address_id }, { rejectWithValue }) => {
+  async ({ user_id, address_id, payment_method }, { rejectWithValue }) => {
     try {
       const response = await createOrder({
         user_id,
         address_id,
+        payment_method,
       });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data.message);
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to create order",
+      );
     }
   },
 );

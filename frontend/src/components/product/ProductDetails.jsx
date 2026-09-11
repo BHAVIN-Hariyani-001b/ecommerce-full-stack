@@ -14,7 +14,6 @@ import {
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { BiLoaderCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 
 const findCartLine = (cartItems, productId) =>
   cartItems.find(

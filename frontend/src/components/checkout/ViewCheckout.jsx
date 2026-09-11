@@ -5,6 +5,10 @@ import OrderConfirmation from "./OrderConfirmation";
 
 const ViewCheckout = ({ checkOut, setCheckOut }) => {
   const [action, setAction] = useState("order");
+  const [orderResult, setOrderResult] = useState(null);
+
+  console.log(orderResult);
+
   const steps = {
     order: (
       <PlaceOrder
@@ -13,8 +17,18 @@ const ViewCheckout = ({ checkOut, setCheckOut }) => {
         setAction={setAction}
       />
     ),
-    payment: <PaymentGateway setAction={setAction} />,
-    confirmation: <OrderConfirmation />,
+    payment: (
+      <PaymentGateway
+        setAction={setAction}
+        setOrderResult={setOrderResult}
+      />
+    ),
+    confirmation: (
+      <OrderConfirmation
+        orderResult={orderResult}
+        setCheckOut={setCheckOut}
+      />
+    ),
   };
 
   return <div>{steps[action]}</div>;

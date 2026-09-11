@@ -3,6 +3,8 @@ import { GrDeliver } from "react-icons/gr";
 import { VscDebugRestart } from "react-icons/vsc";
 import { IoIosArrowForward } from "react-icons/io";
 import { LuPackageCheck } from "react-icons/lu";
+import { IoIosCloseCircle } from "react-icons/io";
+import { MdPendingActions } from "react-icons/md";
 
 const STATUS_META = {
   shipped: {
@@ -17,11 +19,44 @@ const STATUS_META = {
     text: "text-green-500",
     border: "border-green-500",
   },
+  cancelled: {
+    label: "CANCELLED",
+    icon: IoIosCloseCircle,
+    text: "text-red-400",
+    border: "border-red-400",
+  },
+  confirmed: {
+    label: "CONFIRMED",
+    icon: LuPackageCheck,
+    text: "text-yellow-400",
+    border: "border-yellow-400",
+  },
+  pending: {
+    label: "PENDING",
+    icon: MdPendingActions,
+    text: "text-gray-400",
+    border: "border-gray-400",
+  },
 };
 
 const ORDERS = [
   {
     id: "0587",
+    date: "Aug 5, 2026",
+    status: "cancelled",
+    items: [
+      {
+        name: "Oversized Cotton T-Shirt",
+        category: "Fashion",
+        color: "Black",
+        size: "L",
+        qty: 1,
+        price: 24,
+      },
+    ],
+  },
+  {
+    id: "0580",
     date: "Aug 5, 2026",
     status: "shipped",
     items: [
@@ -38,7 +73,7 @@ const ORDERS = [
   {
     id: "0562",
     date: "Jul 22, 2026",
-    status: "delivered",
+    status: "confirmed",
     items: [
       {
         name: "Slim Fit Denim Jeans",
@@ -75,7 +110,7 @@ const ORDERS = [
   {
     id: "0519",
     date: "Jun 24, 2026",
-    status: "delivered",
+    status: "pending",
     items: [
       {
         name: "Smart LED Desk Lamp",
@@ -92,6 +127,9 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "shipped", label: "Shipped" },
   { key: "delivered", label: "Delivered" },
+  { key: "pending", label: "Pending" },
+  { key: "cancelled", label: "Cancelled" },
+  { key: "confirmed", label: "Confirmed" },
 ];
 
 function orderTotal(order) {

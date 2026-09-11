@@ -25,7 +25,21 @@ def get_product(id) -> Response:
         if not product:
             return jsonify({"message": "Product not found"}), 404
 
-        return jsonify({"message": "success", "product": product.to_dict_product_page()}), 200
+        if product.qty <= 1:
+            return (
+                jsonify(
+                    {
+                        "message": "Insufficient stock",
+                        "success": False,
+                    }
+                ),
+                400,
+            )
+
+        return (
+            jsonify({"message": "success", "product": product.to_dict_product_page()}),
+            200,
+        )
     except Exception as e:
         return (
             jsonify(
@@ -441,12 +455,9 @@ def update_product(id) -> Response:
 
             db.session.add(
                 AttributeValue(
-                    p_id=existing.id,
-                    value=i.get("value"),
-                    a_id=attribute.id
+                    p_id=existing.id, value=i.get("value"), a_id=attribute.id
                 )
             )
-
 
         # remove deleted attributes
         remove_attr_ids = request.form.getlist("removeAttributes[]")
@@ -487,7 +498,9 @@ def delete_product(id):
         print(id)
         existing = db.session.get(Products, str(id))
 
-        ProductReview.query.filter_by(product_id=str(id)).delete(synchronize_session=False)
+        ProductReview.query.filter_by(product_id=str(id)).delete(
+            synchronize_session=False
+        )
 
         if not existing:
             return jsonify({"error": "Product not found"}), 404
@@ -522,7 +535,7 @@ def get_products():
         if role == "admin":
             return jsonify({"products": [i.to_dict() for i in products]})
 
-        return jsonify({"products": [i.to_dict() for i in products]})
+        return jsonify({"products": [i.to_dict() for i in products if i.qty >= 1]})
     except Exception as e:
         return (
             jsonify(
@@ -540,6 +553,7 @@ def get_products_page():
     try:
         products = (
             db.session.query(Products)
+            .filter(Products.qty >= 1)
             .options(
                 joinedload(Products.category),
                 joinedload(Products.images),

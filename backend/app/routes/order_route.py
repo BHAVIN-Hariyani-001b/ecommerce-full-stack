@@ -1,11 +1,13 @@
 from flask import Blueprint, jsonify, request
-from app.models.orders import Orders
+from app.models.orders import Orders, OrderStatus
 from app.models.orderItem import OrderItem
 from app.models.users import User
 from app.models.product import Products
 from app.models.cart import Cart
+from app.models.payment import Payment, PaymentMethod, PaymentStatus
 from app.db import db
 from sqlalchemy import select
+from decimal import Decimal
 
 order_bp = Blueprint("order", __name__)
 
@@ -33,12 +35,11 @@ def create_order():
 
         user_id = data.get("user_id")
         address_id = data.get("address_id")
+        payment_method = (data.get("payment_method") or "cod").lower()
 
         cart_items = db.session.scalars(
             select(Cart).where(Cart.user_id == user_id)
         ).all()
-
-        print(cart_items)
 
         if not cart_items:
             return (
@@ -51,7 +52,7 @@ def create_order():
                 400,
             )
 
-        total_amount = 0
+        total_amount = Decimal("0")
         products = []
 
         for cart_item in cart_items:
@@ -71,23 +72,27 @@ def create_order():
                     400,
                 )
 
-            total_amount += product.Product_price * cart_item.qty
+            total_amount += Decimal(str(product.Product_price)) * cart_item.qty
 
             products.append({"cart_item": cart_item, "product": product})
 
-
-        
         def total_count(total):
-            return total + (total * 2 / 100)
+            return total + (total * Decimal("2") / Decimal("100"))
 
+        order_total = total_count(total_amount)
         order = Orders(
             user_id=user_id,
             address_id=address_id,
-            total_amount=total_count(total_amount),
+            total_amount=order_total,
+            status=(
+                OrderStatus.CONFIRMED
+                if payment_method == "cod"
+                else OrderStatus.PENDING
+            ),
         )
 
         db.session.add(order)
-        db.session.commit()
+        db.session.flush()
 
         for item in products:
             cart_item = item.get("cart_item")
@@ -104,7 +109,17 @@ def create_order():
             product.qty -= cart_item.qty
 
             db.session.add(order_item)
-            db.session.commit()
+
+        if payment_method == "cod":
+            db.session.add(
+                Payment(
+                    order_id=order.id,
+                    user_id=user_id,
+                    method=PaymentMethod.COD,
+                    status=PaymentStatus.PENDING,
+                    amount_paid=order_total,
+                )
+            )
 
         for cart_item in cart_items:
             db.session.delete(cart_item)

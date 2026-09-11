@@ -38,6 +38,6 @@ class Orders(db.Model):
             "id": self.id,
             "address": self.address.to_dict(),
             "status": self.status.value,
-            "total_amount": self.total_amount,
+            "total_amount": float(self.total_amount),
             "order_item" :  [i.to_dict() for i in self.order_item]
         }
