@@ -6,8 +6,8 @@ const MathOverviewCard = memo(function MathOverviewCard({
   icon,
 }) {
   return (
-    <div className="bg-white p-4 w-50 cursor-pointer h-25 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 ease-in-out delay-100">
-      <div className="flex items-center justify-between">
+    <div className="bg-white p-4 min-w-40 max-w-full cursor-pointer h-25 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 ease-in-out delay-100">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex items-center justify-between gap-2 w-full">
           <h2 className="text-[12px]">{title}</h2>
           <div className="text text-blue-800 font-extrabold">{icon}</div>

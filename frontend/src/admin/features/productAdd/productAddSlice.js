@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   addProduct,
   deleteProductAPI,
+  manageStockAPI,
   ProductGet,
   UpdateProductAPI,
 } from "./productAddThunk";
@@ -89,6 +90,27 @@ const productAddSlice = createSlice({
         state.products = state.products.filter((p) => p.id !== action.meta.arg);
       })
       .addCase(deleteProductAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // change to the product stock
+
+      .addCase(manageStockAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(manageStockAPI.fulfilled, (state, action) => {
+        state.loading = false;
+
+        const id = String(action.payload?.data?.id ?? "");
+        const index = state.products.findIndex(
+          (p) => String(p.id ?? p._id) === id,
+        );
+
+        if (index !== -1) state.products[index].qty = action.payload?.data?.qty;
+      })
+      .addCase(manageStockAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -233,7 +233,9 @@ const PaymentGateway = ({ setAction, setOrderResult }) => {
       if (paymentMethod === "cod") {
         toast.success("Order placed successfully");
         setAction("confirmation");
+        
         setIsPaying(false);
+        await dispatch(fetchCartItem(user.id));
         return;
       }
 

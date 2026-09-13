@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 from app.models.orders import Orders, OrderStatus
 from app.models.orderItem import OrderItem
-from app.models.users import User
+from app.models.users import User, userRole
 from app.models.product import Products
 from app.models.cart import Cart
 from app.models.payment import Payment, PaymentMethod, PaymentStatus
 from app.db import db
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from decimal import Decimal
 
 order_bp = Blueprint("order", __name__)
@@ -179,17 +179,22 @@ def get_all_order(id):
 
         print(existing_user)
 
-        if existing_user.role == "admin":
-            orders = db.session.scalars(select(Orders)).all()
+        role_value = (
+            existing_user.role.value
+            if hasattr(existing_user.role, "value")
+            else existing_user.role
+        )
+
+        if role_value == userRole.ADMIN.value or existing_user.role == userRole.ADMIN:
+            orders = db.session.scalars(
+                select(Orders).order_by(Orders.create_at.desc())
+            ).all()
         else:
             orders = db.session.scalars(
                 select(Orders).where(Orders.user_id == existing_user.id)
             ).all()
 
         print(orders)
-
-        if not orders:
-            return jsonify({"message": "Order not found", "success": False}), 404
 
         return (
             jsonify(
@@ -238,4 +243,29 @@ def update_order_status(id):
 
     except Exception as e:
         db.session.rollback()
+        return jsonify({"message": "Something went wrong", "success": False}), 500
+
+
+@order_bp.route("/order/get/summary", methods=["GET"])
+def get_summary():
+    try:
+        orders = db.session.scalars(
+            select(Orders).order_by(Orders.create_at.desc()).limit(3)
+        ).all()
+
+        if not orders:
+            return jsonify({"message": "Order Not Found", "success": False}), 404
+
+        return (
+            jsonify(
+                {
+                    "message": "Orders retrieved successfully",
+                    "success": True,
+                    "data": [order.to_dict_() for order in orders],
+                }
+            ),
+            200,
+        )
+    except Exception as e:
+        print(e)
         return jsonify({"message": "Something went wrong", "success": False}), 500

@@ -9,17 +9,22 @@ export const createOrder = async ({ user_id, address_id, payment_method }) => {
   return response.data;
 };
 
-export const changeOrderStatus = async ({ status }) => {
-  const response = await api.patch("/order/status/", { status });
+export const changeOrderStatus = async ({ order_id, status }) => {
+  const response = await api.patch(`/order/status/${order_id}`, { status });
   return response.data;
 };
 
-export const getOneOrder = async ({ user_id }) => {
-  const response = await api.get("/order/get/", { user_id });
+export const getOneOrder = async ({ order_id }) => {
+  const response = await api.get(`/order/${order_id}`);
   return response.data;
 };
 
-export const getOrder = async () => {
-  const response = await api.get("/order");
+export const getOrder = async ({ user_id }) => {
+  const response = await api.get(`/order/get/${user_id}`);
+  return response.data;
+};
+
+export const getSummary = async () => {
+  const response = await api.get("/order/get/summary");
   return response.data;
 };

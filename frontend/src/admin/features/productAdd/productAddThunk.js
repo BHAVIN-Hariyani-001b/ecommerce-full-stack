@@ -3,6 +3,7 @@ import {
   addProductRequest,
   deleteProductRequest,
   getProductRequest,
+  manageStock,
   updateProductRequest,
 } from "../../middleware/productApi";
 
@@ -54,6 +55,22 @@ export const deleteProductAPI = createAsyncThunk(
       return response.data;
     } catch {
       return rejectWithValue("Failed to delete product");
+    }
+  },
+);
+
+export const manageStockAPI = createAsyncThunk(
+  "productAdd/manageStockAPI",
+  async ({ id, newqty }, { rejectWithValue }) => {
+    try {
+      const response = await manageStock({ id, newqty });
+      return response;
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to Update product Stock";
+      return rejectWithValue(message);
     }
   },
 );

@@ -548,6 +548,50 @@ def get_products():
         )
 
 
+@product_bp.route("/order/stock/manage/<uuid:id>", methods=["PATCH"])
+def manage_stock(id):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"message": "Data Are required", "success": False}), 400
+
+        product = db.session.get(Products, str(id))
+
+        if not product:
+            return jsonify({"message": "Product not found", "success": False}), 404
+
+        try:
+            newqty = int(data.get("newqty"))
+        except (TypeError, ValueError):
+            return jsonify({"message": "newqty must be a number", "success": False}), 400
+
+        if newqty < 0:
+            return jsonify({"message": "Quantity cannot be negative", "success": False}), 400
+
+        product.qty = newqty
+        db.session.commit()
+
+        return jsonify(
+            {
+                "message": "Product stock update successfully",
+                "data": {"id": product.id, "qty": product.qty},
+                "success": True,
+            }
+        )
+
+    except Exception as e:
+        return (
+            jsonify(
+                {
+                    "message": "An error occurred while updating product stock",
+                    "error": str(e),
+                }
+            ),
+            500,
+        )
+
+
 @product_bp.route("/products/homepage/product-summary")
 def get_products_page():
     try:

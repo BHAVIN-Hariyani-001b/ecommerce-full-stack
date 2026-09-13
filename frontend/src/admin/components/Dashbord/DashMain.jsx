@@ -9,7 +9,7 @@ const DashMain = memo(function DashMain({ setActivePage }) {
     <div>
       <Overview />
       <QuickActions setActivePage={setActivePage} />
-      <RecentOrder />
+      <RecentOrder setActivePage={setActivePage} />
     </div>
   );
 });

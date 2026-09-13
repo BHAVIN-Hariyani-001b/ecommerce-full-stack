@@ -4,28 +4,40 @@ import {
   createOrder,
   getOneOrder,
   getOrder,
+  getSummary,
 } from "../../middleware/order";
 
 export const getOrderOneAPI = createAsyncThunk(
   "orders/getOrderOneAPI",
-  async ({ user_id }, { rejectWithValue }) => {
+  async ({ order_id }, { rejectWithValue }) => {
     try {
-      const response = await getOneOrder({ user_id });
+      const response = await getOneOrder({ order_id });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch order",
+      );
     }
   },
 );
 
 export const getOrderAPI = createAsyncThunk(
   "orders/getOrderAPI",
-  async (_, { rejectWithValue }) => {
+  async (arg, { getState, rejectWithValue }) => {
     try {
-      const response = await getOrder();
+      const user_id =
+        (typeof arg === "object" && arg?.user_id) || getState().auth?.user?.id;
+
+      if (!user_id) {
+        return rejectWithValue("User not logged in");
+      }
+
+      const response = await getOrder({ user_id });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch orders",
+      );
     }
   },
 );
@@ -53,12 +65,28 @@ export const createOrderAPI = createAsyncThunk(
 
 export const changeOrderStatusAPI = createAsyncThunk(
   "orders/changeOrderStatusAPI",
-  async ({ status }, { rejectWithValue }) => {
+  async ({ order_id, status }, { rejectWithValue }) => {
     try {
-      const response = await changeOrderStatus({ status });
+      const response = await changeOrderStatus({ order_id, status });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update order status",
+      );
+    }
+  },
+);
+
+export const getOrderSummaryAPI = createAsyncThunk(
+  "orders/getOrderSummaryAPI",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getSummary();
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update order status",
+      );
     }
   },
 );

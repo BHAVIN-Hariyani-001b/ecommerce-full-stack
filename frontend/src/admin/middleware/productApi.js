@@ -19,3 +19,8 @@ export const deleteProductRequest = async (id) => {
   const response = await api.delete(`/product/delete/${id}`);
   return response.data;
 };
+
+export const manageStock = async ({ id, newqty }) => {
+  const response = await api.patch(`/order/stock/manage/${id}`, { newqty });
+  return response.data;
+};

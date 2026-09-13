@@ -4,16 +4,18 @@ import {
   createOrderAPI,
   getOrderAPI,
   getOrderOneAPI,
+  getOrderSummaryAPI,
 } from "./orderThunk";
 
 const initialState = {
   loading: false,
   error: null,
   order: [],
-  orderOne: [],
+  orderSummary: [],
+  orderOne: null,
 };
 
-createSlice({
+const orderSlice = createSlice({
   name: "orders",
   initialState,
   reducers: {},
@@ -26,7 +28,7 @@ createSlice({
       })
       .addCase(getOrderOneAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.orderOne = action.payload?.data;
+        state.orderOne = action.payload?.data ?? null;
       })
       .addCase(getOrderOneAPI.rejected, (state, action) => {
         state.error = action.payload;
@@ -40,30 +42,31 @@ createSlice({
       })
       .addCase(getOrderAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.order = action.payload.data;
+        state.order = action.payload?.data ?? [];
       })
       .addCase(getOrderAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.order = [];
       })
 
       // create order
-
       .addCase(createOrderAPI.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createOrderAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.order.push(action.payload?.data);
+        if (action.payload?.data) {
+          state.order.push(action.payload.data);
+        }
       })
-      .addCase(createOrderAPI.pending, (state, action) => {
+      .addCase(createOrderAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      //   status chane
-
+      // status change
       .addCase(changeOrderStatusAPI.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -76,10 +79,29 @@ createSlice({
         if (index !== -1) {
           state.order[index] = orderData;
         }
+        if (state.orderOne?.id == orderData?.id) {
+          state.orderOne = orderData;
+        }
       })
       .addCase(changeOrderStatusAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // get summary
+      .addCase(getOrderSummaryAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOrderSummaryAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderSummary = action.payload?.data ?? [];
+      })
+      .addCase(getOrderSummaryAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
+
+export default orderSlice.reducer;

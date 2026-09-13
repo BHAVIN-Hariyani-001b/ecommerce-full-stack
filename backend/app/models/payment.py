@@ -50,3 +50,26 @@ class Payment(db.Model):
 
     orders = db.relationship("Orders", back_populates="payments")
     user = db.relationship("User", back_populates="payments")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "order_id": self.order_id,
+            "user_id": self.user_id,
+            "user": self.user.to_dict(),
+            "method": self.method.value if self.method else None,
+            "status": self.status.value if self.status else None,
+            "amount_paid": (
+                float(self.amount_paid) if self.amount_paid is not None else 0
+            ),
+            "amount_refunded": (
+                float(self.amount_refunded) if self.amount_refunded is not None else 0
+            ),
+            "razorpay_order_id": self.razorpay_order_id,
+            "razorpay_payment_id": self.razorpay_payment_id,
+            "razorpay_refund_id": self.razorpay_refund_id,
+            "failure_reason": self.failure_reason,
+            "paid_at": self.paid_at.isoformat() if self.paid_at else None,
+            "create_at": self.create_at.isoformat() if self.create_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }

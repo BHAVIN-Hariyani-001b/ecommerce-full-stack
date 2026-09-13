@@ -12,17 +12,25 @@ import Product from "../../components/product_show/Product";
 import BrandAdd from "../../components/brand/BrandAdd";
 import ShowUser from "../../components/user/ShowUser";
 import AddAttributes from "../../components/attribute/AddAttributes";
+import Order from "../../components/order_manage/order";
+import Analytics from "../../components/Analytics/Analytics";
+import SalesReport from "../../components/Analytics/SalesReport";
 
-import { MdDashboard } from "react-icons/md";
+import { MdDashboard, MdShoppingCart } from "react-icons/md";
 import { FaBoxArchive } from "react-icons/fa6";
-import { MdShoppingCart } from "react-icons/md";
 import { AiFillSetting } from "react-icons/ai";
+import Payment from "../../components/manage_payment/Payment";
 
 const DashMain = lazy(() => import("../../components/Dashbord/DashMain"));
 // const AddProduct = lazy(() => import("../../components/AddProduct"));
 
 const Dashboard = memo(function Dashboard() {
-  const isAdmin = useSelector((state) => state.auth?.isAdmin);
+  const isAdmin = useSelector(
+    (state) =>
+      state.auth?.isAdmin ||
+      state.auth?.user?.role === "admin" ||
+      state.auth?.userRole === "admin",
+  );
   const [activePage, setActivePage] = useState("dashboard");
   // console.log(activePage);
 
@@ -70,15 +78,21 @@ const Dashboard = memo(function Dashboard() {
         ) : (
           <Container setActivePage={setActivePage}>
             {activePage === "Category" && <Category />}
-            {activePage == "products" && (
+            {activePage === "products" && (
               <Product setActivePage={setActivePage} />
             )}
-            {activePage == "Add Product" && (
+            {activePage === "Add Product" && (
               <AddProduct setActivePage={setActivePage} />
             )}
-            {activePage == "Brand" && <BrandAdd />}
-            {activePage == "User" && <ShowUser />}
-            {activePage == "Attribute" && <AddAttributes />}
+            {activePage === "Brand" && <BrandAdd />}
+            {activePage === "User" && <ShowUser />}
+            {activePage === "Attribute" && <AddAttributes />}
+            {(activePage === "orders" || activePage === "View Orders") && (
+              <Order />
+            )}
+            {activePage === "Analytics" && <Analytics />}
+            {activePage === "Sales Report" && <SalesReport />}
+            {activePage === "Payments" && <Payment />}
           </Container>
         )}
         <SideBar

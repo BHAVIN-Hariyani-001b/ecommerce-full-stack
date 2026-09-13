@@ -2,16 +2,16 @@ import React, { memo } from "react";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 
-
 const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
   const SideBarMenuItem = [
-    "Inventory",
-    "Sales Report",
     "View Orders",
     "Category",
     "Brand",
     "User",
-    "Attribute"
+    "Attribute",
+    "Sales Report",
+    "Analytics",
+    "Payments",
   ];
 
   return (
@@ -34,7 +34,10 @@ const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
               onClick={() => setSideBar(false)}
               className="p-2 rounded-full hover:bg-gray-200 transition-all duration-300 cursor-pointer"
             >
-              <IoClose size={30} className="hover:rotate-90 transition-all duration-300" />
+              <IoClose
+                size={30}
+                className="hover:rotate-90 transition-all duration-300"
+              />
             </button>
           </div>
         </div>

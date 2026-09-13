@@ -17,6 +17,8 @@ import userReducer from "../admin/features/user/userSlice";
 import reviewReducer from "../features/review/ReviewSlice";
 import userAddressReducer from "./userAddress/userAddressSlice";
 import wishlistReducer from "./wishlist/wishlistSlice";
+import orderReducer from "./orders/orderSlice";
+import paymentReducer from "../admin/features/payment/paymentSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -61,6 +63,8 @@ const rootReducer = combineReducers({
   review: reviewReducer,
   address: userAddressReducer,
   wishlist: persistReducer(persistConfigWishList, wishlistReducer),
+  orders: orderReducer,
+  payment: paymentReducer,
 });
 
 export default rootReducer;

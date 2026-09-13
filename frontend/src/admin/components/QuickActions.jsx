@@ -35,7 +35,7 @@ const QuickActions = memo(function QuickActions({ setActivePage }) {
       },
       {
         icon: <BiBox />,
-        title: "Inventory",
+        title: "Analytics",
       },
       {
         icon: <BiBarChartSquare />,
