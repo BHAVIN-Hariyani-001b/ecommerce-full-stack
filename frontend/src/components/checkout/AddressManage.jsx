@@ -9,9 +9,9 @@ import {
 import { setPrimaryAddress } from "../../features/userAddress/userAddressSlice";
 import { MdOutlineAddLocationAlt } from "react-icons/md";
 
-const AddressManage = ({ handeleOpenAddressDetails }) => {
+const AddressManage = ({ handeleOpenAddressDetails, setIsCheck }) => {
   const dispatch = useDispatch();
-  const UserAddress = useSelector((state) => state.address?.Address);
+  const UserAddress = useSelector((state) => state.address?.Address ?? []);
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
@@ -25,6 +25,14 @@ const AddressManage = ({ handeleOpenAddressDetails }) => {
   const [showAddress, setShowAddress] = useState(false);
   const [changed, setChanged] = useState(false);
   const capitalized = (item) => item.charAt(0).toUpperCase() + item.slice(1);
+  const formatPin = (pin) => {
+    const value = String(pin ?? "");
+    return `${value.slice(0, 3)} ${value.slice(3, 6)}`.trim();
+  };
+  const formatPhone = (phone) => {
+    const value = String(phone ?? "");
+    return `${value.slice(0, 3)} ${value.slice(3, 8)} ${value.slice(8, 13)}`.trim();
+  };
 
   const handleChangeAddressOpen = useCallback((e) => {
     e.stopPropagation();
@@ -58,6 +66,11 @@ const AddressManage = ({ handeleOpenAddressDetails }) => {
     },
     [UserAddress, dispatch, user],
   );
+
+
+  useEffect(()=>{
+    setIsCheck(UserAddress.length != 0);
+  },[UserAddress.length])
 
   return (
     <div className="space-y-3 w-full bg-gray-100 p-4 rounded-2xl">
@@ -99,8 +112,8 @@ const AddressManage = ({ handeleOpenAddressDetails }) => {
               {address?.location_type.toUpperCase()}
             </span>
           </div>
-          <p>{`${address?.street_area}, ${address?.city}, ${address?.state}, ${address?.pin_code.slice(0, 3)} ${address?.pin_code.slice(3, 6)}`}</p>
-          <p>{`${user?.phone.slice(0, 3)} ${user?.phone.slice(3, 8)} ${user?.phone.slice(8, 13)}`}</p>
+          <p>{`${address?.street_area}, ${address?.city}, ${address?.state}, ${formatPin(address?.pin_code)}`}</p>
+          <p>{formatPhone(user?.phone)}</p>
         </div>
       )}
 
@@ -140,9 +153,9 @@ const AddressManage = ({ handeleOpenAddressDetails }) => {
                   Primary
                 </span>
               </div>
-              <p>{`${item?.street_area}, ${item?.city}, ${item?.state}, ${item?.pin_code.slice(0, 3)} ${item?.pin_code.slice(3, 6)}`}</p>
+              <p>{`${item?.street_area}, ${item?.city}, ${item?.state}, ${formatPin(item?.pin_code)}`}</p>
               <div className="flex items-center justify-between">
-                <p>{`${user?.phone.slice(0, 3)} ${user?.phone.slice(3, 8)} ${user?.phone.slice(8, 13)}`}</p>
+                <p>{formatPhone(user?.phone)}</p>
                 {!item?.isPrimary && (
                   <input
                     type="checkbox"

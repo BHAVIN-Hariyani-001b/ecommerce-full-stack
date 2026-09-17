@@ -2,9 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   changeOrderStatusAPI,
   createOrderAPI,
+  generateInvoiceAPI,
   getOrderAPI,
   getOrderOneAPI,
-  getOrderSummaryAPI,
+  getOrderSummaryAPI
 } from "./orderThunk";
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
   error: null,
   order: [],
   orderSummary: [],
+  invoice_link: "",
   orderOne: null,
 };
 
@@ -100,7 +102,21 @@ const orderSlice = createSlice({
       .addCase(getOrderSummaryAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
+      // file access
+      .addCase(generateInvoiceAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateInvoiceAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        state.invoice_link = action.payload?.data;
+      })
+      .addCase(generateInvoiceAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

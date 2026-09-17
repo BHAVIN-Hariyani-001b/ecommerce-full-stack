@@ -42,7 +42,6 @@ def login():
         elif not user.check_password(data["password"]):
             return jsonify({"error": "Invalid password"}), 401
 
-
         claims = {"role": user.role.value}
 
         access_token = create_access_token(
@@ -125,6 +124,7 @@ def register():
 @auth_bp.route("/auth/logout", methods=["POST"])
 @jwt_required()
 def logout():
+    response = None
     try:
         user_id = get_jwt_identity()
 
@@ -141,6 +141,8 @@ def logout():
         return response, 200
     except Exception as e:
         print(e)
+        if response is None:
+            response = jsonify({"error": "Logout failed"})
         return response, 500
 
 
@@ -169,7 +171,8 @@ def refresh():
 @auth_bp.route("/auth/profile", methods=["GET"])
 @jwt_required()
 def get_user():
-    user_id = get_jwt_identity()
+    user_id = get_jwt_identity() or request.data.get("user_id")
+
     user = db.session.get(User, user_id)
 
     if not user:
@@ -204,9 +207,30 @@ def update_user_profile(id):
         data = request.get_json()
 
         userName = data.get("username").strip()
+        new_phone = data.get("phone").strip()
 
         if not userName:
             return jsonify({"message": "UserName Are require"}), 400
+
+        if existing.phone != new_phone:
+            phone_owner = User.query.filter(
+                User.phone == new_phone,
+                User.id != existing.id,
+            ).first()
+
+            if phone_owner:
+                return (
+                    jsonify(
+                        {"message": "Phone number already in use by another account"}
+                    ),
+                    409,
+                )
+
+            try:
+                existing.phone = new_phone  # model's own validator runs here
+            except ValueError as ve:
+                db.session.rollback()
+                return jsonify({"message": str(ve)}), 400
 
         existing.username = userName
         existing.phone = data.get("phone").strip()

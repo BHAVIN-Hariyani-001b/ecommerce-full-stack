@@ -45,7 +45,6 @@ class User(db.Model):
     def validate_phone(self, key, phone):
         if not phone:
             return phone
-
         phone = re.sub(r"[\s\-\(\)]", "", phone)
 
         if not phone.startswith("+91"):

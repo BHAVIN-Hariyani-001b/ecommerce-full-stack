@@ -58,6 +58,8 @@ class Products(db.Model):
     status = db.Column(saEnum(Status), default=Status.PUBLIC, nullable=False)
     isFrotPage = db.Column(db.Boolean, default=False, nullable=False)
 
+    gst_id = db.Column(db.Integer, db.ForeignKey("gst.id"), nullable=False)
+
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     images = db.relationship(
@@ -70,6 +72,7 @@ class Products(db.Model):
     wishlists = db.relationship("Wishlist", back_populates="product")
     orders_item = db.relationship("OrderItem", back_populates="product")
 
+    gst = db.relationship("GST", back_populates="products")
 
     def to_dict(self):
         return {
@@ -90,6 +93,7 @@ class Products(db.Model):
             "subcategory_id": self.subcategory_id,
             "SubCategory": str(self.subcategory.name) if self.subcategory else None,
             "discount": self.discount,
+            "gst": self.gst.to_dict() if self.gst else None,
             "attributes": [attr.to_dict() for attr in self.attributes],
             "image": next(
                 (img.to_dict() for img in self.images if img.is_primary), None
@@ -106,6 +110,7 @@ class Products(db.Model):
             "discount": self.discount,
             "category": str(self.category.name) if self.category else None,
             "review": ProductReview.count_rating(self.id),
+            "gst": self.gst.to_dict() if self.gst else None,
             "brand": str(self.brand.name) if self.brand else None,
             "SubCategory": str(self.subcategory.name) if self.subcategory else None,
             "image": next(
@@ -119,6 +124,7 @@ class Products(db.Model):
             "name": self.name,
             "BPrice": float(self.Base_price),
             "PPrice": float(self.Product_price),
+            "gst": self.gst.to_dict() if self.gst else None,
             "image": next(
                 (img.to_dict() for img in self.images if img.is_primary), None
             ),
@@ -147,6 +153,7 @@ class Products(db.Model):
             "brand_image": str(self.brand.image) if self.brand else None,
             "gender": self.gender.value,
             "status": self.status.value,
+            "gst": self.gst.to_dict() if self.gst else None,
             "category_id": self.category_id,
             "category": str(self.category.name) if self.category else None,
             "subcategory_id": self.subcategory_id,

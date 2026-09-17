@@ -7,11 +7,13 @@ import BillDetails from "../cart/BillDetails";
 import { setIsUpdateAddress } from "../../features/userAddress/userAddressSlice";
 import Modal from "../common/Modal";
 import AddressDetails from "../profile/AddressDetails";
+import toast from "react-hot-toast";
 
 const PlaceOrder = ({ checkOut, setCheckOut, setAction }) => {
   const { items } = useSelector((state) => state.cart);
   const [showOrder, setshowOrder] = useState(true);
   const { finalPrice } = useSelector((state) => state.cart);
+  const [isCheck, setIsCheck] = useState(false);
   console.log(items);
 
   const [addressDetail, setAddressDetail] = useState(false);
@@ -35,10 +37,21 @@ const PlaceOrder = ({ checkOut, setCheckOut, setAction }) => {
     if (!checkOut) return;
   }, [checkOut]);
 
+  const handlePayContinue = () => {
+    if (!isCheck) {
+      toast.error("Enter your Address");
+      return;
+    }
+    setAction("payment");
+  };
+
   return (
     <div className="overflow-scroll h-130 scrollbar-none grid grid-cols-2 gap-3 p-2 max-[900px]:flex max-[900px]:flex-col max-[900px]:overflow-auto">
       <div className="max-[900px] space-y-5 min-[900px]:overflow-auto scrollbar-none">
-        <AddressManage handeleOpenAddressDetails={handeleOpenAddressDetails} />
+        <AddressManage
+          handeleOpenAddressDetails={handeleOpenAddressDetails}
+          setIsCheck={setIsCheck}
+        />
         <div className="space-y-3 w-full bg-gray-100 p-4 rounded-2xl">
           <div
             className="text-xl flex items-center justify-between cursor-pointer duration-400 ease-in-out "
@@ -75,7 +88,7 @@ const PlaceOrder = ({ checkOut, setCheckOut, setAction }) => {
               </p>
               <button
                 className="bg-green-600 w-30 rounded-full text-white h-10 cursor-pointer"
-                onClick={() => setAction("payment")}
+                onClick={handlePayContinue}
               >
                 Continue
               </button>

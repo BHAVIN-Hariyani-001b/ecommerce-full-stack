@@ -47,12 +47,12 @@ const App = memo(function App() {
   const [addToItemData, setToItemData] = useState("");
 
   const AddToCartOpen = useCallback(
-    async (e, item) => {
+    (e, item) => {
       e.preventDefault();
       e.stopPropagation();
       setAddToItem(true);
       setToItemData(item);
-      await dispatch(productPageAPI(item));
+      dispatch(productPageAPI(item));
     },
     [dispatch],
   );
@@ -125,13 +125,14 @@ const App = memo(function App() {
           sideBar,
           setSideBar,
           checkOut,
+          setCheckOut,
           AddToCartOpen,
           AddToCartClose,
         }}
       />
 
       <Modal open={addToItem} onClose={AddToCartClose} title="Add To Item">
-        <ProductAdd item={addToItemData} />
+        <ProductAdd item={addToItemData} setCheckOut={setCheckOut} />
       </Modal>
 
       {!isAdminRoute && !isSearch && !about && !contact && (

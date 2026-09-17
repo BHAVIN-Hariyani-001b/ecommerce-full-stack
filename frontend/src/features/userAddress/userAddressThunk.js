@@ -13,7 +13,7 @@ export const GetUserAddress = createAsyncThunk(
       const response = await AddressGet(id);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || "please try again");
+      return rejectWithValue(error.response?.data?.message || "please try again");
     }
   },
 );
@@ -30,7 +30,7 @@ export const AddUserAddress = createAsyncThunk(
       });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error);
+      return rejectWithValue(error.response?.data?.message);
     }
   },
 );
@@ -42,7 +42,7 @@ export const UpdateUserAddress = createAsyncThunk(
       const response = await UpdateAddress({ id, AddressData,location_type });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error);
+      return rejectWithValue(error.response?.data?.message);
     }
   },
 );
@@ -54,7 +54,7 @@ export const DeleteUserAddress = createAsyncThunk(
       const response = await DeleteAddress(id);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error);
+      return rejectWithValue(error.response?.data?.message);
     }
   },
 );

@@ -11,7 +11,19 @@ const UserProfileUpdate = () => {
   const [userPhone, setUserPhone] = useState(user?.phone ?? "");
   const dispatch = useDispatch();
 
+  const isValidPhone = (phone) => /^\+\d{10,13}$/.test(String(phone).trim());
+
   const handleUpdateProfile = useCallback(async () => {
+    if (userPhone.length === 0) {
+      toast.error("Phone Number Are Required");
+      return;
+    }
+
+    if (!isValidPhone(userPhone)) {
+      toast.error("Please enter a valid phone number starting with + and containing 10 to 13 digits");
+      return;
+    }
+
     try {
       await dispatch(
         editProfile({ id: user?.id, username: userName, phone: userPhone }),
@@ -49,9 +61,19 @@ const UserProfileUpdate = () => {
             <input
               type="text"
               name="phone"
+              maxLength={13}
+              inputMode="numeric"
+              pattern="[+0-9]{10,14}"
               value={userPhone}
-              placeholder="8945XXXXXX"
-              onChange={(e) => setUserPhone(e.target.value)}
+              placeholder="+918945XXXXXX"
+              onChange={(e) => {
+                const value = e.target.value;
+                const cleaned = value.startsWith("+91")
+                  ? "+" + value.slice(1).replace(/\D/g, "")
+                  : "+" + value.replace(/\D/g, "");
+                setUserPhone(cleaned.slice(0, 14));
+              }}
+              required
               className="w-full border border-gray-300 p-2 outline-none rounded-lg"
             />
           </div>

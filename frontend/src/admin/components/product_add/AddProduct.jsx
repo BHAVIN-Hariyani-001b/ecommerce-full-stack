@@ -24,7 +24,7 @@ const AddImage = lazy(() => import("./AddImage"));
 const INITIAL_PRODUCT_DATA = {
   name: "",
   Category: "",
-  SubCategory : "",
+  SubCategory: "",
   Base_price: "",
   Product_price: "",
   sku: "",
@@ -39,6 +39,7 @@ const INITIAL_PRODUCT_DATA = {
   attributes: [],
   removeImg: [],
   removeAttributes: [],
+  gst_id: "",
 };
 
 const isProductFormValid = (data) =>
@@ -53,7 +54,8 @@ const isProductFormValid = (data) =>
     data.description?.trim() &&
     data.gender &&
     data.gender !== "option" &&
-    data.image?.image_name,
+    data.image?.image_name &&
+    data.gst_id,
   );
 
 const AddProduct = memo(function AddProduct({ setActivePage }) {
@@ -61,7 +63,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
   const addImageRef = useRef(null);
   const atributeRef = useRef(null);
   const [productData, setProductData] = useState(INITIAL_PRODUCT_DATA);
-  console.log(productData)
+  console.log(productData);
   const isUpdateProduct = useSelector(
     (state) => state.productAdd.isUpdateProduct,
   );
@@ -73,7 +75,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         id: isUpdateProduct?.id,
         name: isUpdateProduct?.name ?? "",
         Category: isUpdateProduct?.category ?? "",
-        SubCategory : isUpdateProduct?.SubCategory ?? "",
+        SubCategory: isUpdateProduct?.SubCategory ?? "",
         Base_price: isUpdateProduct?.BPrice ?? "",
         Product_price: isUpdateProduct?.PPrice ?? "",
         sku: isUpdateProduct?.sku ?? "",
@@ -83,6 +85,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         aboutItem: isUpdateProduct?.aboutItem ?? "",
         gender: isUpdateProduct?.gender ?? "",
         status: isUpdateProduct?.status ?? "public",
+        gst_id: isUpdateProduct?.gst.id ?? "",
         image: {
           image_url: `../../../public/image/product_img/${isUpdateProduct?.image?.image_name}`,
           image_name: isUpdateProduct?.image?.image_name,
@@ -137,6 +140,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         formData.append("aboutItem", productData.aboutItem || "");
         formData.append("gender", productData.gender || "");
         formData.append("status", status);
+        formData.append("gst_id", productData.gst_id);
 
         if (productData.removeImg?.length > 0) {
           productData.removeImg.forEach((id) => {

@@ -38,6 +38,7 @@ class UserAddress(db.Model):
             "street_area": self.street_area,
             "city": self.city,
             "state": self.state,
+            "phone" : self.user.phone,
             "pin_code": self.pin_code,
             "isPrimary": self.isPrimary,
         }

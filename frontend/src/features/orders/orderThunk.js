@@ -2,6 +2,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   changeOrderStatus,
   createOrder,
+  generateInvoice,
+  getGenerateInvoice,
   getOneOrder,
   getOrder,
   getSummary,
@@ -82,6 +84,20 @@ export const getOrderSummaryAPI = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await getSummary();
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update order status",
+      );
+    }
+  },
+);
+
+export const generateInvoiceAPI = createAsyncThunk(
+  "orders/generateInvoiceAPI",
+  async (order_id, { rejectWithValue }) => {
+    try {
+      const response = await generateInvoice(order_id);
       return response;
     } catch (error) {
       return rejectWithValue(

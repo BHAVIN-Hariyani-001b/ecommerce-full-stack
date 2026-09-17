@@ -48,3 +48,8 @@ class Config:
 
     # FORONTEND URL for CORS
     FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    INVOICE_DIR = os.path.abspath(
+        os.path.join(BASE_DIR, os.getenv("INVOICE_DIR", "app/static/invoices"))
+    )

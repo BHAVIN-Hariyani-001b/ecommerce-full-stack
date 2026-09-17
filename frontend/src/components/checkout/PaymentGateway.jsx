@@ -235,11 +235,11 @@ const PaymentGateway = ({ setAction, setOrderResult }) => {
         setAction("confirmation");
         
         setIsPaying(false);
-        await dispatch(fetchCartItem(user.id));
+        dispatch(fetchCartItem(user.id));
         return;
       }
 
-      await dispatch(fetchCartItem(user.id));
+      dispatch(fetchCartItem(user.id));
       // Keep isPaying true until Razorpay modal closes / payment finishes
       await handleOnlinePayment(orderId);
     } catch (error) {

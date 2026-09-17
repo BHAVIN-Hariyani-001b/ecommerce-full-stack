@@ -17,7 +17,7 @@ class Category(db.Model):
     image = db.Column(db.String(255), nullable=True)
     status = db.Column(saEnum(Status), default=Status.ACTIVE, nullable=False)
     created_at = db.Column(db.DateTime,server_default=db.func.now())
-
+    
     parent = db.relationship("Category",remote_side=[id],backref=db.backref("children",lazy=True))
 
     def to_dict(self):

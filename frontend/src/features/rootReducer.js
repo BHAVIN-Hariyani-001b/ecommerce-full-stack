@@ -19,6 +19,7 @@ import userAddressReducer from "./userAddress/userAddressSlice";
 import wishlistReducer from "./wishlist/wishlistSlice";
 import orderReducer from "./orders/orderSlice";
 import paymentReducer from "../admin/features/payment/paymentSlice";
+import gstReducer from "../admin/features/gst/gstSlice";
 
 const storage = storageDefault.default || storageDefault;
 
@@ -65,6 +66,7 @@ const rootReducer = combineReducers({
   wishlist: persistReducer(persistConfigWishList, wishlistReducer),
   orders: orderReducer,
   payment: paymentReducer,
+  gst: gstReducer,
 });
 
 export default rootReducer;

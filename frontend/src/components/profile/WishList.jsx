@@ -32,7 +32,8 @@ const WishList = () => {
   return (
     <div className="px-3">
       <h1 className="font-serif text-[26px] font-semibold text-gray-900 p-2">
-        My WishList ({wishListProduct.length})
+        My WishList{" "}
+        {wishListProduct.length != 0 && `(${wishListProduct.length})`}
       </h1>
       <div>
         {wishListProduct.map((item) => (
@@ -44,6 +45,12 @@ const WishList = () => {
             <WishListProduct key={item.id} item={item} />
           </NavLink>
         ))}
+
+        {wishListProduct.length === 0 && (
+          <p className="text-center text-gray-500 py-8">
+            Your wishlist is empty.
+          </p>
+        )}
       </div>
     </div>
   );

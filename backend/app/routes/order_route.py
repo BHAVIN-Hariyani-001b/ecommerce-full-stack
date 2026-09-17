@@ -1,13 +1,17 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request, send_file
 from app.models.orders import Orders, OrderStatus
 from app.models.orderItem import OrderItem
 from app.models.users import User, userRole
 from app.models.product import Products
 from app.models.cart import Cart
 from app.models.payment import Payment, PaymentMethod, PaymentStatus
+from app.models.AttributeValue import AttributeValue
+from app.models.invoices import Invoice
 from app.db import db
-from sqlalchemy import select, desc
+from sqlalchemy import select
 from decimal import Decimal
+from app.util.invoice import generate_invoice
+import os
 
 order_bp = Blueprint("order", __name__)
 
@@ -156,7 +160,7 @@ def get_order(id):
                 {
                     "message": "Order retrieved successfully",
                     "success": True,
-                    "data": existing.to_dict(),
+                    "data": existing.to_dict_user(),
                 }
             ),
             200,
@@ -191,17 +195,22 @@ def get_all_order(id):
             ).all()
         else:
             orders = db.session.scalars(
-                select(Orders).where(Orders.user_id == existing_user.id)
+                select(Orders)
+                .where(Orders.user_id == existing_user.id)
+                .order_by(Orders.create_at.desc())
             ).all()
-
-        print(orders)
-
+            
         return (
             jsonify(
                 {
                     "message": "Orders retrieved successfully",
                     "success": True,
-                    "data": [order.to_dict() for order in orders],
+                    "data": (
+                        [order.to_dict() for order in orders]
+                        if role_value == userRole.ADMIN.value
+                        or existing_user.role == userRole.ADMIN
+                        else [order.to_dict_user() for order in orders]
+                    ),
                 }
             ),
             200,
@@ -266,6 +275,71 @@ def get_summary():
             ),
             200,
         )
+    except Exception as e:
+        print(e)
+        return jsonify({"message": "Something went wrong", "success": False}), 500
+
+
+@order_bp.route("/order/<uuid:id>/generate-invoice", methods=["POST"])
+def create_invoice(id):
+    try:
+        order = db.session.get(Orders, str(id))
+
+        if not order:
+            return jsonify({"message": "Order not found", "success": False}), 404
+
+        # Optional: only allow invoice generation for paid orders
+        if not order.payment or order.payment.status != PaymentStatus.SUCCESS:
+            return jsonify({"message": "Order not paid yet", "success": False}), 400
+
+        invoice = generate_invoice(order)
+
+        return (
+            jsonify(
+                {
+                    "message": "Invoice generated successfully",
+                    "success": True,
+                    "data": {
+                        "invoice_number": invoice.invoice_number,
+                        "file_url": invoice.file_url,
+                    },
+                }
+            ),
+            200,
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return jsonify({"message": "Something went wrong", "success": False}), 500
+
+
+@order_bp.route("/order/<uuid:id>/invoice/download", methods=["GET"])
+def download_invoice(id):
+    try:
+        invoice = db.session.scalar(
+            select(Invoice).where(Invoice.order_id == str(id))
+        )
+
+        if not invoice:
+            return jsonify({"message": "Invoice not found", "success": False}), 404
+
+        invoice_path = invoice.pdf_path
+        if invoice_path and not os.path.isabs(invoice_path):
+            invoice_path = os.path.abspath(
+                os.path.join(current_app.config["BASE_DIR"], invoice_path)
+            )
+
+        if not invoice_path or not os.path.isfile(invoice_path):
+            return jsonify({"message": "Invoice file not found", "success": False}), 404
+
+        return send_file(
+            invoice_path,
+            mimetype="application/pdf",
+            as_attachment=True,                      # forces download
+            download_name=f"{invoice.invoice_number}.pdf",
+        )
+
     except Exception as e:
         print(e)
         return jsonify({"message": "Something went wrong", "success": False}), 500

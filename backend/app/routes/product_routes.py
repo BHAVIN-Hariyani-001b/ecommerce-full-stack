@@ -65,7 +65,14 @@ def create_product():
         print(data)
 
         # Validate required fields
-        required_fields = ["name", "Base_price", "Product_price", "sku", "qty"]
+        required_fields = [
+            "name",
+            "Base_price",
+            "Product_price",
+            "sku",
+            "qty",
+            "gst_id",
+        ]
         missing_fields = []
 
         for field in required_fields:
@@ -159,6 +166,7 @@ def create_product():
             aboutItem=data.get("aboutItem", "").strip() or None,
             gender=gender,
             status=status,
+            gst_id=data.get("gst_id"),
         )
 
         # Handle primary image from file upload
@@ -387,6 +395,7 @@ def update_product(id) -> Response:
         existing.status = status
         existing.aboutItem = data.get("aboutItem", existing.aboutItem) or None
         existing.subcategory_id = parentCategory.id
+        existing.gst_id = data.get("gst_id") or existing.gst_id
 
         # update primary image``
         primary_image_file = None
@@ -564,10 +573,16 @@ def manage_stock(id):
         try:
             newqty = int(data.get("newqty"))
         except (TypeError, ValueError):
-            return jsonify({"message": "newqty must be a number", "success": False}), 400
+            return (
+                jsonify({"message": "newqty must be a number", "success": False}),
+                400,
+            )
 
         if newqty < 0:
-            return jsonify({"message": "Quantity cannot be negative", "success": False}), 400
+            return (
+                jsonify({"message": "Quantity cannot be negative", "success": False}),
+                400,
+            )
 
         product.qty = newqty
         db.session.commit()

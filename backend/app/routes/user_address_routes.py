@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app.db import db
 from app.models.users import User
 from app.models.UserAddress import UserAddress
+import re
 
 user_address_bp = Blueprint("user_address", __name__)
 
@@ -51,6 +52,22 @@ def user_address_post():
         user_location_type = data.get("location_type")
         user_phone = data.get("phone")
 
+        if existing.phone != user_phone:
+                    phone_owner = User.query.filter(
+                        User.phone == user_phone,
+                        User.id != existing.id,
+                    ).first()
+        
+                    if phone_owner:
+                        return jsonify({"message": "Phone number already in use by another account"}), 409
+        
+                    try:
+                        existing.phone = user_phone  # model's own validator runs here
+                    except ValueError as ve:
+                        db.session.rollback()
+                        return jsonify({"message": str(ve)}), 400
+        
+
         required_fields = {
             "username": user_name,
             "city": user_city,
@@ -69,7 +86,7 @@ def user_address_post():
         if missing_fields:
             return (
                 jsonify(
-                    {   
+                    {
                         "message": "Required fields are missing",
                         "missing_fields": missing_fields,
                     }
@@ -85,7 +102,7 @@ def user_address_post():
                     }
                 ),
                 400,
-            )   
+            )
 
         user_address = UserAddress(
             user_id=user_id,
@@ -95,7 +112,7 @@ def user_address_post():
             pin_code=user_pin_code,
             userfullname=user_name,
             location_type=user_location_type,
-            isPrimary=data.get("isPrimary", False)
+            isPrimary=data.get("isPrimary", False),
         )
 
         try:
@@ -128,15 +145,18 @@ def user_address_post():
         return jsonify({"message": "User Address Not Found"}), 500
 
 
+def is_valid_phone(phone: str) -> bool:
+    """Allow only digits and an optional leading + (e.g. +919724372117)"""
+    return bool(re.fullmatch(r"\+?\d{7,15}", phone))
+
 @user_address_bp.route("/address/<uuid:id>", methods=["PUT"])
 def user_address_update(id):
     """user address Add"""
     try:
         data = request.get_json()
-        print(data)
 
         existing = db.session.get(UserAddress, id)
-
+        print(existing)
         if not existing:
             return jsonify({"message": "User Address Not Found is Not Found"}), 404
 
@@ -155,6 +175,29 @@ def user_address_update(id):
         if missing:
             return jsonify({"message": f"Missing fileds : {', '.join(missing)}"}), 400
 
+        existing_user = db.session.get(User, existing.user_id)
+
+        if not existing_user:
+            return jsonify({"message": "User Not Found"}), 404
+
+        new_phone = data.get("phone")
+        
+        # Only touch phone if it's actually changing
+        if existing_user.phone != new_phone:
+            phone_owner = User.query.filter(
+                User.phone == new_phone,
+                User.id != existing_user.id,
+            ).first()
+
+            if phone_owner:
+                return jsonify({"message": "Phone number already in use by another account"}), 409
+
+            try:
+                existing_user.phone = new_phone  # model's own validator runs here
+            except ValueError as ve:
+                db.session.rollback()
+                return jsonify({"message": str(ve)}), 400
+
         existing.city = data.get("city")
         existing.street_area = data.get("streetArea")
         existing.state = data.get("state")
@@ -163,11 +206,9 @@ def user_address_update(id):
         existing.userfullname = data.get("username")
         existing.isPrimary = data.get("isPrimary", existing.isPrimary)
 
-        existingUser = db.session.get(User, existing.user_id)
-        existingUser.phone = data.get("phone")
-
-
-        UserAddress.query.filter_by(user_id=existingUser.id).update({"isPrimary": False})
+        UserAddress.query.filter_by(user_id=existing_user.id).update(
+            {"isPrimary": False}
+        )
         existing.isPrimary = True
         db.session.commit()
 
@@ -183,6 +224,8 @@ def user_address_update(id):
     except Exception as e:
         db.session.rollback()
         print(e)
+        import traceback
+        traceback.print_exc()
         return jsonify({"message": "User Address Not Found"}), 500
 
 

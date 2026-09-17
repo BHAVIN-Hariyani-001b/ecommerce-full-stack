@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PageWapper from "../components/layout/PageWapper";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import Container from "../admin/components/common/Container";
 import { useDispatch, } from "react-redux";
 import { productPageAPI } from "../features/productPage/ProductPageThunk";
@@ -17,6 +17,7 @@ const ProductPage = () => {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+  const { setCheckOut } = useOutletContext();
 
   const [option, setOption] = useState(true);
 
@@ -47,7 +48,7 @@ const ProductPage = () => {
         <div className="grid grid-cols-2 max-[700px]:flex max-[700px]:justify-center max-[700px]:items-center max-[700px]:flex-wrap h-full my-5 w-full gap-5 p-2">
           <ProductPageImage />
 
-          <ProductDetails />
+          <ProductDetails setCheckOut={setCheckOut} />
         </div>
 
         <ProductService />

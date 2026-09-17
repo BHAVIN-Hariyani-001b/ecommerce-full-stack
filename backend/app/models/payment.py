@@ -48,7 +48,7 @@ class Payment(db.Model):
         onupdate=db.func.current_timestamp(),
     )
 
-    orders = db.relationship("Orders", back_populates="payments")
+    order = db.relationship("Orders", back_populates="payment")
     user = db.relationship("User", back_populates="payments")
 
     def to_dict(self):

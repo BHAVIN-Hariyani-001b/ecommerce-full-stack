@@ -28,3 +28,16 @@ export const getSummary = async () => {
   const response = await api.get("/order/get/summary");
   return response.data;
 };
+
+export const generateInvoice = async (order_id) => {
+  const response = await api.post(`/order/${order_id}/generate-invoice`);
+  return response.data;
+};
+
+export const getGenerateInvoice = async (order_id) => {
+  const response = await api.get(`/order/${order_id}/invoice/download`,{
+    responseType : "blob",
+  });
+  console.log(response)
+  return response.data;
+};

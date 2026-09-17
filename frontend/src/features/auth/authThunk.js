@@ -54,9 +54,9 @@ export const registerUser = createAsyncThunk(
 
 export const getUserProfile = createAsyncThunk(
   "auth/getUserProfile",
-  async (_, { rejectWithValue }) => {
+  async (user_id, { rejectWithValue }) => {
     try {
-      const data = await getProfileApi();
+      const data = await getProfileApi(user_id);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || "please try again");

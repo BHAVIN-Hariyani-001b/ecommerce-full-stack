@@ -2,7 +2,9 @@ import { IoCheckmarkCircle } from "react-icons/io5";
 import { TbTruckDelivery } from "react-icons/tb";
 import { RiFileList2Fill } from "react-icons/ri";
 import { MdOutlinePayments } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { generateInvoiceAPI } from "../../features/orders/orderThunk";
 
 const PAYMENT_LABELS = {
   upi: "UPI",
@@ -10,11 +12,13 @@ const PAYMENT_LABELS = {
   cod: "Cash on Delivery",
 };
 
-const OrderConfirmation = ({ orderResult, setCheckOut }) => {
+const OrderConfirmation = ({
+  orderResult,
+  setCheckOut,
+  showContinue = true,
+}) => {
   const user = useSelector((state) => state.auth.user);
-  const fallbackAddress = useSelector(
-    (state) => state.address?.PrimaryAddress,
-  );
+  const fallbackAddress = useSelector((state) => state.address?.PrimaryAddress);
 
   const order = orderResult?.data || orderResult || null;
   const paymentMethod =
@@ -44,6 +48,12 @@ const OrderConfirmation = ({ orderResult, setCheckOut }) => {
   const handleContinueShopping = () => {
     setCheckOut?.(false);
   };
+
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(generateInvoiceAPI(order.id));
+  }, [dispatch,order]);
 
   return (
     <div className="overflow-scroll h-130 scrollbar-none grid grid-cols-2 gap-3 p-2 max-[900px]:flex max-[900px]:flex-col max-[900px]:overflow-auto">
@@ -181,20 +191,22 @@ const OrderConfirmation = ({ orderResult, setCheckOut }) => {
           </div>
         </div>
 
-        <div className="flex w-full p-1">
-          <div className="flex p-4 justify-between items-center w-full bg-white rounded-xl shadow-lg">
-            <p className="text-sm text-gray-600 pr-3">
-              We&apos;ll notify you when your order ships.
-            </p>
-            <button
-              type="button"
-              className="bg-green-600 shrink-0 px-5 rounded-full text-white h-10 cursor-pointer hover:bg-green-700 transition-colors"
-              onClick={handleContinueShopping}
-            >
-              Continue
-            </button>
+        {showContinue && (
+          <div className="flex w-full p-1">
+            <div className="flex p-4 justify-between items-center w-full bg-white rounded-xl shadow-lg">
+              <p className="text-sm text-gray-600 pr-3">
+                We&apos;ll notify you when your order ships.
+              </p>
+              <button
+                type="button"
+                className="bg-green-600 shrink-0 px-5 rounded-full text-white h-10 cursor-pointer hover:bg-green-700 transition-colors"
+                onClick={handleContinueShopping}
+              >
+                Continue
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

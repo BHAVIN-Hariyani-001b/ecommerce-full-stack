@@ -15,6 +15,7 @@ import AddAttributes from "../../components/attribute/AddAttributes";
 import Order from "../../components/order_manage/order";
 import Analytics from "../../components/Analytics/Analytics";
 import SalesReport from "../../components/Analytics/SalesReport";
+import Gst from "../../components/gst/Gst";
 
 import { MdDashboard, MdShoppingCart } from "react-icons/md";
 import { FaBoxArchive } from "react-icons/fa6";
@@ -93,6 +94,7 @@ const Dashboard = memo(function Dashboard() {
             {activePage === "Analytics" && <Analytics />}
             {activePage === "Sales Report" && <SalesReport />}
             {activePage === "Payments" && <Payment />}
+            {activePage === "GST" && <Gst />}
           </Container>
         )}
         <SideBar

@@ -14,8 +14,8 @@ export const registerApi = async ({ username, email, password }) => {
   return response?.data;
 };
 
-export const getProfileApi = async () => {
-  const response = await api.get("/auth/profile");
+export const getProfileApi = async (user_id) => {
+  const response = await api.get("/auth/profile",{user_id});
   return response?.data;
 };
 

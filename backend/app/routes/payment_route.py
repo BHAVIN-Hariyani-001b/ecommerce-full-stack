@@ -271,21 +271,185 @@ def razorpay_webhook():
         payload = request.get_data()
         signature = request.headers.get("X-Razorpay-Signature")
 
+        if not signature:
+            return jsonify({
+                "success": False,
+                "message": "Missing Razorpay signature"
+            }), 400
+
+        # Verify Razorpay webhook signature
         try:
             client.utility.verify_webhook_signature(
-                payload, signature, RAZORPAY_WEBHOOK_SECRET
+                payload,
+                signature,
+                RAZORPAY_WEBHOOK_SECRET
             )
         except Exception:
-            return jsonify({"success": False, "message": "Invalid signature"}), 400
+            return jsonify({
+                "success": False,
+                "message": "Invalid signature"
+            }), 400
 
-        # Process event here
+        event = request.get_json(silent=True) or {}
+        event_type = event.get("event")
 
-        return (
-            jsonify({"success": True, "message": "signature verify successfully"}),
-            200,
-        )
+        print("Razorpay webhook verified:", event_type)
+
+        # -----------------------------------------
+        # PAYMENT CAPTURED
+        # -----------------------------------------
+        if event_type == "payment.captured":
+
+            razorpay_payment = event["payload"]["payment"]["entity"]
+
+            razorpay_payment_id = razorpay_payment["id"]
+            razorpay_order_id = razorpay_payment.get("order_id")
+            razorpay_amount = razorpay_payment["amount"]
+
+            # Find our Payment record
+            payment = db.session.scalar(
+                select(Payment).where(
+                    Payment.razorpay_order_id == razorpay_order_id
+                )
+            )
+
+            if not payment:
+                print(
+                    "Payment record not found:",
+                    razorpay_order_id
+                )
+
+                return jsonify({
+                    "success": False,
+                    "message": "Payment record not found"
+                }), 404
+
+            # -----------------------------------------
+            # Already processed
+            # -----------------------------------------
+            if payment.status == PaymentStatus.SUCCESS:
+                return jsonify({
+                    "success": True,
+                    "message": "Payment already processed"
+                }), 200
+
+            # -----------------------------------------
+            # Verify amount
+            # -----------------------------------------
+
+            expected_amount = int(
+                (
+                    Decimal(str(payment.amount_paid)) * 100
+                ).quantize(
+                    Decimal("1"),
+                    rounding=ROUND_HALF_UP
+                )
+            )
+
+            if razorpay_amount != expected_amount:
+                print(
+                    "Payment amount mismatch:",
+                    razorpay_amount,
+                    expected_amount
+                )
+
+                return jsonify({
+                    "success": False,
+                    "message": "Payment amount mismatch"
+                }), 400
+
+            # -----------------------------------------
+            # Update Payment
+            # -----------------------------------------
+
+            payment.razorpay_payment_id = razorpay_payment_id
+            payment.status = PaymentStatus.SUCCESS
+            payment.paid_at = datetime.utcnow()
+
+            # -----------------------------------------
+            # Update Product Order
+            # -----------------------------------------
+
+            product_order = db.session.get(
+                Orders,
+                payment.order_id
+            )
+
+            if not product_order:
+                db.session.rollback()
+
+                return jsonify({
+                    "success": False,
+                    "message": "Order not found"
+                }), 404
+
+            product_order.status = OrderStatus.CONFIRMED
+
+            db.session.commit()
+
+            return jsonify({
+                "success": True,
+                "message": "Payment captured successfully"
+            }), 200
+
+        # -----------------------------------------
+        # PAYMENT FAILED
+        # -----------------------------------------
+        elif event_type == "payment.failed":
+
+            razorpay_payment = event["payload"]["payment"]["entity"]
+
+            razorpay_payment_id = razorpay_payment["id"]
+            razorpay_order_id = razorpay_payment.get("order_id")
+
+            payment = db.session.scalar(
+                select(Payment).where(
+                    Payment.razorpay_order_id == razorpay_order_id
+                )
+            )
+
+            if not payment:
+                return jsonify({
+                    "success": False,
+                    "message": "Payment record not found"
+                }), 404
+
+            # Don't change an already successful payment
+            if payment.status == PaymentStatus.SUCCESS:
+                return jsonify({
+                    "success": True,
+                    "message": "Payment already successful"
+                }), 200
+
+            payment.razorpay_payment_id = razorpay_payment_id
+            payment.status = PaymentStatus.FAILED
+
+            db.session.commit()
+
+            return jsonify({
+                "success": True,
+                "message": "Payment failure recorded"
+            }), 200
+
+        # -----------------------------------------
+        # Other events
+        # -----------------------------------------
+
+        return jsonify({
+            "success": True,
+            "message": "Event received"
+        }), 200
+
     except Exception as e:
-        return jsonify({"message": "signature is not verify", "success": False})
+        db.session.rollback()
+
+        print("Razorpay webhook error:", e)
+
+        return jsonify({
+            "success": False,
+            "message": "Webhook processing failed"
+        }), 500
+
 
 
 @payment_order_bp.route("/get/payments", methods=["GET"])
@@ -373,7 +537,7 @@ def get_payment_report():
         return jsonify({"message": "Payment report not fetched", "success": False}), 500
 
 
-@payment_order_bp.route("/change/status/payment/<uuid:id>",methods=["POST"])
+@payment_order_bp.route("/change/status/payment/<uuid:id>", methods=["POST"])
 def change_payment_status(id):
     try:
         payment = db.session.get(Payment, id)
@@ -384,22 +548,28 @@ def change_payment_status(id):
         data = request.get_json()
 
         if not data:
-            return jsonify({"message" : "Data Are Required","success" : False}),400
+            return jsonify({"message": "Data Are Required", "success": False}), 400
 
         payment.status = data.get("status")
 
         db.session.commit()
 
+        return jsonify(
+            {
+                "message": "Payment Data Fetch SuccessFully",
+                "success": True,
+                "data": payment.to_dict(),
+            }
+        )
 
-        return jsonify({
-            "message" : "Payment Data Fetch SuccessFully",
-            "success" : True,
-            "data" : payment.to_dict()
-        })
-        
     except Exception as e:
         print(e)
-        return jsonify({
-            "message" : "Something went wrong",
-            "success" : False,
-        }),500  
+        return (
+            jsonify(
+                {
+                    "message": "Something went wrong",
+                    "success": False,
+                }
+            ),
+            500,
+        )

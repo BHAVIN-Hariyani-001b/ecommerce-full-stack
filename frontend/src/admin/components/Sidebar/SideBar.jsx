@@ -12,6 +12,7 @@ const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
     "Sales Report",
     "Analytics",
     "Payments",
+    "GST",
   ];
 
   return (

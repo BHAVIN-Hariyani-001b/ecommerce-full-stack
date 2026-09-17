@@ -5,7 +5,6 @@ from sqlalchemy import Enum as saEnum
 from enum import Enum as pyEnum
 import uuid
 
-
 class OrderStatus(pyEnum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
@@ -30,8 +29,9 @@ class Orders(db.Model):
 
     user = db.relationship("User", back_populates="orders")
     address = db.relationship("UserAddress", back_populates="orders")
-    payments = db.relationship("Payment", back_populates="orders")
+    payment = db.relationship("Payment", back_populates="order", uselist=False)
     order_item = db.relationship("OrderItem", back_populates="order")
+    invoice = db.relationship("Invoice", back_populates="order", uselist=False)
 
     def to_dict(self):
         return {
@@ -60,4 +60,14 @@ class Orders(db.Model):
             "OrderId": f"#ORD-{self.id[:8].upper()}",
             "OrderMrp": self.total_amount,
             "OrderStatus": self.status.value,
+        }
+
+    def to_dict_user(self):
+        return {
+            "id": self.id,
+            "OrderId": f"#ORD-{self.id[:8].upper()}",
+            "status": self.status.value,
+            "total_amount": float(self.total_amount),
+            "create_at": self.create_at.isoformat() if self.create_at else None,
+            "order_item": [i.to_dict() for i in self.order_item],
         }

@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { logoutUser } from "../../features/auth/authThunk";
-import { FaRegCircleUser } from "react-icons/fa6";
 import { MdDeleteOutline } from "react-icons/md";
-import { PiUserCircle } from "react-icons/pi";
 import ProfileSettingShow from "./ProfileSettingShow";
 import UserProfileUpdate from "./UserProfileUpdate";
 import UserOrderHistory from "./UserOrderHistory";
@@ -15,6 +13,7 @@ import { logout } from "../../features/auth/authSlice";
 import { GetUserAddress } from "../../features/userAddress/userAddressThunk";
 import WishList from "./WishList";
 import { clearAddress } from "../../features/userAddress/userAddressSlice";
+import { getOrderAPI } from "../../features/orders/orderThunk";
 
 const Profile = () => {
   const user = useSelector((state) => state.auth.user);
@@ -46,6 +45,10 @@ const Profile = () => {
   useEffect(() => {
     dispatch(GetUserAddress(user?.id)).unwrap();
   }, [dispatch, user]);
+
+  useEffect(()=>{
+    dispatch(getOrderAPI()).unwrap();
+  },[dispatch])
 
   return (
     <div>

@@ -1,17 +1,31 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
+import { IoIosArrowDown } from "react-icons/io";
 import { MdCurrencyRupee } from "react-icons/md";
+import { getGstAPI } from "../../features/gst/gstThunk";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 
 const PriceInvetary = memo(function PriceInvetary({
   productData,
   handleOnChange,
 }) {
+  const getGstId = (item) => {
+    const id = item?.gst_id ?? item?.id ?? item?._id;
+    return id == null ? "" : String(id);
+  };
+
+  const isGstActive = (item) => {
+    const status = item?.is_active ?? item?.active;
+    return status !== false && status !== 0;
+  };
+
   const calculateProductPrice = (basePrice, discount) => {
     const base = Number(basePrice);
     const discountPercent = Number(discount) || 0;
 
     if (!base) return "";
 
-    return base - (base * discountPercent) / 100;
+    return String(base - (base * discountPercent) / 100);
   };
 
   const handleBasePriceChange = (e) => {
@@ -19,10 +33,7 @@ const PriceInvetary = memo(function PriceInvetary({
 
     const basePrice = e.target.value;
 
-    const price = calculateProductPrice(
-      basePrice,
-      productData?.discount
-    );
+    const price = calculateProductPrice(basePrice, productData?.discount);
 
     handleOnChange({
       target: {
@@ -37,10 +48,7 @@ const PriceInvetary = memo(function PriceInvetary({
 
     const discount = e.target.value;
 
-    const price = calculateProductPrice(
-      productData?.Base_price,
-      discount
-    );
+    const price = calculateProductPrice(productData?.Base_price, discount);
 
     handleOnChange({
       target: {
@@ -54,6 +62,16 @@ const PriceInvetary = memo(function PriceInvetary({
     // Admin can manually change the calculated price
     handleOnChange(e);
   };
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getGstAPI())
+      .unwrap()
+      .catch((loadError) => toast.error(loadError || "Failed to load GST"));
+  }, [dispatch]);
+
+  const { gst = [] } = useSelector((state) => state.gst ?? {});
 
   return (
     <div className="border border-gray-200 p-3 rounded-xl w-full">
@@ -123,6 +141,32 @@ const PriceInvetary = memo(function PriceInvetary({
           />
 
           <MdCurrencyRupee className="absolute left-3 bottom-4" />
+        </div>
+        <div className="flex flex-col relative">
+          <label htmlFor="gst" className="font-semibold py-2">
+            GST
+          </label>
+
+          <select
+            name="gst_id"
+            id="gst"
+            autoComplete="off"
+            required={true}
+            className="outline-none bg-blue-50 border px-3 py-3 rounded-lg border-gray-200 appearance-none"
+            onChange={handleOnChange}
+            value={productData?.gst_id}
+          >
+            <option value="option">Select Any One</option>
+            {gst.filter(isGstActive).map((item) => {
+              const gstId = getGstId(item);
+              return (
+                <option value={gstId} key={gstId}>
+                  {item?.gst_rate ?? item?.rate ?? item?.percentage}%
+                </option>
+              );
+            })}
+          </select>
+          <IoIosArrowDown className="absolute right-3 bottom-4 transition-transform duration-200 text-[15px]" />
         </div>
       </div>
 

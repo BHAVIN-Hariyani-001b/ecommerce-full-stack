@@ -10,6 +10,7 @@ import {
 import { BiHome } from "react-icons/bi";
 import { MdOutlineWorkOutline } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
+import { getUserProfile } from "../../features/auth/authThunk";
 
 const AddressDetails = ({ handeleCloseAddressDetails }) => {
   const user = useSelector((state) => state.auth.user);
@@ -19,7 +20,7 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
     city: "",
     state: "",
     pin: "",
-    phone: user?.phone ?? "",
+    phone: user?.phone ?? "+91",
     isPrimary: false,
   };
 
@@ -33,7 +34,7 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
       : "home";
   };
 
-  const [locationType, setLocationType] = useState(isUpdateLocation) ?? "home";
+  const [locationType, setLocationType] = useState(isUpdateLocation);
   const [otherLocation, setOtherLocation] = useState(
     isUpdate?.location_type ?? "",
   );
@@ -41,10 +42,26 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
   const dispatch = useDispatch();
 
   const [adressInfo, setAddressInfo] = useState(initialAddress);
-  console.log(adressInfo);
 
   const handleOnChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if (name === "pin") {
+      // Digits only, max 6 characters
+      const digitsOnly = value.replace(/\D/g, "").slice(0, 6);
+      setAddressInfo((prev) => ({ ...prev, pin: digitsOnly }));
+      return;
+    }
+
+    if (name === "phone") {
+      // Strip everything except digits, drop a leading "91" if the user
+      // retyped it, then keep only the last 10 digits and lock the +91 prefix
+      const digitsOnly = value.replace(/\D/g, "").replace(/^91/, "");
+      const last10 = digitsOnly.slice(-10);
+      setAddressInfo((prev) => ({ ...prev, phone: `+91${last10}` }));
+      return;
+    }
+
     setAddressInfo((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -52,26 +69,60 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
   };
 
   const isCheckLocation = () => {
-    return locationType.toLocaleLowerCase() === "other"
-      ? otherLocation
+    return locationType.toLowerCase() === "other"
+      ? otherLocation.trim()
       : locationType;
   };
 
-  const ChekcLocation = () => {
-    return Boolean(
-      adressInfo.name && adressInfo.address && adressInfo.city && adressInfo.state && adressInfo.pin && adressInfo.phone,
+  const checkLocation = () =>
+    Boolean(
+      adressInfo.name?.trim() &&
+      adressInfo.address?.trim() &&
+      adressInfo.city?.trim() &&
+      adressInfo.state?.trim() &&
+      String(adressInfo.pin).trim().length === 6 &&
+      adressInfo.phone?.trim().length === 13 && // "+91" + 10 digits
+      isCheckLocation(),
     );
-  }
 
   const handleOnClick = async () => {
-
-    if(user === null){
+    if (!user) {
       toast.error("Please login first");
       return;
     }
 
-    if (!ChekcLocation()) {
-      toast.error("Please fill all required fields");
+    if (!adressInfo.name?.trim()) {
+      toast.error("Please enter full name");
+      return;
+    }
+
+    if (!adressInfo.address?.trim()) {
+      toast.error("Please enter street address");
+      return;
+    }
+
+    if (!adressInfo.city?.trim()) {
+      toast.error("Please enter city");
+      return;
+    }
+
+    if (!adressInfo.state?.trim()) {
+      toast.error("Please enter state");
+      return;
+    }
+
+    if (String(adressInfo.pin).trim().length !== 6) {
+      toast.error("Pin code must be exactly 6 digits");
+      return;
+    }
+
+    if (adressInfo.phone?.trim().length !== 13) {
+      toast.error("Phone number must be +91 followed by 10 digits");
+      return;
+    }
+
+    if (!isCheckLocation()) {
+      toast.error("Please select or enter a location type");
       return;
     }
 
@@ -84,6 +135,7 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
             AddressData: adressInfo,
           }),
         ).unwrap();
+
         toast.success("User Address Update Successfully");
       } else {
         await dispatch(
@@ -94,11 +146,15 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
         ).unwrap();
         toast.success("User Address Add Successfully");
       }
-
+      dispatch(getUserProfile(user?.id)).unwrap();
       handeleCloseAddressDetails();
       await dispatch(GetUserAddress(user?.id)).unwrap();
-    } catch {
-      toast.error("Please Try again");
+    } catch (error) {
+      toast.error(
+        typeof error === "string"
+          ? error
+          : error?.message || "Unable to save address. Please try again.",
+      );
     }
   };
 
@@ -109,13 +165,24 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
         address: isUpdate?.street_area,
         city: isUpdate?.city,
         state: isUpdate?.state,
-        location_type: isUpdate?.location_type,
         pin: isUpdate?.pin_code,
-        phone: user?.phone,
+        phone: user?.phone ?? "+91",
         isPrimary: isUpdate?.isPrimary,
       });
+      setLocationType(
+        ["home", "office"].includes(isUpdate.location_type)
+          ? isUpdate.location_type
+          : "other",
+      );
+      setOtherLocation(
+        ["home", "office"].includes(isUpdate.location_type)
+          ? ""
+          : isUpdate.location_type || "",
+      );
     } else {
       setAddressInfo(initialAddress);
+      setLocationType("home");
+      setOtherLocation("");
     }
   }, [isUpdate, user]);
 
@@ -235,13 +302,13 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
               Pin Code <span className="text-red-600">*</span>
             </label>
             <input
-              type="number"
+              type="text"
               name="pin"
               id="UserPin"
+              maxLength={6}
+              inputMode="numeric"
               value={adressInfo.pin}
-              min={5}
-              max={6}
-              className="border px-2 py-2 border-gray-300 outline-none rounded-md appearance-none"
+              className="border px-2 py-2 border-gray-300 outline-none rounded-md"
               placeholder="365601"
               onChange={handleOnChange}
             />
@@ -254,6 +321,8 @@ const AddressDetails = ({ handeleCloseAddressDetails }) => {
               type="text"
               name="phone"
               id="UserPhone"
+              maxLength={13}
+              inputMode="numeric"
               value={adressInfo.phone}
               className="border px-2 py-2 border-gray-300 outline-none rounded-md"
               onChange={handleOnChange}
