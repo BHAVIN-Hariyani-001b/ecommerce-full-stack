@@ -267,7 +267,7 @@ const ProductCard = ({ item }) => {
           </div>
 
           <div className="flex items-end space-x-2">
-            <div className="flex gap-2 max-[600px]:flex-col max-[600px]:gap-0">
+            <div className="flex flex-col max-[600px]:flex-col max-[600px]:gap-0">
               <span>₹{item?.PPrice}</span>
 
               <span className="line-through text-gray-400">

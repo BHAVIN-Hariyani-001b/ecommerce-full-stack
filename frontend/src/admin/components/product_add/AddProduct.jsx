@@ -54,8 +54,7 @@ const isProductFormValid = (data) =>
     data.description?.trim() &&
     data.gender &&
     data.gender !== "option" &&
-    data.image?.image_name &&
-    data.gst_id,
+    data.image?.image_name
   );
 
 const AddProduct = memo(function AddProduct({ setActivePage }) {
@@ -85,7 +84,7 @@ const AddProduct = memo(function AddProduct({ setActivePage }) {
         aboutItem: isUpdateProduct?.aboutItem ?? "",
         gender: isUpdateProduct?.gender ?? "",
         status: isUpdateProduct?.status ?? "public",
-        gst_id: isUpdateProduct?.gst.id ?? "",
+        gst_id: isUpdateProduct?.gst?.id ?? "",
         image: {
           image_url: `../../../public/image/product_img/${isUpdateProduct?.image?.image_name}`,
           image_name: isUpdateProduct?.image?.image_name,

@@ -68,6 +68,7 @@ class Orders(db.Model):
             "OrderId": f"#ORD-{self.id[:8].upper()}",
             "status": self.status.value,
             "total_amount": float(self.total_amount),
+            "payment_status" : self.payment.status.value,
             "create_at": self.create_at.isoformat() if self.create_at else None,
             "order_item": [i.to_dict() for i in self.order_item],
         }

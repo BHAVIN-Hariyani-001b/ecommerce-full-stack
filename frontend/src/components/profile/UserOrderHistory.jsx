@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import OrderConfirmation from "../checkout/OrderConfirmation";
 import { TbFileDownloadFilled } from "react-icons/tb";
 import { getGenerateInvoice } from "../../middleware/order";
+import toast from "react-hot-toast";
 
 const STATUS_META = {
   shipped: {
@@ -199,6 +200,11 @@ const UserOrderHistory = () => {
 
   const handleDownloadInvoice = async (orderId, invoiceNumber) => {
     try {
+      if (selectedOrder.payment_status !== "success") {
+        toast.error("Please complete the payment first.");
+        return;
+      }
+
       const response = await getGenerateInvoice(orderId);
 
       const blob = new Blob([response], {
@@ -239,7 +245,10 @@ const UserOrderHistory = () => {
           <button
             type="button"
             onClick={() =>
-              handleDownloadInvoice(selectedOrder.id, invoice_link.invoice_number)
+              handleDownloadInvoice(
+                selectedOrder.id,
+                invoice_link.invoice_number,
+              )
             }
             className="bg-gray-100 px-3 py-2 rounded-full group"
           >

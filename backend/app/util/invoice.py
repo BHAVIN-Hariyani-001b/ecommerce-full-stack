@@ -14,6 +14,7 @@ load_dotenv()
 def build_invoice_html(order, items, invoice_number):
     user = order.user
     address = order.address  # UserAddress via Orders.address relationship
+    print()
 
     address_lines = []
     if address:
@@ -53,8 +54,8 @@ def build_invoice_html(order, items, invoice_number):
 
     # Subtotal derived from actual line items so it always matches what's shown above
     subtotal = sum(float(item.qty * item.price_at_purchase) for item in items)
-    tax = round(subtotal * 0.0, 2)  # set actual tax rate here, e.g. 0.18 for 18% GST
-    grand_total = subtotal + tax
+    handling_charge = float((subtotal * 2) / 100)
+    grand_total = subtotal + handling_charge
 
     ACCENT = "#5b3df0"
     INK = "#1a1a1a"
@@ -274,8 +275,8 @@ def build_invoice_html(order, items, invoice_number):
                 <td style="text-align:right;">Rs. {subtotal:.2f}</td>
             </tr>
             <tr>
-                <td>Tax</td>
-                <td style="text-align:right;">Rs. {tax:.2f}</td>
+                <td>Handling charge</td>
+                <td style="text-align:right;">Rs. {handling_charge:.2f}</td>
             </tr>
             <tr class="summary-total-row">
                 <td>Total Paid</td>
@@ -314,6 +315,7 @@ def generate_invoice(order):
     existing = db.session.scalar(select(Invoice).where(Invoice.order_id == order.id))
     if existing:
         return existing
+    print(existing)
 
     invoice_number = f"INV-{order.id[:8].upper()}"
     html = build_invoice_html(order, order.order_item, invoice_number)

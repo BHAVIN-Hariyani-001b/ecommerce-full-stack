@@ -76,12 +76,13 @@ def create_order():
                     400,
                 )
 
-            total_amount += Decimal(str(product.Product_price)) * cart_item.qty
+            total_amount += Decimal(str(product._with_gst(product.Product_price))) * cart_item.qty
 
             products.append({"cart_item": cart_item, "product": product})
 
         def total_count(total):
-            return total + (total * Decimal("2") / Decimal("100"))
+            total_without_gst = total + (total * Decimal("2") / Decimal("100"))
+            return total_without_gst
 
         order_total = total_count(total_amount)
         order = Orders(
@@ -107,7 +108,7 @@ def create_order():
                 product_id=product.id,
                 attribute_id=f"{[str(j.attribute_value_id) for j in cart_item.values]}",
                 qty=cart_item.qty,
-                price_at_purchase=product.Product_price,
+                price_at_purchase=product._with_gst(product.Product_price ),
             )
 
             product.qty -= cart_item.qty

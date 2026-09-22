@@ -214,7 +214,7 @@ const ProductDetails = ({ setCheckOut }) => {
           </div>
           <div className="text-gray-400 pl-1 space-x-2">
             <span className="line-through">&#8377; {product?.BPrice}</span>
-            <span>MRP (include with text)</span>
+            <span>MRP (include with tex)</span>
           </div>
         </div>
         <div>

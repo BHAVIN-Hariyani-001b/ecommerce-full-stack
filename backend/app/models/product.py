@@ -74,12 +74,43 @@ class Products(db.Model):
 
     gst = db.relationship("GST", back_populates="products")
 
+    def _with_gst(self, amount):
+        rate = self.gst.gst_rate if self.gst else 0
+        return round(float(amount + (amount * rate / 100)), 2)
+
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
-            "BPrice": float(self.Base_price),
-            "PPrice": float(self.Product_price),
+            "BPrice": self._with_gst(self.Base_price),
+            "PPrice": self._with_gst(self.Product_price),
+            "sku": self.sku,
+            "qty": self.qty,
+            "aboutItem": self.aboutItem,
+            "description": self.description,
+            "brand": str(self.brand.name) if self.brand else None,
+            "brand_image": str(self.brand.image) if self.brand else None,
+            "gender": self.gender.value,
+            "status": self.status.value,
+            "category_id": self.category_id,
+            "category": str(self.category.name) if self.category else None,
+            "subcategory_id": self.subcategory_id,
+            "SubCategory": str(self.subcategory.name) if self.subcategory else None,
+            "discount": self.discount,
+            "gst": self.gst.to_dict() if self.gst else None,
+            "attributes": [attr.to_dict() for attr in self.attributes],
+            "image": next(
+                (img.to_dict() for img in self.images if img.is_primary), None
+            ),
+            "images": [img.to_dict() for img in self.images if not img.is_primary],
+        }
+    
+    def to_dict_admin(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "BPrice": self.Base_price,
+            "PPrice": self.Product_price,
             "sku": self.sku,
             "qty": self.qty,
             "aboutItem": self.aboutItem,
@@ -105,8 +136,8 @@ class Products(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "BPrice": float(self.Base_price),
-            "PPrice": float(self.Product_price),
+            "BPrice": self._with_gst(self.Base_price),
+            "PPrice": self._with_gst(self.Product_price),
             "discount": self.discount,
             "category": str(self.category.name) if self.category else None,
             "review": ProductReview.count_rating(self.id),
@@ -122,8 +153,8 @@ class Products(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "BPrice": float(self.Base_price),
-            "PPrice": float(self.Product_price),
+            "BPrice": self._with_gst(self.Base_price),
+            "PPrice": self._with_gst(self.Product_price),
             "gst": self.gst.to_dict() if self.gst else None,
             "image": next(
                 (img.to_dict() for img in self.images if img.is_primary), None
@@ -143,8 +174,8 @@ class Products(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "BPrice": float(self.Base_price),
-            "PPrice": float(self.Product_price),
+            "BPrice": self._with_gst(self.Base_price),
+            "PPrice": self._with_gst(self.Product_price),
             "sku": self.sku,
             "qty": self.qty,
             "aboutItem": self.aboutItem,

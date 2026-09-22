@@ -291,7 +291,7 @@ def create_product():
             jsonify(
                 {
                     "message": "Product created successfully",
-                    "product": product.to_dict(),
+                    "product": product.to_dict_admin(),
                 }
             ),
             201,
@@ -481,7 +481,7 @@ def update_product(id) -> Response:
             jsonify(
                 {
                     "message": "Product update successfully",
-                    "product": existing.to_dict(),
+                    "product": existing.to_dict_admin(),
                 }
             ),
             200,
@@ -542,7 +542,7 @@ def get_products():
         else:
             products = Products.query.all()
         if role == "admin":
-            return jsonify({"products": [i.to_dict() for i in products]})
+            return jsonify({"products": [i.to_dict_admin() for i in products]})
 
         return jsonify({"products": [i.to_dict() for i in products if i.qty >= 1]})
     except Exception as e:
