@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import BillDetails from "../cart/BillDetails";
 import { TbCashBanknote } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { createOrderAPI } from "../../features/orders/orderThunk";
-import { fetchCartItem } from "../../features/card/cardThunk";
+import { createOrderAPI, getOrderAPI } from "../../features/orders/orderThunk";
+import { ClearCartAPI, fetchCartItem } from "../../features/card/cardThunk";
 import { loadRazorpay } from "../../util/loadRazorpay";
 import api from "../../middleware/index";
 import { getErrorMessage } from "../../util/getErrorMessage";
@@ -111,8 +111,7 @@ const PaymentGateway = ({ setAction, setOrderResult }) => {
         handler: async (response) => {
           try {
             const verificationPayload = {
-              razorpay_order_id:
-                response.razorpay_order_id || razorpayOrderId,
+              razorpay_order_id: response.razorpay_order_id || razorpayOrderId,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
               order_id: orderId,
@@ -149,6 +148,9 @@ const PaymentGateway = ({ setAction, setOrderResult }) => {
             });
             toast.success("Payment successful");
             setAction("confirmation");
+            // dispatch(ClearCartAPI(user.id));
+            dispatch(fetchCartItem(user.id));
+            dispatch(getOrderAPI());
           } catch (error) {
             const message = getErrorMessage(error);
             setStatus({
@@ -233,13 +235,20 @@ const PaymentGateway = ({ setAction, setOrderResult }) => {
       if (paymentMethod === "cod") {
         toast.success("Order placed successfully");
         setAction("confirmation");
-        
+
         setIsPaying(false);
         dispatch(fetchCartItem(user.id));
         return;
       }
 
-      dispatch(fetchCartItem(user.id));
+      if (order?.data?.status === "confirmed") {
+        toast.success("Order already confirmed");
+        setAction("confirmation");
+        setIsPaying(false);
+        dispatch(fetchCartItem(user.id));
+        return;
+      }
+
       // Keep isPaying true until Razorpay modal closes / payment finishes
       await handleOnlinePayment(orderId);
     } catch (error) {

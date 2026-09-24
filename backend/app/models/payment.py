@@ -21,7 +21,7 @@ class Payment(db.Model):
     __tablename__ = "payment"
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    order_id = db.Column(db.String(36), db.ForeignKey("orders.id"), nullable=False)
+    order_id = db.Column(db.String(36), db.ForeignKey("orders.id"), nullable=False, unique=True)
     user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
 
     method = db.Column(saEnum(PaymentMethod), nullable=False)

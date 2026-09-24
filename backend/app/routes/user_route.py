@@ -2,9 +2,14 @@ from flask import Blueprint, jsonify, request
 from app.models.users import User
 from app.util.admin import admin_required
 from app.db import db
+from sqlalchemy import select
 from app.models.cart import Cart
 from app.models.ProductReview import ProductReview
 from app.models.UserAddress import UserAddress
+from app.models.payment import Payment
+from app.models.orders import Orders 
+from app.models.orderItem import OrderItem
+from app.models.invoices import Invoice 
 
 user_bp = Blueprint("user", __name__)
 
@@ -139,28 +144,41 @@ def update_user(id):
         db.session.rollback()
         return jsonify({"success": False, "message": "User Not Update"}), 500
 
+
 @user_bp.route("/user/<uuid:id>", methods=["DELETE"])
 def delete_user(id):
     """User Delete Use By Id"""
     try:
-        existing = db.session.get(User, str(id))
-        """delele for user all table connection"""
-
-        Cart.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
-        ProductReview.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
-        UserAddress.query.filter_by(user_id=str(id)).delete(synchronize_session=False)
-
-        print("---------- delete ---------")
-        print(existing)
+        user_id = str(id)
+        existing = db.session.get(User, user_id)
 
         if not existing:
-            return jsonify({"message": "User Not Found"}), 404
+            return jsonify({"message": "User Not Found", "success": False}), 404
+
+        order_ids = db.session.scalars(
+            select(Orders.id).where(Orders.user_id == user_id)
+        ).all()
+
+        if order_ids:
+            OrderItem.query.filter(OrderItem.order_id.in_(order_ids)).delete(synchronize_session=False)
+            Invoice.query.filter(Invoice.order_id.in_(order_ids)).delete(synchronize_session=False)
+
+        Payment.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+        Orders.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+        Cart.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+        ProductReview.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+        UserAddress.query.filter_by(user_id=user_id).delete(synchronize_session=False)
 
         db.session.delete(existing)
         db.session.commit()
-        return jsonify(
-            {"success": True, "message": "User Delete Successfully", "data": id}
-        )
+
+        return jsonify({
+            "success": True,
+            "message": "User Deleted Successfully",
+            "data": user_id,
+        }), 200
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "message": "User Not Delete"}), 500
+        print(e)
+        return jsonify({"success": False, "message": "User Not Deleted"}), 500

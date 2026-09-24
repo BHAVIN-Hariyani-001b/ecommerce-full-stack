@@ -4,31 +4,41 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import { IoArrowForward } from "react-icons/io5";
 import { IoIosWarning } from "react-icons/io";
+import { MdDeleteOutline } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { BiLoaderCircle } from "react-icons/bi";
 import {
   decrementCartItem,
   incrementCartItem,
+  ClearCartAPI,
 } from "../../features/card/cardThunk";
 import {
+  clearCart,
   decrementQty,
   incrementQty,
-  RecalculateCart
+  RecalculateCart,
 } from "../../features/card/cardSlice";
 import { setAuthOpen, setAuthView } from "../../features/auth/authSlice";
 import toast from "react-hot-toast";
 import BillDetails from "./BillDetails";
+import { getErrorMessage } from "../../util/getErrorMessage";
 
-const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
+const Cart = ({ sideBarOpen, setSideBar, setCheckOut }) => {
   const items = useSelector((state) => state.cart.items) ?? [];
+  const { error, loading } = useSelector((state) => state.cart);
   // console.log(items);
   const user = useSelector((state) => state.auth?.user);
   const dispatch = useDispatch();
 
-  
   useEffect(() => {
     dispatch(RecalculateCart());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(getErrorMessage(error));
+    }
+  }, [error]);
 
   const handleOpenCheckOut = useCallback(() => {
     if (items.length === 0) {
@@ -48,6 +58,22 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
     setCheckOut(true);
   }, [setCheckOut, user, dispatch, items.length]);
 
+  const handleClearCart = useCallback(() => {
+    if (items.length === 0 || loading) return;
+
+    if (user?.id) {
+      const clearToast = toast.loading("Clearing cart...");
+
+      dispatch(ClearCartAPI(user.id))
+        .unwrap()
+        .then(() => toast.success("Cart cleared", { id: clearToast }))
+        .catch(() => toast.dismiss(clearToast));
+    } else {
+      dispatch(clearCart());
+      toast.success("Cart cleared");
+    }
+  }, [dispatch, items.length, loading, user]);
+
   return (
     <>
       <div
@@ -62,6 +88,20 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
           transition-all duration-300 ease-in-out
           ${sideBarOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}`}
       >
+        <button
+          type="button"
+          onClick={handleClearCart}
+          disabled={items.length === 0 || loading}
+          title="Clear cart"
+          className="flex items-center justify-center rounded-full w-10 h-10 z-10 absolute bottom-15 left-2 cursor-pointer text-sm bg-red-100 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {loading ? (
+            <BiLoaderCircle className="animate-spin" size={18} />
+          ) : (
+            <MdDeleteOutline size={20} />
+          )}
+        </button>
+
         <div className="text-xl w-full flex items-center mx-5 py-2 mt-2 bg-white rounded-l-full">
           <div className="flex justify-start items-center gap-5 w-full px-3 relative">
             <button
@@ -80,7 +120,7 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
           </div>
         </div>
 
-        <div className="bg-gray-50/50 space-y-2 px-2 py-4 mx-2 max-[600px]:rounded-xl h-screen shadow-inner pb-60 overflow-scroll scrollbar-none">
+        <div className="bg-gray-50/50 space-y-2 px-2 py-4 mx-2 max-[600px]:rounded-xl rounded-2xl h-screen shadow-inner pb-60 overflow-scroll scrollbar-none">
           <div className="space-y-2">
             {items.length === 0 ? (
               <p className="text-center text-gray-500 py-8">
@@ -114,17 +154,15 @@ const Cart = ({ sideBarOpen, setSideBar, checkOut, setCheckOut }) => {
 const CartProduct = ({ item }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-  const { loadingCartId, error } = useSelector((state) => state.cart);
+  const { loadingCartId } = useSelector((state) => state.cart);
   const product = item?.product || item;
   const name = product?.name;
   const pPrice = product?.PPrice;
   const bPrice = product?.BPrice;
   const imageName = product?.image?.image_name;
-  console.log(product?.image);
-
-  console.log(item);
-
   const handleIncrement = () => {
+    if (loadingCartId === item?.cart_id) return;
+
     if (user && item?.cart_id) {
       dispatch(incrementCartItem({ cart_id: item.cart_id, user }));
     } else {
@@ -133,6 +171,8 @@ const CartProduct = ({ item }) => {
   };
 
   const handleDecrement = () => {
+    if (loadingCartId === item?.cart_id) return;
+
     if (user && item?.cart_id) {
       dispatch(decrementCartItem({ cart_id: item.cart_id, user }));
     } else {
@@ -187,6 +227,7 @@ const CartProduct = ({ item }) => {
           <button
             className="h-full cursor-pointer hover:scale-90"
             onClick={handleDecrement}
+            disabled={loadingCartId === item?.cart_id}
           >
             <IoMdRemove />
           </button>
@@ -194,6 +235,7 @@ const CartProduct = ({ item }) => {
           <button
             className="h-full cursor-pointer hover:scale-90"
             onClick={handleIncrement}
+            disabled={loadingCartId === item?.cart_id}
           >
             <IoMdAdd />
           </button>

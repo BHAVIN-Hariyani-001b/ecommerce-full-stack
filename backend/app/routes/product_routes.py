@@ -25,7 +25,7 @@ def get_product(id) -> Response:
         if not product:
             return jsonify({"message": "Product not found"}), 404
 
-        if product.qty <= 1:
+        if product.qty <= 0:
             return (
                 jsonify(
                     {

@@ -19,12 +19,24 @@ const refreshToken = async () => {
   await api.post("/auth/refresh");
 };
 
+export const checkHealth = () => api.get("/health");
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      status === 502 &&
+      window.location.pathname !== "/502" &&
+      window.location.pathname !== "/server-error"
+    ) {
+      window.location.assign("/502");
+      return Promise.reject(error);
+    }
+
+    if (status === 401 && originalRequest && !originalRequest._retry) {
       if (
         originalRequest.url?.includes("/auth/login") ||
         originalRequest.url?.includes("/auth/refresh")

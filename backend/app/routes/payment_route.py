@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from app.models.payment import Payment, PaymentStatus, PaymentMethod
 from app.models.users import User
 from app.models.orders import Orders, OrderStatus
+from app.models.product import Products
+from app.models.cart import Cart
 from sqlalchemy import select
 import hashlib
 import hmac
@@ -231,6 +233,18 @@ def verify_payment():
 
         product_order.status = OrderStatus.CONFIRMED
 
+        for order_item in product_order.order_item:
+            product = db.session.get(Products, order_item.product_id)
+            if product:
+                product.qty -= order_item.qty
+
+        cart_items = db.session.scalars(
+            select(Cart).where(Cart.user_id == product_order.user_id)
+        ).all()
+        
+        for item in cart_items:
+            db.session.delete(item)
+
         db.session.commit()
 
         return (
@@ -382,8 +396,20 @@ def razorpay_webhook():
                     "success": False,
                     "message": "Order not found"
                 }), 404
-
+            
             product_order.status = OrderStatus.CONFIRMED
+
+            for order_item in product_order.order_item:
+                product = db.session.get(Products, order_item.product_id)
+                if product:
+                    product.qty -= order_item.qty
+
+            cart_items = db.session.scalars(
+                select(Cart).where(Cart.user_id == product_order.user_id)
+            ).all()
+
+            for item in cart_items:
+                db.session.delete(item)
 
             db.session.commit()
 

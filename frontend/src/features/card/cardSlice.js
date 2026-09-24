@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addToCart,
+  ClearCartAPI,
   decrementCartItem,
   fetchCartItem,
   incrementCartItem,
@@ -28,6 +29,7 @@ const mapCartItem = (cartItem) => ({
   cart_value: cartItem.cart_value,
   BTotalAmount: cartItem.BTotalAmount,
   PTotalAmount: cartItem.PTotalAmount,
+  attributes_value_ids: cartItem.attributes_value_ids,
   product: cartItem.product,
   ...(cartItem.product || {}),
 });
@@ -52,9 +54,18 @@ export const recalculate = (state) => {
 
   state.deliveryCharge = Number(delivery.toFixed(2));
   state.handlingCharge = Number(handling.toFixed(2));
-  state.finalPrice = Number(
-    (state.totalPrice + handling).toFixed(2),
-  );
+  state.finalPrice = Number((state.totalPrice + handling).toFixed(2));
+};
+
+const ClearCartItem = (state) => {
+  state.count = 0;
+  state.items = [];
+  state.totalPrice = 0;
+  state.basePrice = 0;
+  state.finalPrice = 0;
+  state.deliveryCharge = 0;
+  state.handlingCharge = 0;
+  state.error = null;
 };
 
 const cartSlice = createSlice({
@@ -96,19 +107,12 @@ const cartSlice = createSlice({
     },
 
     clearCart: (state) => {
-      state.count = 0;
-      state.items = [];
-      state.totalPrice = 0;
-      state.basePrice = 0;
-      state.finalPrice = 0;
-      state.deliveryCharge = 0;
-      state.handlingCharge = 0;
-      state.error = null;
+      ClearCartItem(state);
     },
 
     RecalculateCart: (state) => {
       recalculate(state);
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -151,6 +155,20 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loadingProductId = null;
+        state.error = action.payload;
+      })
+
+      .addCase(ClearCartAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(ClearCartAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload?.items ?? [];
+        ClearCartItem(state);
+      })
+      .addCase(ClearCartAPI.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       })
 
@@ -210,5 +228,10 @@ const cartSlice = createSlice({
 });
 
 export default cartSlice.reducer;
-export const { addGuestCartItem, decrementQty, incrementQty, clearCart, RecalculateCart } =
-  cartSlice.actions;
+export const {
+  addGuestCartItem,
+  decrementQty,
+  incrementQty,
+  clearCart,
+  RecalculateCart,
+} = cartSlice.actions;

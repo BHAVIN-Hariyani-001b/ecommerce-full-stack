@@ -85,6 +85,7 @@ def create_app():
     from app.routes.order_route import order_bp
     from app.routes.payment_route import payment_order_bp
     from app.routes.gst_routes import gst_bp
+    from app.routes.health_routes import health_db
 
     # register blueprints
     app.register_blueprint(auth_bp,url_prefix='/api')
@@ -102,6 +103,7 @@ def create_app():
     app.register_blueprint(order_bp,url_prefix="/api")
     app.register_blueprint(payment_order_bp,url_prefix="/api")
     app.register_blueprint(gst_bp,url_prefix="/api")
+    app.register_blueprint(health_db,url_prefix="/api")
 
     # initialize the database
     db.init_app(app)

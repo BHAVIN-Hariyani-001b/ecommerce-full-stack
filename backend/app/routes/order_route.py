@@ -25,6 +25,7 @@ def create_order():
             "user_id",
             "address_id",
         ]
+
         missing = [f for f in required_fields if f not in data]
         if missing:
             return (
@@ -40,6 +41,28 @@ def create_order():
         user_id = data.get("user_id")
         address_id = data.get("address_id")
         payment_method = (data.get("payment_method") or "cod").lower()
+
+
+        existing_order = db.session.scalar(
+            select(Orders)
+            .where(Orders.user_id == user_id, Orders.status == OrderStatus.PENDING)
+            .order_by(Orders.create_at.desc())
+        )
+
+        if existing_order:
+            existing_payment = db.session.scalar(
+                select(Payment).where(
+                    Payment.order_id == existing_order.id,
+                    Payment.status == PaymentStatus.PENDING,
+                )
+            )
+            if existing_payment:
+                return jsonify({
+                    "message": "Existing order reused",
+                    "success": True,
+                    "data": existing_order.to_dict(),
+                    "razorpay_order_id": existing_payment.razorpay_order_id,
+                }), 200
 
         cart_items = db.session.scalars(
             select(Cart).where(Cart.user_id == user_id)
@@ -111,7 +134,8 @@ def create_order():
                 price_at_purchase=product._with_gst(product.Product_price ),
             )
 
-            product.qty -= cart_item.qty
+            if payment_method == "cod":
+                product.qty -= cart_item.qty
 
             db.session.add(order_item)
 
@@ -126,8 +150,9 @@ def create_order():
                 )
             )
 
-        for cart_item in cart_items:
-            db.session.delete(cart_item)
+            for cart_item in cart_items:
+                db.session.delete(cart_item)
+
 
         db.session.commit()
 
@@ -152,7 +177,7 @@ def create_order():
 def get_order(id):
     try:
         existing = db.session.get(Orders, id)
-
+        print(existing)
         if not existing:
             return jsonify({"message": "Order Not Found", "success": False}), 404
 
@@ -200,7 +225,8 @@ def get_all_order(id):
                 .where(Orders.user_id == existing_user.id)
                 .order_by(Orders.create_at.desc())
             ).all()
-            
+
+
         return (
             jsonify(
                 {

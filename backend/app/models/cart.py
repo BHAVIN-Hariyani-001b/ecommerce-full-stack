@@ -29,4 +29,6 @@ class Cart(db.Model):
             ),
             "product": self.product.to_dictt() if self.product else None,
             "cart_value": [i.to_dict() for i in self.values],
+            "attributes_value_ids": [i.attribute_value_id for i in self.values],
+            "hi": "hello",
         }

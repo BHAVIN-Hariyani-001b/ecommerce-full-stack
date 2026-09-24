@@ -4,6 +4,7 @@ import {
   fetchCart,
   incrementCartProduct,
   decrementCartProduct,
+  ClearCart,
 } from "../../middleware/cart";
 
 export const fetchCartItem = createAsyncThunk(
@@ -16,7 +17,9 @@ export const fetchCartItem = createAsyncThunk(
       if (error.response?.status === 404) {
         return { cart: [] };
       }
-      return rejectWithValue("faild to fetch cart item");
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to load cart",
+      );
     }
   },
 );
@@ -35,8 +38,24 @@ export const addToCart = createAsyncThunk(
         qty,
       });
       return response;
-    } catch {
-      return rejectWithValue("faild to add cart item");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to add item to cart",
+      );
+    }
+  },
+);
+
+export const ClearCartAPI = createAsyncThunk(
+  "cart/ClearCartAPI",
+  async (user_id, { rejectWithValue }) => {
+    try {
+      const response = await ClearCart(user_id);
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to clear cart",
+      );
     }
   },
 );
@@ -48,8 +67,12 @@ export const incrementCartItem = createAsyncThunk(
       if (!user) return { local: true, cart_id };
       const response = await incrementCartProduct({ cart_id });
       return response;
-    } catch {
-      return rejectWithValue("failed to increment");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to increase cart item",
+      );
     }
   },
 );
@@ -61,8 +84,12 @@ export const decrementCartItem = createAsyncThunk(
       if (!user) return { local: true, cart_id };
       const response = await decrementCartProduct({ cart_id });
       return { ...response, cart_id };
-    } catch {
-      return rejectWithValue("failed to decrement");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to decrease cart item",
+      );
     }
   },
 );

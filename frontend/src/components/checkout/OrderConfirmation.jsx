@@ -4,7 +4,10 @@ import { RiFileList2Fill } from "react-icons/ri";
 import { MdOutlinePayments } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { generateInvoiceAPI } from "../../features/orders/orderThunk";
+import {
+  generateInvoiceAPI,
+  getOrderOneAPI,
+} from "../../features/orders/orderThunk";
 
 const PAYMENT_LABELS = {
   upi: "UPI",
@@ -17,14 +20,25 @@ const OrderConfirmation = ({
   setCheckOut,
   showContinue = true,
 }) => {
+  const dispatch = useDispatch();
+  const order = orderResult?.data || orderResult || null;
+  console.log(order);
+  useEffect(() => {
+    dispatch(getOrderOneAPI({ order_id: order.id }));
+  }, [dispatch, order?.id]);
+
+  useEffect(() => {
+    dispatch(generateInvoiceAPI(order.id));
+  }, [dispatch, order]);
+
   const user = useSelector((state) => state.auth.user);
   const fallbackAddress = useSelector((state) => state.address?.PrimaryAddress);
+  const oneOrderGet = useSelector((state) => state.orders?.orderOne);
 
-  const order = orderResult?.data || orderResult || null;
   const paymentMethod =
     orderResult?.payment_method || order?.payment_method || "cod";
-  const address = order?.address || fallbackAddress;
-  const items = order?.order_item || [];
+  const address = oneOrderGet?.address || fallbackAddress;
+  const items = oneOrderGet?.order_item || [];
 
   const capitalized = (value = "") =>
     value ? value.charAt(0).toUpperCase() + value.slice(1) : "";
@@ -41,19 +55,13 @@ const OrderConfirmation = ({
     return `${digits.slice(0, 3)} ${digits.slice(3, 8)} ${digits.slice(8)}`;
   };
 
-  const shortOrderId = order?.id
-    ? `#${String(order.id).slice(0, 8).toUpperCase()}`
+  const shortOrderId = oneOrderGet?.id
+    ? `#${String(oneOrderGet.id).slice(0, 8).toUpperCase()}`
     : "#ORDER";
 
   const handleContinueShopping = () => {
     setCheckOut?.(false);
   };
-
-  const dispatch = useDispatch();
-  
-  useEffect(() => {
-    dispatch(generateInvoiceAPI(order.id));
-  }, [dispatch,order]);
 
   return (
     <div className="overflow-scroll h-130 scrollbar-none grid grid-cols-2 gap-3 p-2 max-[900px]:flex max-[900px]:flex-col max-[900px]:overflow-auto">
@@ -89,7 +97,7 @@ const OrderConfirmation = ({
               <div>
                 <p className="text-sm text-gray-500">Order status</p>
                 <p className="font-medium text-green-700 capitalize">
-                  {order?.status || "confirmed"}
+                  {oneOrderGet?.status || "confirmed"}
                 </p>
               </div>
             </div>

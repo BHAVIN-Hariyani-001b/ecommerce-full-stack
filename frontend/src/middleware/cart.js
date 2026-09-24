@@ -11,13 +11,18 @@ export const addCart = async ({
   attributes_value_ids,
   qty = 1,
 }) => {
-      console.log(attributes_value_ids)
+  console.log(attributes_value_ids);
   const response = await api.post("/add/cart", {
     user_id,
     product_id,
     attributes_value_ids,
     qty,
   });
+  return response.data;
+};
+
+export const ClearCart = async (user_id) => {
+  const response = await api.delete(`/cart/clear/${user_id}`);
   return response.data;
 };
 

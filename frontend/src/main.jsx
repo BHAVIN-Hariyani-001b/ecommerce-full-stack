@@ -1,4 +1,5 @@
 import NotFound from "./pages/NotFound.jsx";
+import ServerError from "./pages/ServerError.jsx";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
@@ -53,6 +54,14 @@ const router = createBrowserRouter([
         element: <ContactUs />,
       },
     ],
+  },
+  {
+    path: "/502",
+    element: <ServerError />,
+  },
+  {
+    path: "/server-error",
+    element: <ServerError />,
   },
   {
     path: "*",
