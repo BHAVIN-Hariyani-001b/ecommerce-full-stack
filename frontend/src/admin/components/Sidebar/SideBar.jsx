@@ -1,6 +1,7 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
+import logo from "../../../assets/images/logo/logo.png";
 
 const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
   const SideBarMenuItem = [
@@ -30,7 +31,12 @@ const SideBar = ({ sideBarOpen, setSideBar, setActivePage }) => {
           ${sideBarOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}
       >
         <div className="text-xl w-full flex items-center p-2">
-          <div className="flex justify-end items-center w-full px-3">
+          <div className="flex justify-between items-center w-full px-3">
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-30 h-20 object-contain max-[600px]:w-40 max-[800px]:w-100 max-[1200px]:w-240 "
+            />
             <button
               onClick={() => setSideBar(false)}
               className="p-2 rounded-full hover:bg-gray-200 transition-all duration-300 cursor-pointer"

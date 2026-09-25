@@ -18,6 +18,7 @@ import SalesReport from "../../components/Analytics/SalesReport";
 import Gst from "../../components/gst/Gst";
 
 import { MdDashboard, MdShoppingCart } from "react-icons/md";
+import { FaRegCreditCard } from "react-icons/fa";
 import { FaBoxArchive } from "react-icons/fa6";
 import { AiFillSetting } from "react-icons/ai";
 import Payment from "../../components/manage_payment/Payment";
@@ -59,8 +60,8 @@ const Dashboard = memo(function Dashboard() {
       itemName: "Orders",
     },
     {
-      icon: <AiFillSetting size={25} color="#5c647a" />,
-      itemName: "Settings",
+      icon: <FaRegCreditCard size={25} color="#5c647a" />,
+      itemName: "Payments",
     },
   ];
 
@@ -93,7 +94,7 @@ const Dashboard = memo(function Dashboard() {
             )}
             {activePage === "Analytics" && <Analytics />}
             {activePage === "Sales Report" && <SalesReport />}
-            {activePage === "Payments" && <Payment />}
+            {(activePage === "Payments" || activePage === "payments") && <Payment />}
             {activePage === "GST" && <Gst />}
           </Container>
         )}

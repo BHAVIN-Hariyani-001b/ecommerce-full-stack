@@ -8,7 +8,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Search from "../common/Search";
 import Logout from "../Popup/Logout";
-import logo from "../../assets/images/logo/logo.jpeg";
+import logo from "../../assets/images/logo/logo.png";
 import SearchAnimation from "../animation/SearchAnimation";
 
 import { MdOutlineAddLocationAlt } from "react-icons/md";
