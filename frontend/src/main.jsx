@@ -12,7 +12,6 @@ import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import WebPageLoding from "./components/ProductLoading/WebPageLoding.jsx";
 
-// const Home = lazy(() => import("./pages/Home"));
 const SearchProduct = lazy(() => import("./pages/SearchProduct"));
 const Dashboard = lazy(() => import("./admin/pages/Dashboard/Dashboard"));
 const Home = lazy(() => import("./pages/Home"));
@@ -20,8 +19,6 @@ const ProductPage = lazy(() => import("./pages/ProductPage"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const ContactUs = lazy(() => import("./pages/ContactUs"));
 
-
-// Setup axios interceptors after store is created
 setupInterceptors(store);
 
 const router = createBrowserRouter([

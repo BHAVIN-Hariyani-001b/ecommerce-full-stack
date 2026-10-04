@@ -1,8 +1,8 @@
-import { memo, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import All from "../components/cards/All";
 import ProductSection from "../components/cards/ProductSection";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 import { TbHome } from "react-icons/tb";
@@ -15,6 +15,7 @@ import { setAuthOpen, setAuthView } from "../features/auth/authSlice";
 
 import { useOutletContext } from "react-router-dom";
 import { GetUserAddress } from "../features/userAddress/userAddressThunk";
+import CategoryPicker from "../components/category/CategoryPicker";
 
 const BOTTOM_MENU_ITEMS = [
   {
@@ -58,6 +59,7 @@ const Home = memo(function Home() {
   const dispatch = useDispatch();
 
   const { sideBar, setSideBar } = useOutletContext();
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const user = useSelector((state) => state.auth.user);
   useEffect(() => {
@@ -66,26 +68,35 @@ const Home = memo(function Home() {
     }
   }, [dispatch, user]);
 
-  const handleOnChange = (item) => {
-    switch (item) {
-      case "home":
-        navigate("/");
-        console.log(item);
-        break;
-      case "category":
-        console.log(item);
-        break;
-      case "cart":
-        setSideBar(!sideBar);
-        break;
-      case "profile":
-        dispatch(setAuthView("signin"));
-        dispatch(setAuthOpen(true));
-        break;
-      default:
-        break;
-    }
-  };
+  const handleCloseCategory = useCallback(() => {
+    setCategoryOpen(false);
+  }, []);
+
+  const handleOnChange = useCallback(
+    (item) => {
+      switch (item) {
+        case "home":
+          setCategoryOpen(false);
+          navigate("/");
+          break;
+        case "category":
+          setCategoryOpen((open) => !open);
+          break;
+        case "cart":
+          setCategoryOpen(false);
+          setSideBar(!sideBar);
+          break;
+        case "profile":
+          setCategoryOpen(false);
+          dispatch(setAuthView("signin"));
+          dispatch(setAuthOpen(true));
+          break;
+        default:
+          break;
+      }
+    },
+    [dispatch, navigate, setSideBar, sideBar],
+  );
 
   return (
     <div>
@@ -98,12 +109,13 @@ const Home = memo(function Home() {
       </Helmet>
       <main className="scrollbar-none">
         <div className="pb-20">{mainContent}</div>
-        <div className="w-full fixed bottom-0 z-30 border-t border-gray-200 bg-white p-2 min-[600px]:hidden">
+        <div className="w-full fixed bottom-0 z-50 border-t border-gray-200 bg-white p-2 min-[600px]:hidden">
           <BottomMenu
             BOTTOM_MENU_ITEMS={BOTTOM_MENU_ITEMS}
             action={handleOnChange}
           />
         </div>
+        <CategoryPicker open={categoryOpen} onClose={handleCloseCategory} />
       </main>
     </div>
   );
