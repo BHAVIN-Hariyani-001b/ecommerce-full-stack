@@ -15,7 +15,7 @@ export const registerApi = async ({ username, email, password }) => {
 };
 
 export const getProfileApi = async (user_id) => {
-  const response = await api.get("/auth/profile",{user_id});
+  const response = await api.get("/auth/profile", { user_id });
   return response?.data;
 };
 
@@ -29,12 +29,19 @@ export const refreshTokenApi = async () => {
   return response?.data;
 };
 
-export const logoutApi = async () => {  
+export const logoutApi = async () => {
   const response = await api.post("/auth/logout"); // clears cookie on server
   return response?.data;
 };
 
 export const profileEdit = async ({ id, username, phone }) => {
   const response = await api.put(`/user/profile/${id}`, { username, phone });
+  return response?.data;
+};
+
+export const googleAuth = async (res) => {
+  const response = await api.post("/auth/google", {
+    idToken: res.credential,
+  });
   return response?.data;
 };

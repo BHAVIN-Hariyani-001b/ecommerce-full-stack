@@ -23,7 +23,8 @@ class User(db.Model):
     username = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     phone = db.Column(db.String(20), unique=True, nullable=True)
-    password = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(200), nullable=True)
+    google_id = db.Column(db.String(255), unique=True, nullable=True)
     role = db.Column(saEnum(userRole), default=userRole.USER, nullable=False)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 

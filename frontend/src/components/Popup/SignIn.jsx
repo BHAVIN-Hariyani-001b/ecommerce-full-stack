@@ -4,6 +4,7 @@ import Modal from "../common/Modal";
 import { loginUser } from "../../features/auth/authThunk";
 import Passwordshow from "../common/Passwordshow";
 import toast from "react-hot-toast";
+import AuthGoogle from "./AuthGoogle";
 
 const SignIn = memo(function SignIn({
   open,
@@ -38,7 +39,10 @@ const SignIn = memo(function SignIn({
       title="Sign In"
       widthClassName="max-w-sm"
     >
-      <div className="space-y-3">
+      <div className="space-y-5">
+        <AuthGoogle onClose={onClose} />
+        
+
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           {error ? (
             <div className="border border-red-200 bg-red-50 text-red-700 rounded-xl px-3 py-2 text-sm">

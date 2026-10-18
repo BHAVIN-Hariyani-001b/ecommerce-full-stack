@@ -5,6 +5,7 @@ import {
   getUserProfile,
   fetchAdminStatus,
   editProfile,
+  GoogleAuth,
 } from "./authThunk";
 
 const initialState = {
@@ -145,6 +146,22 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(editProfile.rejected, (state, action) => {
+        state.error = action.payload;
+        state.isLoading = false;
+      })
+
+      // google auth
+
+      .addCase(GoogleAuth.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(GoogleAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload?.user;
+        state.error = null;
+      })
+      .addCase(GoogleAuth.rejected, (state, action) => {
         state.error = action.payload;
         state.isLoading = false;
       });

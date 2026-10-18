@@ -4,6 +4,7 @@ import Modal from "../common/Modal";
 import { registerUser } from "../../features/auth/authThunk";
 import Passwordshow from "../common/Passwordshow";
 import toast from "react-hot-toast";
+import AuthGoogle from "./AuthGoogle";
 
 const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { isLoading, error } = useSelector((state) => state.auth);
-  console.log(isLoading)
+  console.log(isLoading);
   const dispatch = useDispatch();
 
   const passwordMismatch = useMemo(
@@ -38,9 +39,9 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
     async (e) => {
       e.preventDefault();
       if (password !== confirmPassword) {
-        toast.error("password are not match?")
+        toast.error("password are not match?");
         return;
-      };
+      }
       try {
         await dispatch(registerUser({ username, email, password })).unwrap();
         setPassword("");
@@ -60,6 +61,8 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
       title="Sign Up"
       widthClassName="max-w-sm"
     >
+      <AuthGoogle onClose={onClose} />
+
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         {error ? (
           <div className="border border-red-200 bg-red-50 text-red-700 rounded-xl px-3 py-2 text-sm">
@@ -139,7 +142,7 @@ const SignUp = memo(function SignUp({ open, onClose, onSwitchToSignIn }) {
         <button
           type="submit"
           disabled={isLoading || passwordMismatch}
-          className={`w-full rounded-xl cursor-pointer text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity ${(isLoading || passwordMismatch ) ? 'bg-[#8685ef] cursor-not-allowed' : 'bg-[#8685ef]'}`}
+          className={`w-full rounded-xl cursor-pointer text-white font-medium py-2.5 hover:opacity-95 active:opacity-90 transition-opacity ${isLoading || passwordMismatch ? "bg-[#8685ef] cursor-not-allowed" : "bg-[#8685ef]"}`}
         >
           {isLoading ? "Creating..." : "Create account"}
         </button>

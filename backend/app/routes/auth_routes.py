@@ -17,6 +17,28 @@ from sqlalchemy.exc import IntegrityError
 auth_bp = Blueprint("auth", __name__)
 
 
+def build_auth_response(user, message="Login successful"):
+    claims = {"role": user.role.value}
+
+    access_token = create_access_token(identity=str(user.id), additional_claims=claims)
+    refresh_token = create_refresh_token(identity=str(user.id), additional_claims=claims)
+
+    response = jsonify({
+        "message": message,
+        "user": {
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "role": user.role.value,
+            "phone": user.phone,
+        },
+    })
+
+    set_access_cookies(response, access_token)
+    set_refresh_cookies(response, refresh_token)
+    return response, 200
+
+
 # login route
 @auth_bp.route("/auth/login", methods=["POST"])
 def login():
@@ -42,35 +64,7 @@ def login():
         elif not user.check_password(data["password"]):
             return jsonify({"error": "Invalid password"}), 401
 
-        claims = {"role": user.role.value}
-
-        access_token = create_access_token(
-            identity=str(user.id), additional_claims=claims
-        )
-
-        refresh_token = create_refresh_token(
-            identity=str(user.id), additional_claims=claims
-        )
-
-        response = jsonify(
-            {
-                "message": "Login successful",
-                "user": {
-                    "id": str(user.id),
-                    "username": user.username,
-                    "email": user.email,
-                    "role": user.role.value,
-                    "phone": user.phone,
-                },
-            }
-        )
-
-        print(response)
-
-        set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
-
-        return response, 200
+        return build_auth_response(user)
 
     except Exception as e:
         return jsonify({"error": "Login failed, please try again"}), 500

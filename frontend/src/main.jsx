@@ -4,10 +4,11 @@ import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { Provider } from "react-redux";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Meta, RouterProvider } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./app/store.js";
 import { setupInterceptors } from "./middleware/index.js";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import WebPageLoding from "./components/ProductLoading/WebPageLoding.jsx";
@@ -72,7 +73,11 @@ createRoot(document.getElementById("root")).render(
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <Suspense fallback={<WebPageLoding />}>
-            <RouterProvider router={router} />
+            <GoogleOAuthProvider
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
+            >
+              <RouterProvider router={router} />
+            </GoogleOAuthProvider>
           </Suspense>
         </PersistGate>
       </Provider>

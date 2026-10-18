@@ -58,7 +58,7 @@ class Products(db.Model):
     status = db.Column(saEnum(Status), default=Status.PUBLIC, nullable=False)
     isFrotPage = db.Column(db.Boolean, default=False, nullable=False)
 
-    gst_id = db.Column(db.Integer, db.ForeignKey("gst.id"), nullable=False)
+    gst_id = db.Column(db.Integer, db.ForeignKey("gst.id"), nullable=True)
 
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 

@@ -6,6 +6,7 @@ import {
   checkAdmin,
   logoutApi,
   profileEdit,
+  googleAuth,
 } from "../../middleware/authApi";
 import { addToCart, fetchCartItem } from "../card/cardThunk";
 import { clearCart } from "../card/cardSlice";
@@ -98,6 +99,18 @@ export const editProfile = createAsyncThunk(
       return response;
     } catch (error) {
       console.log(error);
+      return rejectWithValue(error.response?.data?.message);
+    }
+  },
+);
+
+export const GoogleAuth = createAsyncThunk(
+  "auth/GoogleAuth",
+  async (res, { rejectWithValue }) => {
+    try {
+      const response = await googleAuth(res);
+      return response;
+    } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
   },
