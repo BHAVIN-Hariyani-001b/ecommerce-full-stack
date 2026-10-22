@@ -1,15 +1,19 @@
 from flask import Blueprint, jsonify, request
-from app.models.users import User
+from flask_jwt_extended import get_jwt_identity
+from app.models.users import User, userRole
 from app.util.admin import admin_required
 from app.db import db
 from sqlalchemy import select
 from app.models.cart import Cart
+from app.models.cartValue import CartValue
 from app.models.ProductReview import ProductReview
 from app.models.UserAddress import UserAddress
 from app.models.payment import Payment
-from app.models.orders import Orders 
+from app.models.orders import Orders
 from app.models.orderItem import OrderItem
-from app.models.invoices import Invoice 
+from app.models.wishlist import Wishlist
+from app.models.invoices import Invoice
+from app.models.ForgotPassword import ForgotPassword 
 
 user_bp = Blueprint("user", __name__)
 
@@ -168,6 +172,8 @@ def delete_user(id):
         Cart.query.filter_by(user_id=user_id).delete(synchronize_session=False)
         ProductReview.query.filter_by(user_id=user_id).delete(synchronize_session=False)
         UserAddress.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+        Wishlist.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+
 
         db.session.delete(existing)
         db.session.commit()

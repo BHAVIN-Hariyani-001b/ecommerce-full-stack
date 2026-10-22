@@ -13,9 +13,10 @@ const AuthGoogle = ({ onClose }) => {
           logo_alignment="left"
           onSuccess={(res) => {
             const result = dispatch(GoogleAuth(res));
-            if (GoogleAuth.fulfilled.match(result)) {
-              onClose?.();
-            }
+            // if (GoogleAuth.fulfilled.match(result)) {
+            //   onClose?.();
+            // }
+            onClose?.();
           }}
           onError={() => console.log("Google login failed")}
         />

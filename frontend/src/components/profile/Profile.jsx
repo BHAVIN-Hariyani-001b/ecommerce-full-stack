@@ -37,9 +37,17 @@ const Profile = () => {
     dispatch(logout());
     dispatch(clearAddress());
     toast.success("logout successfully");
-    dispatch(deleteUserAPI(delteId));
-    toast.success("Delete Account successfully");
-    setDeleteId(null);
+    console.log("deleteId", delteId);
+
+    dispatch(deleteUserAPI(delteId)).unwrap().then(() => {
+      toast.success("Delete Account successfully");
+      setDeleteId(null);
+    }).catch((error) => {
+      toast.error(error.response?.data?.error || "Failed to delete account");
+    }).finally(() => {
+      setDeleteId(null);
+    });
+    console.log("deleteId", delteId);
   }, [dispatch, delteId]);
 
   useEffect(() => {
