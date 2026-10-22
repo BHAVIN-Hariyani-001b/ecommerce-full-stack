@@ -218,7 +218,7 @@ const ProductDetails = ({ setCheckOut }) => {
           </div>
         </div>
         <div>
-          <div className="flex gap-10 w-full flex-wrap">
+          <div className="flex gap-2 space-y-3 space-x-3 w-full flex-wrap">
             {Object.entries(productAttributes).map(
               ([name, items]) =>
                 items.length > 0 && (
@@ -235,7 +235,7 @@ const ProductDetails = ({ setCheckOut }) => {
                             onClick={() =>
                               handleSelectAttribute(item.a_id, item)
                             }
-                            className={`w-10 h-10 flex shadow-2xl rounded-md border justify-center items-center cursor-pointer
+                            className={`${name.toLocaleLowerCase() !== "color" ? "h-10 min-w-20 px-2" : "w-10 h-10"} flex shadow-2xl rounded-md border justify-center items-center cursor-pointer
                           ${isSelected ? "border-blue-600 border-2" : "border-gray-200"}`}
                             style={
                               name.toLocaleLowerCase() === "color"

@@ -443,29 +443,51 @@ def update_product(id) -> Response:
                     new_order += 1
 
         ## add attributes
-
         attributes_data = []
-
         idx = 0
         while f"attributes[{idx}]" in data:
-            attr_str = data.get(f"attributes[{idx}]")
-            attr_obj = json.loads(attr_str)
-
-            if "id" not in attr_obj:
-                attributes_data.append(attr_obj)
-
+            attr_str = data.get(f"attributes[{idx}]", "")
+            if isinstance(attr_str, str) and attr_str:
+                try:
+                    attr_obj = json.loads(attr_str)
+                    if isinstance(attr_obj, dict):
+                        attributes_data.append(attr_obj)
+                except (json.JSONDecodeError, TypeError):
+                    pass
             idx += 1
 
-        for i in attributes_data:
-            attribute = Attribute.query.filter_by(name=i.get("type")).first()
+        existing_value_ids = {av.id for av in existing.attributes}
 
+        for i in attributes_data:
+            attr_id = i.get("id")
+            value = (i.get("value") or "").strip() if isinstance(i.get("value"), str) else i.get("value")
+            if not value:
+                continue
+
+            if attr_id and attr_id in existing_value_ids:
+                continue
+
+            attribute = db.session.get(Attribute, attr_id) if attr_id else None
+            if not attribute:
+                type_name = i.get("type")
+                if type_name:
+                    attribute = Attribute.query.filter_by(name=type_name).first()
             if not attribute:
                 continue
 
-            db.session.add(
-                AttributeValue(
-                    p_id=existing.id, value=i.get("value"), a_id=attribute.id
-                )
+            already = next(
+                (
+                    av
+                    for av in existing.attributes
+                    if av.a_id == attribute.id and av.value == value
+                ),
+                None,
+            )
+            if already:
+                continue
+
+            existing.attributes.append(
+                AttributeValue(a_id=attribute.id, p_id=existing.id, value=value)
             )
 
         # remove deleted attributes
@@ -474,6 +496,7 @@ def update_product(id) -> Response:
             db.session.execute(
                 delete(AttributeValue).where(AttributeValue.id == attr_id)
             )
+        
 
         db.session.commit()
 
